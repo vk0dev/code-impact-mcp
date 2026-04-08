@@ -1,0 +1,8 @@
+{
+  "name": "code-impact-mcp",
+  "description": "Impact analysis and blast radius for agent-driven code changes. Analyzes dependency graphs to predict what breaks before you commit.",
+  "version": "0.1.0",
+  "npm": "@vk0/code-impact-mcp",
+  "github": "vk0dev/code-impact-mcp",
+  "tools": []
+}
