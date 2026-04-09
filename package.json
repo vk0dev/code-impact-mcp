@@ -1,10 +1,28 @@
 {
   "name": "@vk0/code-impact-mcp",
   "version": "0.1.0",
-  "description": "Impact analysis and blast radius for agent-driven code changes. Analyzes dependency graphs to predict what breaks before you commit.",
+  "description": "Dependency graph, blast-radius analysis, and gate-style checks for local TypeScript and JavaScript repositories.",
   "type": "module",
   "main": "dist/server.js",
-  "bin": { "code-impact-mcp": "./dist/cli.js" },
+  "types": "dist/server.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/server.d.ts",
+      "default": "./dist/server.js"
+    },
+    "./graph": {
+      "types": "./dist/graph.d.ts",
+      "default": "./dist/graph.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "bin": {
+    "code-impact-mcp": "./dist/cli.js"
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsx src/server.ts",
@@ -13,12 +31,24 @@
     "lint": "tsc --noEmit",
     "smoke": "tsx scripts/test-mcp-client.ts"
   },
-  "keywords": ["mcp", "mcp-server", "claude-code", "ai-agent"],
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "dependency-graph",
+    "impact-analysis",
+    "blast-radius",
+    "typescript"
+  ],
   "author": "vk0.dev",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vk0dev/code-impact-mcp.git"
+  },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.0",
     "express": "^5.1.0",
+    "ts-morph": "^27.0.2",
     "zod": "^3.24.0"
   },
   "devDependencies": {
