@@ -1,6 +1,7 @@
 {
   "name": "@vk0/code-impact-mcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
+  "mcpName": "io.github.vk0dev/code-impact-mcp",
   "description": "Dependency graph, blast-radius analysis, and gate-style checks for local TypeScript and JavaScript repositories.",
   "type": "module",
   "main": "dist/server.js",

@@ -50,10 +50,29 @@ function groupPathsByDirectory(files: string[]) {
 }
 
 function buildImpactScanability(files: string[]) {
+  const sorted = [...files].sort();
+  const topDirectories = groupPathsByDirectory(sorted).slice(0, 5);
+  const directoryGroups = topDirectories.map(({ directory, count }) => {
+    const inDirectory = sorted.filter((file) => path.posix.dirname(file) === directory);
+    const examples = inDirectory.slice(0, 3);
+    return {
+      directory,
+      count,
+      examples,
+      remainingExamples: Math.max(0, inDirectory.length - examples.length),
+    };
+  });
+
   return {
-    topDirectories: groupPathsByDirectory(files).slice(0, 5),
-    firstFiles: files.slice(0, 8),
-    remainingFiles: Math.max(0, files.length - 8),
+    totalFiles: sorted.length,
+    topDirectories,
+    directoryGroups,
+    firstFiles: sorted.slice(0, 8),
+    remainingFiles: Math.max(0, sorted.length - 8),
+    summaryLine: topDirectories
+      .map(({ directory, count }) => `${directory} (${count})`)
+      .join(", "),
+    displayMode: sorted.length >= 8 || topDirectories.length >= 3 ? "grouped" : "flat",
   };
 }
 

@@ -4,3 +4,11 @@ dist/
 .env.local
 *.log
 .DS_Store
+
+# Auth tokens (mcp-publisher, npm)
+.mcpregistry_*_token
+.npmrc
+
+# Build artifacts
+*.tgz
+test/

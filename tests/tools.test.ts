@@ -151,6 +151,8 @@ describe("registerTools", () => {
         expect(payload.transitivelyAffected).toEqual(["src/feature.ts"]);
         expect(payload.affectedFiles).toBe(2);
         expect(payload.impactBreakdown.directScan.topDirectories).toEqual([{ directory: "src", count: 1 }]);
+        expect(payload.impactBreakdown.directScan.displayMode).toBe("flat");
+        expect(payload.impactBreakdown.directScan.totalFiles).toBe(1);
       },
     );
   });
@@ -221,12 +223,24 @@ describe("registerTools", () => {
 
         expect(payload.totalAffected).toBe(10);
         expect(payload.impactBreakdown.directCount).toBe(10);
+        expect(payload.impactBreakdown.directScan.totalFiles).toBe(10);
+        expect(payload.impactBreakdown.directScan.displayMode).toBe("grouped");
         expect(payload.impactBreakdown.directScan.topDirectories).toEqual([
           { directory: "src/components", count: 3 },
           { directory: "src/pages", count: 3 },
           { directory: "src", count: 2 },
           { directory: "src/analytics", count: 2 },
         ]);
+        expect(payload.impactBreakdown.directScan.directoryGroups[0]).toEqual({
+          directory: "src/components",
+          count: 3,
+          examples: [
+            "src/components/Chart.tsx",
+            "src/components/Nav.tsx",
+            "src/components/Status.tsx",
+          ],
+          remainingExamples: 0,
+        });
         expect(payload.impactBreakdown.directScan.firstFiles).toEqual([
           "src/App.tsx",
           "src/analytics/events.ts",
@@ -237,6 +251,7 @@ describe("registerTools", () => {
           "src/main.tsx",
           "src/pages/Home.tsx",
         ]);
+        expect(payload.impactBreakdown.directScan.summaryLine).toContain("src/components (3)");
         expect(payload.impactBreakdown.directScan.remainingFiles).toBe(2);
       },
     );
