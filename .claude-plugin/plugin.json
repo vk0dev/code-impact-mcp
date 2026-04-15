@@ -1,7 +1,13 @@
 {
-  "name": "code-impact-mcp",
-  "description": "Dependency graph, blast-radius analysis, and gate-style checks for local TypeScript and JavaScript repositories before code changes.",
-  "author": { "name": "vk0.dev", "email": "hi@vk0.dev" },
-  "category": "development",
-  "version": "0.1.0"
+  "name": "@vk0/code-impact-mcp",
+  "mcpName": "io.github.vk0dev/code-impact-mcp",
+  "version": "1.0.0",
+  "description": "Dependency graph, blast-radius analysis, and gate-style checks for local TypeScript and JavaScript repositories. Predict what breaks before you commit.",
+  "author": {
+    "name": "vk0.dev",
+    "url": "https://github.com/vk0dev"
+  },
+  "homepage": "https://vk0dev.github.io/code-impact-mcp",
+  "repository": "https://github.com/vk0dev/code-impact-mcp",
+  "category": "developer-tools"
 }

@@ -1,17 +1,17 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.vk0dev/code-impact-mcp",
-  "description": "Dependency graph & blast-radius analysis for TypeScript/JS. Predict breaks before commit.",
+  "description": "Dependency graph and blast-radius analysis for local TypeScript/JavaScript repos.",
   "repository": {
     "url": "https://github.com/vk0dev/code-impact-mcp",
     "source": "github"
   },
-  "version": "0.1.1",
+  "version": "1.0.0",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "@vk0/code-impact-mcp",
-      "version": "0.1.1",
+      "version": "1.0.0",
       "transport": {
         "type": "stdio"
       }

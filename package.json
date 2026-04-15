@@ -1,15 +1,15 @@
 {
   "name": "@vk0/code-impact-mcp",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "mcpName": "io.github.vk0dev/code-impact-mcp",
-  "description": "Dependency graph, blast-radius analysis, and gate-style checks for local TypeScript and JavaScript repositories.",
+  "description": "Lightweight pre-commit safety gate for AI agents. Answers 'is this change safe?' with PASS/WARN/BLOCK verdict in seconds. Zero setup, no database.",
   "type": "module",
-  "main": "dist/server.js",
-  "types": "dist/server.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/server.d.ts",
-      "default": "./dist/server.js"
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
     },
     "./graph": {
       "types": "./dist/graph.d.ts",
@@ -25,35 +25,55 @@
     "code-impact-mcp": "./dist/cli.js"
   },
   "scripts": {
-    "build": "tsc",
-    "dev": "tsx src/server.ts",
+    "build": "rm -rf dist && tsc",
     "start": "node dist/server.js",
     "test": "vitest run",
     "lint": "tsc --noEmit",
-    "smoke": "tsx scripts/test-mcp-client.ts"
+    "smoke": "npm run build && node scripts/dogfood_smoke.mjs",
+    "release-check": "node scripts/release-check.mjs",
+    "version-sync": "node scripts/version-sync.mjs"
   },
   "keywords": [
     "mcp",
     "mcp-server",
+    "model-context-protocol",
     "dependency-graph",
     "impact-analysis",
     "blast-radius",
-    "typescript"
+    "typescript",
+    "javascript",
+    "code-analysis",
+    "claude",
+    "claude-code",
+    "anthropic",
+    "ai-agent",
+    "developer-tools",
+    "local-first",
+    "refactoring",
+    "static-analysis"
   ],
   "author": "vk0.dev",
   "license": "MIT",
+  "homepage": "https://vk0dev.github.io/code-impact-mcp",
   "repository": {
     "type": "git",
     "url": "https://github.com/vk0dev/code-impact-mcp.git"
   },
+  "bugs": {
+    "url": "https://github.com/vk0dev/code-impact-mcp/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.0",
-    "express": "^5.1.0",
     "ts-morph": "^27.0.2",
     "zod": "^3.24.0"
   },
   "devDependencies": {
-    "@types/express": "^5.0.0",
     "@types/node": "^22.0.0",
     "tsx": "^4.19.0",
     "typescript": "^5.8.0",

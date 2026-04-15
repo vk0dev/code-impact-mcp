@@ -1,197 +1,204 @@
 # CodeImpact MCP
 
-CodeImpact MCP helps you answer a practical question before changing code: **what else is likely to move if I touch this file?**
+[![npm](https://img.shields.io/npm/v/@vk0/code-impact-mcp)](https://www.npmjs.com/package/@vk0/code-impact-mcp)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![CI](https://github.com/vk0dev/code-impact-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/vk0dev/code-impact-mcp/actions/workflows/ci.yml)
 
-It builds a dependency graph for a local TypeScript/JavaScript repo, then exposes a small set of read-only MCP tools for:
-- dependency lookup
-- blast-radius analysis
-- lightweight gate-style change review
+**Lightweight pre-commit safety gate for AI agents.** Answers "is this change safe?" with a PASS/WARN/BLOCK verdict in seconds — no database, no complex setup.
 
-Current status: local-first and dogfooded, not published yet.
+[日本語](./README.ja.md) | [中文](./README.zh-CN.md) | [Русский](./README.ru.md) | [Español](./README.es.md)
+
+## Why / When to use
+
+Use this MCP server when:
+
+- The user asks: **"What will break if I change this file?"**
+- The user asks: **"Is this refactoring safe to commit?"**
+- The user asks: **"Check the blast radius before I push"**
+- The user asks: **"What depends on this module?"**
+- An agent needs a **quick pre-commit gate** before modifying multiple files
+- An agent wants a **numeric risk score (0-1)** for a proposed change
+- You need dependency analysis **without setting up a database or tree-sitter**
+
+CodeImpact MCP builds a lightweight dependency graph using ts-morph and gives you a bounded answer: PASS, WARN, or BLOCK. Zero cloud, no API key, local-first.
+
+## Install
+
+### Claude Code
+
+```bash
+claude mcp add code-impact-mcp -- npx -y @vk0/code-impact-mcp
+```
+
+### Claude Desktop
+
+Add to `claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "code-impact-mcp": {
+      "command": "npx",
+      "args": ["-y", "@vk0/code-impact-mcp"]
+    }
+  }
+}
+```
+
+### Cursor
+
+Add to `.cursor/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "code-impact-mcp": {
+      "command": "npx",
+      "args": ["-y", "@vk0/code-impact-mcp"]
+    }
+  }
+}
+```
+
+### Cline
+
+Add to Cline MCP settings:
+
+```json
+{
+  "mcpServers": {
+    "code-impact-mcp": {
+      "command": "npx",
+      "args": ["-y", "@vk0/code-impact-mcp"]
+    }
+  }
+}
+```
 
 ## Tools
 
-### `get_dependencies`
-For one file, returns:
-- what it imports
-- what imports it
-- exports
-- fan-in / fan-out
-- a simple high-coupling signal
+### `gate_check`
+
+Pre-commit safety gate. Analyzes specified changes and returns a **PASS/WARN/BLOCK verdict** with reasons. Use as a bounded decision aid before committing multi-file changes. BLOCK means risk exceeds threshold. WARN means human review recommended. PASS means low graph-based risk.
 
 ### `analyze_impact`
-For one or more changed files, returns:
-- directly affected files
-- transitively affected files
-- total affected files
-- cascade depth
-- a graph-based risk score
 
-### `gate_check`
-For one or more changed files, returns a bounded recommendation:
-- `PASS`
-- `WARN`
-- `BLOCK`
+Analyze the blast radius of changing specific files. Returns which files would be directly and transitively affected, with a risk score (0-1). Use BEFORE committing multi-file changes to understand what might break. Does NOT modify any files.
 
-This is a **graph-only heuristic**, not a full engineering safety system. It does not know about tests, runtime behavior, data migrations, or production traffic.
+### `get_dependencies`
 
-## Installation
+Get the import and importedBy relationships for a specific file. Shows what this file depends on and what depends on it. Use to understand coupling before refactoring a file.
 
-### Requirements
-- Node.js 22+
-- npm
-- a local TypeScript/JavaScript repo you want to inspect
+### `refresh_graph`
 
-### Install
+Rebuild the dependency graph from scratch. Call this after significant file additions/deletions, or if results seem stale. Returns graph statistics including file count, edge count, build time, and circular dependencies detected.
 
-```bash
-cd ~/projects/code-impact-mcp
-npm install
-```
+## Example conversation
 
-### Build
+**User:** "I want to refactor `src/routes.ts` — is it safe?"
 
-```bash
-npm run build
-```
-
-### Run locally
-
-Development mode:
-
-```bash
-npm run dev
-```
-
-Compiled server mode:
-
-```bash
-npm run build
-npm start
-```
-
-Optional quick transport smoke check after the server is up:
-
-```bash
-npm run smoke
-```
-
-## Fast local verification
-
-```bash
-npm test
-npm run build
-```
-
-Focused graph/tool verification:
-
-```bash
-npx vitest run tests/graph.test.ts tests/tools.test.ts
-```
-
-## First useful local usage path
-
-The simplest honest first run is:
-1. point the tools at a real local repo
-2. inspect one important file with `get_dependencies`
-3. run `analyze_impact` on a likely change target
-4. use `gate_check` for a quick pass/warn/block signal
-
-Example target repo from local dogfooding:
-- `~/projects/openclaw-tasks`
-
-Example progression:
-- `get_dependencies` for `src/routes.ts`
-- `analyze_impact` for `src/routes/index.ts`
-- `gate_check` for the same file with a chosen threshold
-
-### Example request shapes
-
-`get_dependencies`
+**Agent calls** `gate_check`:
 ```json
 {
-  "projectRoot": "/Users/you/projects/openclaw-tasks",
-  "file": "src/routes.ts"
+  "projectRoot": "/Users/you/projects/my-app",
+  "files": ["src/routes.ts"],
+  "threshold": 0.5
 }
 ```
 
-`analyze_impact`
+**Result:**
 ```json
 {
-  "projectRoot": "/Users/you/projects/openclaw-tasks",
-  "files": ["src/routes/index.ts"]
+  "verdict": "WARN",
+  "recommendation": "Proceed only with targeted review of affected files.",
+  "riskScore": 0.35,
+  "reasons": ["Risk score 0.35 is approaching threshold. Review affected files."],
+  "affectedFiles": 8,
+  "circularDependencies": 0
 }
 ```
 
-`gate_check`
-```json
-{
-  "projectRoot": "/Users/you/projects/openclaw-tasks",
-  "files": ["src/routes/index.ts"],
-  "threshold": 0.2
-}
+**Agent:** "The gate check returned WARN — 8 files depend on routes.ts. I'll review the affected files before making changes."
+
+## How it works
+
+```
+┌─────────────┐     ┌──────────────┐     ┌──────────────┐
+│  Agent asks  │────▶│  ts-morph     │────▶│  In-memory    │
+│  "safe to    │     │  parses       │     │  dependency   │
+│   change?"   │     │  imports      │     │  graph        │
+└─────────────┘     └──────────────┘     └──────┬───────┘
+                                                 │
+                    ┌──────────────┐     ┌───────▼───────┐
+                    │  PASS/WARN/  │◀────│  BFS traverse  │
+                    │  BLOCK       │     │  reverse deps  │
+                    │  + risk 0-1  │     │  + risk score  │
+                    └──────────────┘     └───────────────┘
 ```
 
-## Tool behavior notes
+1. **Parse:** ts-morph scans your project for ESM imports, re-exports, and CommonJS requires
+2. **Graph:** Builds an in-memory dependency graph (no database, no persistence)
+3. **Analyze:** BFS traversal of reverse dependencies from changed files
+4. **Score:** Risk = affected files / total files (0-1)
+5. **Verdict:** PASS (< 60% of threshold), WARN (60-100%), BLOCK (> threshold)
 
-### Path expectations
-- `projectRoot` should be an absolute path to the repo root
-- file inputs should be repo-relative paths like `src/routes.ts`
-- `tsconfigPath` is optional and should be relative to `projectRoot`
+Supports: ESM imports, ESM re-exports, CommonJS `require()`, NodeNext-style `.js` → `.ts` resolution.
 
-### Resolver behavior
-The graph currently supports:
-- ESM imports
-- ESM re-exports
-- CommonJS `require(...)`
-- NodeNext-style `.js` import specifiers that point back to `.ts` source files
+## Comparison
 
-### Error behavior
-The tool layer returns bounded JSON errors instead of crashing for:
-- invalid project roots
-- broken or missing `tsconfig`
-- missing files in the built graph
+| Feature | CodeImpact MCP | Codegraph | Depwire | dependency-mcp |
+|---------|:---:|:---:|:---:|:---:|
+| Pre-commit gate (PASS/WARN/BLOCK) | **Yes** | No | No | No |
+| Numeric risk score (0-1) | **Yes** | No | Health score | No |
+| Zero setup (no database) | **Yes** | SQLite required | Setup required | Yes |
+| Install time | **Seconds** | Minutes | Minutes | Seconds |
+| License | **MIT** | MIT | **BSL 1.1** | MIT |
+| Number of tools | 4 | 30+ | 10 | 3 |
+| Language support | TS/JS | 11 languages | Multi | Multi |
+| Circular dependency detection | **Yes** | Yes | Yes | No |
+| Agent-optimized output | **Yes** | Partial | Partial | Partial |
+| Local-first / zero cloud | **Yes** | Yes | Yes | Yes |
 
-## What the outputs mean
+**When to choose CodeImpact MCP:** You want a quick, bounded answer (PASS/WARN/BLOCK) before committing — not a full codebase exploration tool. Zero setup, MIT license, works in seconds.
 
-### Risk score
-The current `riskScore` is a simple graph-derived heuristic based on how many files are affected relative to graph size.
+**When to choose Codegraph/Depwire:** You need deep codebase exploration across many languages with persistent storage and visualization.
 
-Treat it as:
-- useful for quick comparison
-- good enough for first-pass triage
-- **not** a substitute for test/runtime knowledge
+## FAQ
 
-### `gate_check` recommendation
-- `PASS` means low graph impact right now
-- `WARN` means review is recommended before proceeding
-- `BLOCK` means the current change shape looks too risky for the chosen threshold
+**Q: Does it access the network?**
+A: No. CodeImpact MCP is 100% local-first. It reads your project files via ts-morph and never makes network requests. No API keys, no cloud, no telemetry.
 
-A good mental model is: **CodeImpact tells you where to look next, not whether the code is truly safe.**
+**Q: Will it modify my code?**
+A: No. All 4 tools are read-only (annotated with `readOnlyHint: true`). They analyze but never write.
+
+**Q: How accurate is the risk score?**
+A: The risk score is a graph-based heuristic (affected files / total files). It does not know about runtime behavior, tests, or data migrations. Treat it as a triage signal, not a guarantee.
+
+**Q: Does it support JavaScript-only projects?**
+A: Yes. It works with TypeScript and JavaScript files (`.ts`, `.tsx`, `.js`, `.jsx`, `.mts`, `.cts`, `.mjs`, `.cjs`).
+
+**Q: How fast is it?**
+A: Graph building typically takes 1-5 seconds depending on project size. Individual tool calls against a cached graph are near-instant.
+
+**Q: Does it cache the graph?**
+A: Yes, the graph is cached in-memory per (projectRoot, tsconfigPath) pair. Use `refresh_graph` to rebuild after significant changes.
 
 ## Limitations
-- explanation quality is still intentionally compact
-- no distinction yet between runtime imports and type-only imports
-- no CI integration yet
-- no registry/publish flow yet
-- no dashboard or reporting surface yet
 
-## Current repo scripts
+- TypeScript/JavaScript only (no multi-language support)
+- No distinction between runtime imports and type-only imports
+- Graph is in-memory only (no persistence across server restarts)
+- Risk score is structural, not semantic — it doesn't know which files are "important"
+- No visualization output (text/JSON only)
 
-```bash
-npm run dev     # run local MCP server with tsx
-npm test        # vitest run
-npm run build   # TypeScript compile to dist/
-npm start       # run compiled MCP server
-npm run smoke   # basic local MCP client smoke path
-```
+## Changelog
 
-## Publish readiness
-Current state is closer to publish than before, but still in polish mode.
+See [CHANGELOG.md](./CHANGELOG.md) for release history.
 
-Before any package/publish step, the priority remains:
-- keep local-first install/run obvious
-- keep tool output explanations understandable
-- keep dogfooding on real repos
+## License
 
-At this point the project looks close to controlled publish-prep, but should still be treated as local-first until that step is explicitly started.
+[MIT](./LICENSE) — free to use in any project, commercial or personal.
+
+## Contributing
+
+Issues and PRs welcome at [github.com/vk0dev/code-impact-mcp](https://github.com/vk0dev/code-impact-mcp).

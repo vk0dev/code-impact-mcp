@@ -1,0 +1,553 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CodeImpact MCP &middot; Pre-commit safety gate for AI agents</title>
+    <meta
+      name="description"
+      content="Lightweight pre-commit safety gate for AI agents. Answers 'is this change safe?' with PASS/WARN/BLOCK verdict in seconds. Zero setup, no database."
+    />
+
+    <!-- Open Graph / social preview -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="CodeImpact MCP" />
+    <meta
+      property="og:description"
+      content="Lightweight pre-commit safety gate for AI agents. PASS / WARN / BLOCK in seconds. No database, no complex setup."
+    />
+    <meta property="og:url" content="https://vk0dev.github.io/code-impact-mcp/" />
+    <meta property="og:image" content="./og-image.png" />
+    <meta property="og:image:width" content="1280" />
+    <meta property="og:image:height" content="640" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="CodeImpact MCP" />
+    <meta
+      name="twitter:description"
+      content="Pre-commit safety gate for AI agents. PASS / WARN / BLOCK in seconds."
+    />
+    <meta name="twitter:image" content="./og-image.png" />
+
+    <style>
+      :root {
+        --bg: #0a0a0a;
+        --bg-elevated: #141414;
+        --bg-code: #1a1a1a;
+        --border: #262626;
+        --text: #e5e5e5;
+        --text-muted: #8a8a8a;
+        --accent: #00e676;
+        --accent-dim: #00e67633;
+        --danger: #ff5c5c;
+        --warn: #ffc107;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family:
+          "JetBrains Mono", "SF Mono", Menlo, Consolas, "Liberation Mono",
+          monospace;
+        font-size: 15px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+
+      .container {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 4rem 1.5rem 6rem;
+      }
+
+      /* Hero */
+      .hero {
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 2.5rem;
+        margin-bottom: 3rem;
+      }
+      .hero .tag {
+        display: inline-block;
+        font-size: 0.75rem;
+        color: var(--accent);
+        border: 1px solid var(--accent-dim);
+        padding: 0.15rem 0.6rem;
+        border-radius: 999px;
+        margin-bottom: 1rem;
+      }
+      .hero h1 {
+        font-size: 2.4rem;
+        margin: 0 0 0.5rem;
+        letter-spacing: -0.02em;
+      }
+      .hero h1 .at {
+        color: var(--text-muted);
+      }
+      .hero .tagline {
+        font-size: 1.1rem;
+        color: var(--text-muted);
+        margin: 0 0 1.5rem;
+        max-width: 600px;
+      }
+      .hero .key-message {
+        font-size: 1rem;
+        color: var(--text);
+        margin: 0 0 1.5rem;
+        max-width: 600px;
+      }
+      .hero .key-message .verdict {
+        font-weight: bold;
+      }
+      .hero .key-message .pass { color: var(--accent); }
+      .hero .key-message .warn { color: var(--warn); }
+      .hero .key-message .block { color: var(--danger); }
+      .hero .badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 1.5rem;
+      }
+      .hero .badges img {
+        height: 20px;
+      }
+
+      .lang-switcher {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-top: 1rem;
+      }
+      .lang-switcher a {
+        margin-right: 0.5rem;
+      }
+
+      /* Sections */
+      section {
+        margin: 3rem 0;
+      }
+      section h2 {
+        font-size: 1.5rem;
+        margin: 0 0 1rem;
+        letter-spacing: -0.01em;
+        border-left: 3px solid var(--accent);
+        padding-left: 0.75rem;
+      }
+      section p {
+        margin: 0.5rem 0 1rem;
+      }
+
+      /* Why list */
+      .why-list {
+        list-style: none;
+        padding: 0;
+        margin: 1rem 0 0;
+      }
+      .why-list li {
+        padding: 0.4rem 0 0.4rem 1.5rem;
+        position: relative;
+      }
+      .why-list li::before {
+        content: "\25B8";
+        position: absolute;
+        left: 0;
+        color: var(--accent);
+      }
+
+      /* Install tabs */
+      .tabs {
+        margin-top: 1.5rem;
+      }
+      .tab-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .tab-button {
+        background: transparent;
+        color: var(--text-muted);
+        border: none;
+        border-bottom: 2px solid transparent;
+        padding: 0.6rem 1.1rem;
+        font-family: inherit;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .tab-button:hover {
+        color: var(--text);
+      }
+      .tab-button.active {
+        color: var(--accent);
+        border-bottom-color: var(--accent);
+      }
+      .tab-panel {
+        display: none;
+        padding-top: 1rem;
+      }
+      .tab-panel.active {
+        display: block;
+      }
+      .tab-panel .file-path {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-bottom: 0.5rem;
+      }
+
+      /* Code blocks */
+      pre {
+        background: var(--bg-code);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 1rem 1.2rem;
+        overflow-x: auto;
+        margin: 0.5rem 0;
+        font-size: 0.85rem;
+        line-height: 1.55;
+      }
+      code {
+        font-family: inherit;
+        font-size: 0.9em;
+      }
+      p code,
+      li code {
+        background: var(--bg-code);
+        border: 1px solid var(--border);
+        padding: 0.05rem 0.35rem;
+        border-radius: 3px;
+        font-size: 0.85em;
+      }
+
+      /* Tools grid */
+      .tools-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.8rem;
+        margin-top: 1rem;
+      }
+      @media (min-width: 640px) {
+        .tools-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+      .tool-card {
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 1rem 1.1rem;
+      }
+      .tool-card h3 {
+        margin: 0 0 0.3rem;
+        font-size: 0.95rem;
+        color: var(--accent);
+      }
+      .tool-card p {
+        margin: 0;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+      }
+
+      /* ASCII diagram */
+      .ascii-diagram {
+        white-space: pre;
+        font-size: 0.75rem;
+        line-height: 1.4;
+        color: var(--text-muted);
+        overflow-x: auto;
+      }
+
+      /* Footer */
+      footer {
+        margin-top: 5rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--border);
+        font-size: 0.8rem;
+        color: var(--text-muted);
+      }
+      footer a {
+        color: var(--text-muted);
+        text-decoration: underline;
+      }
+      footer a:hover {
+        color: var(--accent);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header class="hero">
+        <span class="tag">v1.0 &middot; MCP server</span>
+        <h1>CodeImpact <span class="at">MCP</span></h1>
+        <p class="tagline">
+          Lightweight pre-commit safety gate for AI agents.
+        </p>
+        <p class="key-message">
+          <span class="verdict pass">PASS</span> /
+          <span class="verdict warn">WARN</span> /
+          <span class="verdict block">BLOCK</span>
+          in seconds &mdash; no database, no complex setup.
+        </p>
+        <div class="badges">
+          <a href="https://www.npmjs.com/package/@vk0/code-impact-mcp"
+            ><img
+              src="https://img.shields.io/npm/v/@vk0/code-impact-mcp.svg?style=flat-square"
+              alt="npm version"
+          /></a>
+          <a href="./LICENSE"
+            ><img
+              src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square"
+              alt="MIT"
+          /></a>
+          <a
+            href="https://github.com/vk0dev/code-impact-mcp/actions/workflows/ci.yml"
+            ><img
+              src="https://img.shields.io/github/actions/workflow/status/vk0dev/code-impact-mcp/ci.yml?branch=main&style=flat-square"
+              alt="CI"
+          /></a>
+          <a href="https://nodejs.org"
+            ><img
+              src="https://img.shields.io/badge/node-%E2%89%A518-339933.svg?style=flat-square"
+              alt="Node &ge;18"
+          /></a>
+        </div>
+        <div class="lang-switcher">
+          Languages:
+          <a href="https://github.com/vk0dev/code-impact-mcp/blob/main/README.md"
+            >English</a
+          >
+          &middot;
+          <a
+            href="https://github.com/vk0dev/code-impact-mcp/blob/main/README.ja.md"
+            >日本語</a
+          >
+          &middot;
+          <a
+            href="https://github.com/vk0dev/code-impact-mcp/blob/main/README.zh-CN.md"
+            >简体中文</a
+          >
+          &middot;
+          <a
+            href="https://github.com/vk0dev/code-impact-mcp/blob/main/README.ru.md"
+            >Русский</a
+          >
+          &middot;
+          <a
+            href="https://github.com/vk0dev/code-impact-mcp/blob/main/README.es.md"
+            >Español</a
+          >
+        </div>
+      </header>
+
+      <section>
+        <h2>When to install</h2>
+        <p style="color: var(--text-muted)">
+          Use this MCP server when the user asks any of:
+        </p>
+        <ul class="why-list">
+          <li>"Is this refactoring safe to commit?"</li>
+          <li>"What will break if I change this file?"</li>
+          <li>"Show me the blast radius of these changes."</li>
+          <li>"Which files depend on this module?"</li>
+          <li>"Are there circular dependencies in my project?"</li>
+          <li>"Give me a safety check before I push."</li>
+          <li>"How coupled is this file to the rest of the codebase?"</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Install</h2>
+        <p style="color: var(--text-muted)">
+          Pick your client. Everything runs through <code>npx</code> &mdash;
+          nothing to install globally.
+        </p>
+        <div class="tabs">
+          <div class="tab-buttons" role="tablist">
+            <button
+              class="tab-button active"
+              data-tab="claude-desktop"
+              role="tab"
+            >
+              Claude Desktop
+            </button>
+            <button class="tab-button" data-tab="claude-code" role="tab">
+              Claude Code
+            </button>
+            <button class="tab-button" data-tab="cursor" role="tab">
+              Cursor
+            </button>
+            <button class="tab-button" data-tab="cline" role="tab">
+              Cline
+            </button>
+          </div>
+
+          <div class="tab-panel active" id="claude-desktop">
+            <div class="file-path">
+              ~/Library/Application Support/Claude/claude_desktop_config.json
+              <span style="opacity: 0.5">(macOS)</span>
+            </div>
+            <pre><code>{
+  "mcpServers": {
+    "code-impact": {
+      "command": "npx",
+      "args": ["-y", "@vk0/code-impact-mcp"]
+    }
+  }
+}</code></pre>
+          </div>
+
+          <div class="tab-panel" id="claude-code">
+            <div class="file-path">One-liner via CLI</div>
+            <pre><code>claude mcp add --transport stdio code-impact -- npx -y @vk0/code-impact-mcp</code></pre>
+          </div>
+
+          <div class="tab-panel" id="cursor">
+            <div class="file-path">.cursor/mcp.json in your project root</div>
+            <pre><code>{
+  "mcpServers": {
+    "code-impact": {
+      "command": "npx",
+      "args": ["-y", "@vk0/code-impact-mcp"]
+    }
+  }
+}</code></pre>
+          </div>
+
+          <div class="tab-panel" id="cline">
+            <div class="file-path">
+              Cline MCP settings (MCP Servers icon &rarr; Configure)
+            </div>
+            <pre><code>{
+  "mcpServers": {
+    "code-impact": {
+      "command": "npx",
+      "args": ["-y", "@vk0/code-impact-mcp"],
+      "disabled": false,
+      "alwaysAllow": []
+    }
+  }
+}</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Tools</h2>
+        <div class="tools-grid">
+          <div class="tool-card">
+            <h3>gate_check</h3>
+            <p>
+              Pre-commit safety gate. Returns a PASS / WARN / BLOCK verdict
+              with reasons based on the blast radius of your changes.
+            </p>
+          </div>
+          <div class="tool-card">
+            <h3>analyze_impact</h3>
+            <p>
+              Analyze the blast radius of changing specific files. Returns
+              directly and transitively affected files with a risk score (0-1).
+            </p>
+          </div>
+          <div class="tool-card">
+            <h3>get_dependencies</h3>
+            <p>
+              Get import and importedBy relationships for a file. Shows
+              coupling, fan-in/fan-out, and exports at a glance.
+            </p>
+          </div>
+          <div class="tool-card">
+            <h3>refresh_graph</h3>
+            <p>
+              Rebuild the dependency graph from scratch. Returns file count,
+              edge count, build time, and detected circular dependencies.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>How it works</h2>
+        <pre class="ascii-diagram">
+  Your TS/JS project               ┌──────────────────┐
+  (imports & exports)   ──────────▶ │  ts-morph parser  │
+                                    │  + graph builder  │
+                                    └────────┬─────────┘
+                                             │
+                                             ▼
+                                    ┌──────────────────┐
+  Agent tool call (stdio MCP)  ──▶  │  MCP server      │ ── PASS / WARN / BLOCK
+                                    │  (4 tools)       │
+                                    └──────────────────┘
+        </pre>
+        <p style="color: var(--text-muted); font-size: 0.9rem">
+          Parses your TypeScript / JavaScript project locally via ts-morph.
+          Read-only. No telemetry, no API key, no cloud sync.
+        </p>
+      </section>
+
+      <section>
+        <h2>Links</h2>
+        <p>
+          &rarr;
+          <a href="https://github.com/vk0dev/code-impact-mcp"
+            >Full README &amp; source on GitHub</a
+          >
+        </p>
+        <p>
+          &rarr;
+          <a href="https://www.npmjs.com/package/@vk0/code-impact-mcp"
+            >npm package</a
+          >
+        </p>
+        <p>
+          &rarr;
+          <a
+            href="https://github.com/vk0dev/code-impact-mcp/blob/main/CHANGELOG.md"
+            >Changelog</a
+          >
+        </p>
+        <p>
+          &rarr;
+          <a href="https://github.com/vk0dev/code-impact-mcp/issues"
+            >Report an issue</a
+          >
+        </p>
+      </section>
+
+      <footer>
+        <p>
+          <a href="https://github.com/vk0dev/code-impact-mcp">github.com/vk0dev/code-impact-mcp</a>
+          &middot; MIT License &middot; Built by
+          <a href="https://github.com/vk0dev">vk0.dev</a>
+        </p>
+      </footer>
+    </div>
+
+    <script>
+      // Minimal tab switching
+      const buttons = document.querySelectorAll(".tab-button");
+      const panels = document.querySelectorAll(".tab-panel");
+      buttons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const target = btn.getAttribute("data-tab");
+          buttons.forEach((b) => b.classList.remove("active"));
+          panels.forEach((p) => p.classList.remove("active"));
+          btn.classList.add("active");
+          document.getElementById(target).classList.add("active");
+        });
+      });
+    </script>
+  </body>
+</html>
