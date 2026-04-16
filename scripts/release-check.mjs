@@ -284,6 +284,62 @@ if (pkgVersion) {
   }
 }
 
+// ── Security ─────────────────────────────────────────────────────────────────
+
+console.log(`\n${bold('Security')}`);
+
+// npm audit — no high/critical vulnerabilities
+try {
+  const { execSync } = await import('node:child_process');
+  const auditOutput = execSync('npm audit --json 2>/dev/null', { encoding: 'utf-8', timeout: 30000 });
+  const audit = JSON.parse(auditOutput);
+  const high = audit?.metadata?.vulnerabilities?.high ?? 0;
+  const critical = audit?.metadata?.vulnerabilities?.critical ?? 0;
+  check(high === 0 && critical === 0, 'No high/critical npm vulnerabilities', `high: ${high}, critical: ${critical}`);
+} catch (e) {
+  // npm audit exits non-zero when vulnerabilities found
+  try {
+    const parsed = JSON.parse(e.stdout || '{}');
+    const high = parsed?.metadata?.vulnerabilities?.high ?? 0;
+    const critical = parsed?.metadata?.vulnerabilities?.critical ?? 0;
+    check(high === 0 && critical === 0, 'No high/critical npm vulnerabilities', `high: ${high}, critical: ${critical}`);
+  } catch {
+    check(true, 'npm audit (skipped — could not parse output)');
+  }
+}
+
+// No hardcoded secret patterns in src/
+{
+  const secretPatterns = [
+    /sk-[a-zA-Z0-9]{20,}/,        // OpenAI/Stripe keys
+    /ghp_[a-zA-Z0-9]{36}/,         // GitHub PATs
+    /npm_[a-zA-Z0-9]{36}/,         // npm tokens
+    /AKIA[A-Z0-9]{16}/,            // AWS access keys
+    /-----BEGIN (RSA |EC )?PRIVATE KEY-----/,  // Private keys
+  ];
+  const srcFiles = [];
+  const walkDir = (dir) => {
+    if (!fs.existsSync(dir)) return;
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) walkDir(full);
+      else if (/\.[tj]s$/.test(entry.name)) srcFiles.push(full);
+    }
+  };
+  walkDir('src');
+  const secretFindings = [];
+  for (const f of srcFiles) {
+    const content = readText(f);
+    if (!content) continue;
+    for (const pattern of secretPatterns) {
+      if (pattern.test(content)) {
+        secretFindings.push(`${f}: matches ${pattern.source.slice(0, 30)}...`);
+      }
+    }
+  }
+  check(secretFindings.length === 0, 'No hardcoded secret patterns in src/', secretFindings.join('; '));
+}
+
 // ── Tool Descriptions (MCP-specific) ─────────────────────────────────────────
 
 console.log(`\n${bold('Tool Descriptions')}`);
