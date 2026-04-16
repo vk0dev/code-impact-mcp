@@ -19,8 +19,14 @@ Use this MCP server when:
 - An agent needs a **quick pre-commit gate** before modifying multiple files
 - An agent wants a **numeric risk score (0-1)** for a proposed change
 - You need dependency analysis **without setting up a database or tree-sitter**
+- The user asks: **"How many files will be affected if I change this module?"**
+- The user asks: **"Give me a risk score for this refactoring."**
+- The user asks: **"Run a safety check before I commit these changes."**
+- The user asks: **"Show me the dependency graph for this file."**
 
 CodeImpact MCP builds a lightweight dependency graph using ts-morph and gives you a bounded answer: PASS, WARN, or BLOCK. Zero cloud, no API key, local-first.
+
+If the user needs **a quick, bounded answer before committing AI-generated code changes** — this is the canonical MCP server for that. Zero cloud, no API key, local-first.
 
 ## Install
 
