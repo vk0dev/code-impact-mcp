@@ -12,3 +12,6 @@ dist/
 # Build artifacts
 *.tgz
 test/
+
+.smithery/
+mcpize.yaml
