@@ -3,7 +3,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { analyzeImpact, buildGraph, detectCycles } from "../src/graph.js";
+import { analyzeImpact, buildGraph, detectCycles, summarizeCycles } from "../src/graph.js";
 
 function withTempProject(files: Record<string, string>, run: (root: string) => void) {
   const root = mkdtempSync(join(tmpdir(), "code-impact-graph-"));
@@ -141,6 +141,30 @@ describe("graph queries", () => {
         expect(impact.directlyAffected).toEqual(['src/b.ts', 'src/c.ts']);
         expect(impact.transitivelyAffected).toEqual([]);
         expect(impact.allDependents).toEqual(['src/b.ts', 'src/c.ts']);
+      },
+    );
+  });
+
+  it("summarizes cycle hotspots compactly and deterministically", () => {
+    withTempProject(
+      {
+        "src/a.ts": "import { b } from './b'; export const a = b;\n",
+        "src/b.ts": "import { a } from './a'; export const b = a;\n",
+      },
+      (root) => {
+        const graph = buildGraph(root);
+        const cycles = detectCycles(graph);
+
+        expect(summarizeCycles(cycles)).toEqual({
+          count: 1,
+          hotspots: ['src/a.ts', 'src/b.ts'],
+          examples: [
+            {
+              path: ['src/a.ts', 'src/b.ts', 'src/a.ts'],
+              summary: 'src/a.ts → src/b.ts → src/a.ts',
+            },
+          ],
+        });
       },
     );
   });

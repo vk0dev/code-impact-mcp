@@ -54,6 +54,15 @@ export interface ImpactAnalysis {
   riskScore: number;
 }
 
+export interface CycleDiagnostics {
+  count: number;
+  hotspots: string[];
+  examples: Array<{
+    path: string[];
+    summary: string;
+  }>;
+}
+
 const SOURCE_DIRS = ["src", "app", "components", "lib", "hooks", "stores", "utils", "pages", "tests", "scripts"];
 const SOURCE_GLOBS = [
   ...SOURCE_DIRS.flatMap((dir) => [`${dir}/**/*.ts`, `${dir}/**/*.tsx`, `${dir}/**/*.js`, `${dir}/**/*.jsx`]),
@@ -254,6 +263,34 @@ export function detectCycles(graph: DependencyGraph): string[][] {
   }
 
   return cycles;
+}
+
+export function summarizeCycles(cycles: string[][], maxExamples = 3): CycleDiagnostics {
+  const hotspotCounts = new Map<string, number>();
+  for (const cycle of cycles) {
+    for (const node of new Set(cycle)) {
+      hotspotCounts.set(node, (hotspotCounts.get(node) ?? 0) + 1);
+    }
+  }
+
+  const hotspots = Array.from(hotspotCounts.entries())
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .map(([node]) => node);
+
+  const examples = cycles
+    .slice()
+    .sort((a, b) => a.join("→").localeCompare(b.join("→")))
+    .slice(0, maxExamples)
+    .map((cycle) => ({
+      path: cycle,
+      summary: cycle.join(" → "),
+    }));
+
+  return {
+    count: cycles.length,
+    hotspots,
+    examples,
+  };
 }
 
 function collectModuleReferences(sourceFile: SourceFile): Array<{ specifier: string; kind: GraphEdgeKind }> {

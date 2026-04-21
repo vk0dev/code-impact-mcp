@@ -184,6 +184,17 @@ describe("registerTools", () => {
         expect(payload.explanation).toContain("review is warranted");
         expect(payload.circularDependencies).toBe(1);
         expect(payload.cycleExamples).toEqual([["src/a.ts", "src/b.ts", "src/a.ts"]]);
+        expect(payload.cycleDiagnostics).toEqual({
+          count: 1,
+          hotspots: ["src/a.ts", "src/b.ts"],
+          examples: [
+            {
+              path: ["src/a.ts", "src/b.ts", "src/a.ts"],
+              summary: "src/a.ts → src/b.ts → src/a.ts",
+            },
+          ],
+        });
+        expect(payload.scanSummary).toContain("1 cycle");
         expect(payload.reasons.some((reason: string) => reason.includes("circular dependency"))).toBe(true);
         expect(payload.reasons.some((reason: string) => reason.includes("src/a.ts → src/b.ts → src/a.ts"))).toBe(true);
       },

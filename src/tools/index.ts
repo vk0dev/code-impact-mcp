@@ -1,7 +1,7 @@
 import path from "node:path";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { GraphBuildError, buildGraph, analyzeImpact, detectCycles, type DependencyGraph } from "../graph.js";
+import { GraphBuildError, buildGraph, analyzeImpact, detectCycles, summarizeCycles, type DependencyGraph } from "../graph.js";
 
 let cachedGraph: DependencyGraph | null = null;
 let cachedRoot: string | null = null;
@@ -250,6 +250,7 @@ export function registerTools(server: McpServer): void {
 
         const affectedCycles = cycles.filter((cycle) => files.some((f) => cycle.includes(f)));
         const cycleExamples = affectedCycles.slice(0, 3);
+        const cycleDiagnostics = affectedCycles.length > 0 ? summarizeCycles(affectedCycles) : undefined;
         if (affectedCycles.length > 0) {
           verdict = verdict === "PASS" ? "WARN" : verdict;
           const preview = formatCyclePreview(cycleExamples[0]!);
@@ -276,9 +277,14 @@ export function registerTools(server: McpServer): void {
         const directScan = buildImpactScanability(impact.directlyAffected);
         const transitiveScan = buildImpactScanability(impact.transitivelyAffected);
 
+        const scanSummary = [
+          buildDecisionSummary(verdict, totalAffected, directScan),
+          cycleDiagnostics ? `${cycleDiagnostics.count} cycle${cycleDiagnostics.count === 1 ? "" : "s"}` : null,
+        ].filter(Boolean).join(", ");
+
         return {
           verdict,
-          scanSummary: buildDecisionSummary(verdict, totalAffected, directScan),
+          scanSummary,
           recommendation,
           explanation,
           riskScore: impact.riskScore,
@@ -296,6 +302,7 @@ export function registerTools(server: McpServer): void {
           affectedFiles: totalAffected,
           circularDependencies: affectedCycles.length,
           cycleExamples: cycleExamples.length > 0 ? cycleExamples : undefined,
+          cycleDiagnostics,
         };
       }),
   );
