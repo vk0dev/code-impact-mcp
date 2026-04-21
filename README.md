@@ -116,6 +116,7 @@ Rebuild the dependency graph from scratch. Call this after significant file addi
 ```json
 {
   "verdict": "WARN",
+  "scanSummary": "WARN, 8 affected across src/routes (4), src/pages (2), src (2)",
   "recommendation": "Proceed only with targeted review of affected files.",
   "riskScore": 0.35,
   "reasons": ["Risk score 0.35 is approaching threshold. Review affected files."],

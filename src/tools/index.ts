@@ -76,6 +76,32 @@ function buildImpactScanability(files: string[]) {
   };
 }
 
+function buildDecisionSummary(verdictLabel: string, totalAffected: number, scan: ReturnType<typeof buildImpactScanability>) {
+  const impactLabel = totalAffected === 0 ? "locally contained" : `${totalAffected} affected`;
+  const scopeLabel = scan.summaryLine ? ` across ${scan.summaryLine}` : "";
+  return `${verdictLabel}, ${impactLabel}${scopeLabel}`;
+}
+
+function formatCyclePreview(cycle: string[]) {
+  return cycle.join(" → ");
+}
+
+function classifyCouplingRole(fanIn: number, fanOut: number, isHighCoupling: boolean) {
+  if (isHighCoupling || fanIn >= 5) {
+    return "central module";
+  }
+  if (fanIn > 0 && fanOut > 0) {
+    return "bridge module";
+  }
+  if (fanIn > 0 && fanOut === 0) {
+    return "leaf";
+  }
+  if (fanIn === 0 && fanOut > 0) {
+    return "source module";
+  }
+  return "isolated module";
+}
+
 async function runTool<T>(projectRoot: string, tsconfigPath: string | undefined, fn: () => T | Promise<T>) {
   try {
     const payload = await fn();
@@ -110,6 +136,8 @@ export function registerTools(server: McpServer): void {
         const impact = analyzeImpact(graph, files);
 
         const totalAffected = impact.directlyAffected.length + impact.transitivelyAffected.length;
+        const directScan = buildImpactScanability(impact.directlyAffected);
+        const transitiveScan = buildImpactScanability(impact.transitivelyAffected);
         const summary =
           impact.riskScore >= 0.7
             ? `High graph impact: ${impact.directlyAffected.length} direct and ${impact.transitivelyAffected.length} transitive files may move.`
@@ -119,6 +147,7 @@ export function registerTools(server: McpServer): void {
 
         return {
           summary,
+          scanSummary: buildDecisionSummary(impact.riskScore >= 0.7 ? "HIGH" : impact.riskScore >= 0.3 ? "MEDIUM" : "LOW", totalAffected, directScan),
           explanation:
             "This result is graph-based only. It does not account for tests, runtime behavior, migrations, or production traffic.",
           changedFiles: files,
@@ -127,8 +156,8 @@ export function registerTools(server: McpServer): void {
           impactBreakdown: {
             directCount: impact.directlyAffected.length,
             transitiveCount: impact.transitivelyAffected.length,
-            directScan: buildImpactScanability(impact.directlyAffected),
-            transitiveScan: buildImpactScanability(impact.transitivelyAffected),
+            directScan,
+            transitiveScan,
           },
           riskScore: impact.riskScore,
           totalAffected,
@@ -159,20 +188,24 @@ export function registerTools(server: McpServer): void {
           return { error: `File '${file}' not found in dependency graph. Run refresh_graph first or check the path.` };
         }
 
+        const fanIn = node.importedBy.length;
+        const fanOut = node.imports.length;
+        const isHighCoupling = fanIn > 10;
+        const couplingRole = classifyCouplingRole(fanIn, fanOut, isHighCoupling);
+        const edgeLabel = fanIn === 1 && fanOut === 0 ? "edge" : "edges";
+
         return {
           file: node.file,
-          summary:
-            node.importedBy.length > 0
-              ? `${node.file} is connected to ${node.importedBy.length} incoming and ${node.imports.length} outgoing dependency edges.`
-              : `${node.file} currently looks leaf-like from the graph's point of view.`,
+          summary: `${node.file} is a ${couplingRole} with ${fanIn} incoming and ${fanOut} outgoing dependency ${edgeLabel}.`,
           explanation:
             "This is a structural dependency view. It does not distinguish runtime-only vs type-only usage yet.",
           imports: node.imports,
           importedBy: node.importedBy,
           exports: node.exports,
-          fanIn: node.importedBy.length,
-          fanOut: node.imports.length,
-          isHighCoupling: node.importedBy.length > 10,
+          fanIn,
+          fanOut,
+          isHighCoupling,
+          couplingRole,
         };
       }),
   );
@@ -216,9 +249,11 @@ export function registerTools(server: McpServer): void {
         }
 
         const affectedCycles = cycles.filter((cycle) => files.some((f) => cycle.includes(f)));
+        const cycleExamples = affectedCycles.slice(0, 3);
         if (affectedCycles.length > 0) {
           verdict = verdict === "PASS" ? "WARN" : verdict;
-          reasons.push(`Changed files are part of ${affectedCycles.length} circular dependency cycle(s).`);
+          const preview = formatCyclePreview(cycleExamples[0]!);
+          reasons.push(`Changed files are part of ${affectedCycles.length} circular dependency cycle(s). Example: ${preview}.`);
         }
 
         if (reasons.length === 0) {
@@ -238,8 +273,12 @@ export function registerTools(server: McpServer): void {
               ? "The change is not automatically blocked, but the graph suggests meaningful review is warranted."
               : "The current graph suggests a relatively contained change, though this is not a runtime or test guarantee.";
 
+        const directScan = buildImpactScanability(impact.directlyAffected);
+        const transitiveScan = buildImpactScanability(impact.transitivelyAffected);
+
         return {
           verdict,
+          scanSummary: buildDecisionSummary(verdict, totalAffected, directScan),
           recommendation,
           explanation,
           riskScore: impact.riskScore,
@@ -251,11 +290,12 @@ export function registerTools(server: McpServer): void {
           impactBreakdown: {
             directCount: impact.directlyAffected.length,
             transitiveCount: impact.transitivelyAffected.length,
-            directScan: buildImpactScanability(impact.directlyAffected),
-            transitiveScan: buildImpactScanability(impact.transitivelyAffected),
+            directScan,
+            transitiveScan,
           },
           affectedFiles: totalAffected,
           circularDependencies: affectedCycles.length,
+          cycleExamples: cycleExamples.length > 0 ? cycleExamples : undefined,
         };
       }),
   );

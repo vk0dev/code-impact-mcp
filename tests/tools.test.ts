@@ -57,8 +57,10 @@ describe("registerTools", () => {
           fanIn: 1,
           fanOut: 0,
           isHighCoupling: false,
+          couplingRole: "leaf",
         });
-        expect(payload.summary).toContain("incoming");
+        expect(payload.summary).toContain("leaf");
+        expect(payload.summary).toContain("1 incoming");
         expect(payload.explanation).toContain("structural dependency view");
       },
     );
@@ -95,6 +97,7 @@ describe("registerTools", () => {
         expect(payload.totalAffected).toBe(2);
         expect(payload.riskScore).toBeGreaterThan(0);
         expect(typeof payload.summary).toBe("string");
+        expect(payload.scanSummary).toContain("affected");
         expect(payload.explanation).toContain("graph-based only");
         expect(payload.impactBreakdown.directCount).toBe(1);
         expect(payload.impactBreakdown.transitiveCount).toBe(1);
@@ -147,6 +150,8 @@ describe("registerTools", () => {
         expect(payload.verdict).toBe("BLOCK");
         expect(payload.recommendation).toContain("Hold the change");
         expect(payload.explanation).toContain("reaches too far");
+        expect(payload.scanSummary).toContain("BLOCK");
+        expect(payload.scanSummary).toContain("2 affected");
         expect(payload.directlyAffected).toEqual(["src/service.ts"]);
         expect(payload.transitivelyAffected).toEqual(["src/feature.ts"]);
         expect(payload.affectedFiles).toBe(2);
@@ -178,7 +183,9 @@ describe("registerTools", () => {
         expect(payload.verdict).toBe("WARN");
         expect(payload.explanation).toContain("review is warranted");
         expect(payload.circularDependencies).toBe(1);
+        expect(payload.cycleExamples).toEqual([["src/a.ts", "src/b.ts", "src/a.ts"]]);
         expect(payload.reasons.some((reason: string) => reason.includes("circular dependency"))).toBe(true);
+        expect(payload.reasons.some((reason: string) => reason.includes("src/a.ts → src/b.ts → src/a.ts"))).toBe(true);
       },
     );
   });
@@ -222,6 +229,8 @@ describe("registerTools", () => {
         );
 
         expect(payload.totalAffected).toBe(10);
+        expect(payload.scanSummary).toContain("10 affected");
+        expect(payload.scanSummary).toContain("src/components (3)");
         expect(payload.impactBreakdown.directCount).toBe(10);
         expect(payload.impactBreakdown.directScan.totalFiles).toBe(10);
         expect(payload.impactBreakdown.directScan.displayMode).toBe("grouped");
