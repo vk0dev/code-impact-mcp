@@ -1,4 +1,14 @@
-# Changelog
+
+## [1.0.2] — 2026-04-22
+
+### Added
+- Cycle diagnostics surfaced in gate output (`feat(gate): surface cycle diagnostics`, ec22f20) — closes P4 parity gap vs code-graph-mcp.
+- Output scanability polish for gate verdicts (`feat(output): polish scanability cues`, 8e9e3fe).
+- MCPize deploy step in publish workflow.
+
+### Changed
+- Sharpened README positioning with Best for / Not for sections — leads with fast PASS/WARN/BLOCK pre-commit gate value.
+
 
 All notable changes to this project will be documented in this file.
 

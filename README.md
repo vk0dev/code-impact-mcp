@@ -4,9 +4,21 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![CI](https://github.com/vk0dev/code-impact-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/vk0dev/code-impact-mcp/actions/workflows/ci.yml)
 
-**Lightweight pre-commit safety gate for AI agents.** Answers "is this change safe?" with a PASS/WARN/BLOCK verdict in seconds — no database, no complex setup.
+**Fast pre-commit dependency gate for AI-assisted code changes.** Answers "is this safe to commit?" with a PASS/WARN/BLOCK verdict in seconds, so you can catch risky blast radius before a bad commit, not after it. No database, no heavy setup.
 
 [日本語](./README.ja.md) | [中文](./README.zh-CN.md) | [Русский](./README.ru.md) | [Español](./README.es.md)
+
+## Best for
+
+- **Pre-commit refactor checks:** before changing a shared file, route, or module and needing a fast PASS/WARN/BLOCK answer.
+- **Agent multi-file edits:** when an AI agent is about to touch several files and you want a bounded dependency-aware gate before commit.
+- **Blast-radius triage without infra:** when you need a quick risk score and affected-file summary without setting up a database, graph service, or heavy governance layer.
+
+## Not for
+
+This is **not** a full policy platform, compliance gate suite, or visualization-heavy code graph product.
+
+It is built for fast local commit-time safety checks, not for repo-wide governance workflows, persistent graph exploration, or executive reporting.
 
 ## Why / When to use
 
@@ -19,14 +31,10 @@ Use this MCP server when:
 - An agent needs a **quick pre-commit gate** before modifying multiple files
 - An agent wants a **numeric risk score (0-1)** for a proposed change
 - You need dependency analysis **without setting up a database or tree-sitter**
-- The user asks: **"How many files will be affected if I change this module?"**
-- The user asks: **"Give me a risk score for this refactoring."**
-- The user asks: **"Run a safety check before I commit these changes."**
-- The user asks: **"Show me the dependency graph for this file."**
 
 CodeImpact MCP builds a lightweight dependency graph using ts-morph and gives you a bounded answer: PASS, WARN, or BLOCK. Zero cloud, no API key, local-first.
 
-If the user needs **a quick, bounded answer before committing AI-generated code changes** — this is the canonical MCP server for that. Zero cloud, no API key, local-first.
+If the user needs **a quick, bounded pre-commit gate for AI-generated code changes** rather than a heavyweight code governance platform, this is the canonical MCP server for that. Zero cloud, no API key, local-first.
 
 ## Install
 

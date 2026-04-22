@@ -76,3 +76,11 @@ jobs:
         env:
           SMITHERY_API_KEY: ${{ secrets.SMITHERY_API_KEY }}
         continue-on-error: true
+
+      - name: Deploy to MCPize
+        run: |
+          npx -y mcpize deploy -y 2>/dev/null || \
+          echo "::warning::MCPize deploy failed — run 'npx mcpize deploy' manually"
+        env:
+          MCPIZE_TOKEN: ${{ secrets.MCPIZE_TOKEN }}
+        continue-on-error: true
