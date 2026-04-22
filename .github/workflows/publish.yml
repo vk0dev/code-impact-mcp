@@ -84,3 +84,25 @@ jobs:
         env:
           MCPIZE_TOKEN: ${{ secrets.MCPIZE_TOKEN }}
         continue-on-error: true
+
+      # Tell our dashboard to refresh NOW instead of waiting up to 15 min for
+      # the next scheduled collect cycle. HMAC-signed with a shared secret.
+      # Failure is non-fatal: publish is the real event, dashboard refresh is
+      # best-effort (cron will catch up within 15 min anyway).
+      - name: Notify dashboard refresh
+        if: success()
+        run: |
+          PAYLOAD="{\"product\":\"${GITHUB_REPOSITORY##*/}\",\"version\":\"${GITHUB_REF_NAME}\"}"
+          SECRET="${{ secrets.DASHBOARD_REFRESH_SECRET }}"
+          if [ -z "$SECRET" ]; then
+            echo "::warning::DASHBOARD_REFRESH_SECRET not set — skipping notify"
+            exit 0
+          fi
+          SIG=$(printf '%s' "$PAYLOAD" | openssl dgst -sha256 -hmac "$SECRET" | sed 's/^.* //')
+          curl -sS --max-time 15 \
+            -H "X-Hub-Signature-256: sha256=$SIG" \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD" \
+            https://inbox.vk0.dev/api/dashboard/refresh \
+            || echo "::warning::dashboard refresh webhook failed (cron will catch up)"
+        continue-on-error: true
