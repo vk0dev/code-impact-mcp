@@ -1,4 +1,9 @@
 
+## [1.1.1] — 2026-04-29
+
+### Fixed
+- Updated `scripts/dogfood_smoke.mjs` to include the new `detect_cycles` tool so release CI smoke stays aligned with the current public tool set.
+
 ## [1.1.0] — 2026-04-29
 
 ### Added

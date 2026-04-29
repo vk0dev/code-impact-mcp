@@ -43,7 +43,7 @@ async function run() {
 
   const tools = await client.listTools();
   const toolNames = tools.tools.map((tool) => tool.name).sort();
-  const expected = ["analyze_impact", "gate_check", "get_dependencies", "refresh_graph"];
+  const expected = ["analyze_impact", "detect_cycles", "gate_check", "get_dependencies", "refresh_graph"];
 
   if (JSON.stringify(toolNames) !== JSON.stringify(expected)) {
     throw new Error(`Expected tools ${expected.join(", ")}, got ${toolNames.join(", ")}`);
@@ -75,6 +75,14 @@ async function run() {
   const impactPayload = JSON.parse(impactResult.content[0].text);
   console.log("analyze_impact OK: risk", impactPayload.riskScore, "affected", impactPayload.totalAffected);
 
+  // detect_cycles
+  const cyclesResult = await client.callTool({
+    name: "detect_cycles",
+    arguments: { projectRoot: fixtureRoot },
+  });
+  const cyclesPayload = JSON.parse(cyclesResult.content[0].text);
+  console.log("detect_cycles OK:", cyclesPayload.cycleCount, "cycle(s)");
+
   // gate_check
   const gateResult = await client.callTool({
     name: "gate_check",
@@ -83,7 +91,7 @@ async function run() {
   const gatePayload = JSON.parse(gateResult.content[0].text);
   console.log("gate_check OK: verdict", gatePayload.verdict);
 
-  console.log("\nAll 4 tools passed smoke test.");
+  console.log("\nAll 5 tools passed smoke test.");
   await client.close();
 }
 
