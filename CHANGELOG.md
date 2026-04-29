@@ -1,4 +1,9 @@
 
+## [1.1.2] — 2026-04-29
+
+### Fixed
+- Corrected the release smoke and CLI version test drift that blocked the 1.1.1 publish workflow after the cycle-detection release line.
+
 ## [1.1.1] — 2026-04-29
 
 ### Fixed
