@@ -316,6 +316,38 @@ describe("registerTools", () => {
     );
   });
 
+  it("aggregates per-workspace gate results for pnpm workspaces", async () => {
+    await withTempProject(
+      {
+        "pnpm-workspace.yaml": "packages:\n  - 'packages/*'\n",
+        "packages/app-a/src/a.ts": "import { b } from './b'; export const a = b;\n",
+        "packages/app-a/src/b.ts": "import { a } from './a'; export const b = a;\n",
+        "packages/app-a/package.json": '{"name":"app-a"}',
+        "packages/app-b/src/index.ts": "export const ok = 1;\n",
+        "packages/app-b/package.json": '{"name":"app-b"}',
+      },
+      async (root) => {
+        const server = new FakeServer();
+        registerTools(server as any);
+
+        const payload = parseToolResult(
+          await server.handlers.get("gate_check")!({
+            projectRoot: root,
+            files: ["packages/app-a/src/a.ts", "packages/app-b/src/index.ts"],
+            threshold: 0.9,
+          }),
+        );
+
+        expect(payload.verdict).toBe("BLOCK");
+        expect(payload.workspaces).toHaveLength(2);
+        expect(payload.workspaces.map((workspace: any) => [workspace.workspace, workspace.verdict])).toEqual([
+          ["packages/app-a", "BLOCK"],
+          ["packages/app-b", "PASS"],
+        ]);
+      },
+    );
+  });
+
   it("returns a bounded error for broken tsconfig", async () => {
     await withTempProject(
       {

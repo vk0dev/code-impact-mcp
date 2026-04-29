@@ -1,7 +1,7 @@
 import path from "node:path";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { GraphBuildError, buildGraph, analyzeImpact, detectCycles, summarizeCycles, type DependencyGraph } from "../graph.js";
+import { GraphBuildError, buildGraph, analyzeImpact, detectCycles, detectWorkspacePackages, summarizeCycles, type DependencyGraph } from "../graph.js";
 
 let cachedGraph: DependencyGraph | null = null;
 let cachedRoot: string | null = null;
@@ -15,6 +15,53 @@ function getGraph(projectRoot: string, force = false, tsconfigPath?: string): De
   cachedRoot = projectRoot;
   cachedTsconfigPath = tsconfigPath;
   return cachedGraph;
+}
+
+function verdictRank(verdict: "PASS" | "WARN" | "BLOCK"): number {
+  return verdict === "BLOCK" ? 2 : verdict === "WARN" ? 1 : 0;
+}
+
+function evaluateGate(graph: DependencyGraph, files: string[], threshold: number) {
+  const impact = analyzeImpact(graph, files);
+  const cycles = detectCycles(graph);
+  let verdict: "PASS" | "WARN" | "BLOCK" = "PASS";
+  const reasons: string[] = [];
+  const totalAffected = impact.directlyAffected.length + impact.transitivelyAffected.length;
+
+  if (impact.riskScore >= threshold) {
+    verdict = "BLOCK";
+    reasons.push(`Risk score ${impact.riskScore.toFixed(2)} exceeds threshold ${threshold.toFixed(2)}.`);
+  } else if (impact.riskScore >= threshold * 0.6) {
+    verdict = "WARN";
+    reasons.push(`Risk score ${impact.riskScore.toFixed(2)} is approaching threshold.`);
+  }
+
+  const affectedCycles = cycles.filter((cycle) => files.some((f) => cycle.includes(f)));
+  const cycleExamples = cycles.slice(0, 3);
+  const cycleDiagnostics = cycles.length > 0 ? summarizeCycles(cycles) : undefined;
+  if (affectedCycles.length > 0) {
+    verdict = "BLOCK";
+    reasons.push(`Changed files participate in a circular dependency. Example: ${formatCyclePreview(affectedCycles[0]!)}.`);
+  } else if (cycles.length > 0) {
+    if (verdictRank(verdict) < verdictRank("WARN")) verdict = "WARN";
+    reasons.push(`The graph contains ${cycles.length} circular dependency cycle(s). Example: ${formatCyclePreview(cycleExamples[0]!)}.`);
+  }
+
+  if (reasons.length === 0) {
+    reasons.push(`Changes affect ${impact.directlyAffected.length} direct dependents. Risk is low.`);
+  }
+
+  return {
+    verdict,
+    threshold,
+    reasons,
+    impact,
+    cycles,
+    affectedCycles,
+    cycleExamples,
+    cycleDiagnostics,
+    totalAffected,
+  };
 }
 
 function buildErrorPayload(error: unknown, projectRoot: string, tsconfigPath?: string) {
@@ -80,6 +127,28 @@ function buildDecisionSummary(verdictLabel: string, totalAffected: number, scan:
   const impactLabel = totalAffected === 0 ? "locally contained" : `${totalAffected} affected`;
   const scopeLabel = scan.summaryLine ? ` across ${scan.summaryLine}` : "";
   return `${verdictLabel}, ${impactLabel}${scopeLabel}`;
+}
+
+function buildRecommendation(verdict: "PASS" | "WARN" | "BLOCK") {
+  return verdict === "BLOCK"
+    ? "Hold the change until impact is reduced or explicitly reviewed."
+    : verdict === "WARN"
+      ? "Proceed only with targeted review of affected files."
+      : "Safe to proceed based on current graph impact.";
+}
+
+function buildExplanation(verdict: "PASS" | "WARN" | "BLOCK", totalAffected: number, cycleCount: number) {
+  if (verdict === "BLOCK") {
+    return cycleCount > 0
+      ? "The change is blocked because impact is high or a changed file is part of a circular dependency."
+      : "The current graph shape suggests the change reaches too far for the chosen threshold.";
+  }
+  if (verdict === "WARN") {
+    return cycleCount > 0
+      ? "The graph contains circular dependencies, so human review is warranted even if changed files are outside the affected cycle."
+      : "The change is not automatically blocked, but the graph suggests meaningful review is warranted.";
+  }
+  return "The current graph suggests a relatively contained change, though this is not a runtime or test guarantee.";
 }
 
 function formatCyclePreview(cycle: string[]) {
@@ -252,88 +321,111 @@ export function registerTools(server: McpServer): void {
     },
     async ({ projectRoot, files, threshold, tsconfigPath }) =>
       runTool(projectRoot, tsconfigPath, () => {
-        const graph = getGraph(projectRoot, false, tsconfigPath);
-        const impact = analyzeImpact(graph, files);
-        const cycles = detectCycles(graph);
+        const workspaces = detectWorkspacePackages(projectRoot);
+        if (workspaces.length === 0) {
+          const result = evaluateGate(getGraph(projectRoot, false, tsconfigPath), files, threshold);
+          const directScan = buildImpactScanability(result.impact.directlyAffected);
+          const transitiveScan = buildImpactScanability(result.impact.transitivelyAffected);
+          const scanSummary = [
+            buildDecisionSummary(result.verdict, result.totalAffected, directScan),
+            result.cycleDiagnostics ? `${result.cycleDiagnostics.count} cycle${result.cycleDiagnostics.count === 1 ? "" : "s"}` : null,
+          ].filter(Boolean).join(", ");
 
-        const reasons: string[] = [];
-        let verdict: "PASS" | "WARN" | "BLOCK" = "PASS";
-        const totalAffected = impact.directlyAffected.length + impact.transitivelyAffected.length;
-
-        if (impact.riskScore >= threshold) {
-          verdict = "BLOCK";
-          reasons.push(`Risk score ${impact.riskScore} exceeds threshold ${threshold}. ${totalAffected} files would be affected.`);
-        } else if (impact.riskScore >= threshold * 0.6) {
-          verdict = "WARN";
-          reasons.push(`Risk score ${impact.riskScore} is approaching threshold. Review affected files.`);
+          return {
+            verdict: result.verdict,
+            scanSummary,
+            recommendation: buildRecommendation(result.verdict),
+            explanation: buildExplanation(result.verdict, result.totalAffected, result.cycles.length),
+            riskScore: result.impact.riskScore,
+            threshold,
+            reasons: result.reasons,
+            changedFiles: files,
+            directlyAffected: result.impact.directlyAffected,
+            transitivelyAffected: result.impact.transitivelyAffected,
+            impactBreakdown: {
+              directCount: result.impact.directlyAffected.length,
+              transitiveCount: result.impact.transitivelyAffected.length,
+              directScan,
+              transitiveScan,
+            },
+            affectedFiles: result.totalAffected,
+            circularDependencies: result.cycles.length,
+            cycleExamples: result.cycleExamples.length > 0 ? result.cycleExamples : undefined,
+            cycleDiagnostics: result.cycleDiagnostics,
+            cycles: result.cycles.length > 0 ? result.cycles : undefined,
+            affectedCycles: result.affectedCycles,
+          };
         }
 
-        if (impact.directlyAffected.length > 20) {
-          verdict = verdict === "PASS" ? "WARN" : verdict;
-          reasons.push(`High fan-out: ${impact.directlyAffected.length} files directly depend on changed files.`);
-        }
+        const workspaceResults = workspaces.map((workspace) => {
+          const workspaceFiles = files
+            .filter((file) => file === workspace.relativeRoot || file.startsWith(`${workspace.relativeRoot}/`))
+            .map((file) => file.slice(workspace.relativeRoot.length).replace(/^\//, ""));
+          if (workspaceFiles.length === 0) {
+            return {
+              workspace: workspace.relativeRoot,
+              verdict: "PASS" as const,
+              reasons: ["No changed files in this workspace."],
+              changedFiles: [] as string[],
+              directlyAffected: [] as string[],
+              transitivelyAffected: [] as string[],
+              affectedFiles: 0,
+              circularDependencies: 0,
+              riskScore: 0,
+            };
+          }
 
-        const affectedCycles = cycles.filter((cycle) => files.some((f) => cycle.includes(f)));
-        const cycleExamples = cycles.slice(0, 3);
-        const cycleDiagnostics = cycles.length > 0 ? summarizeCycles(cycles) : undefined;
-        if (affectedCycles.length > 0) {
-          verdict = "BLOCK";
-          const preview = formatCyclePreview(affectedCycles[0]!);
-          reasons.push(`Changed files participate in a circular dependency. Example: ${preview}.`);
-        } else if (cycles.length > 0) {
-          verdict = verdict === "PASS" ? "WARN" : verdict;
-          const preview = formatCyclePreview(cycleExamples[0]!);
-          reasons.push(`The graph contains ${cycles.length} circular dependency cycle(s). Example: ${preview}.`);
-        }
+          const result = evaluateGate(buildGraph(workspace.root), workspaceFiles, threshold);
+          return {
+            workspace: workspace.relativeRoot,
+            verdict: result.verdict,
+            reasons: result.reasons,
+            changedFiles: workspaceFiles,
+            directlyAffected: result.impact.directlyAffected,
+            transitivelyAffected: result.impact.transitivelyAffected,
+            affectedFiles: result.totalAffected,
+            circularDependencies: result.cycles.length,
+            riskScore: result.impact.riskScore,
+            cycleExamples: result.cycleExamples.length > 0 ? result.cycleExamples : undefined,
+            affectedCycles: result.affectedCycles,
+          };
+        });
 
-        if (reasons.length === 0) {
-          reasons.push(`Changes affect ${impact.directlyAffected.length} direct dependents. Risk is low.`);
-        }
+        const verdict = workspaceResults.reduce<"PASS" | "WARN" | "BLOCK">(
+          (worst, current) => (verdictRank(current.verdict) > verdictRank(worst) ? current.verdict : worst),
+          "PASS",
+        );
+        const reasons = workspaceResults
+          .filter((workspace) => workspace.verdict !== "PASS")
+          .flatMap((workspace) => workspace.reasons.map((reason) => `[${workspace.workspace}] ${reason}`));
+        const affectedFiles = workspaceResults.reduce((sum, workspace) => sum + workspace.affectedFiles, 0);
+        const circularDependencies = workspaceResults.reduce((sum, workspace) => sum + workspace.circularDependencies, 0);
+        const riskScore = Math.max(...workspaceResults.map((workspace) => workspace.riskScore), 0);
 
-        const recommendation =
-          verdict === "BLOCK"
-            ? "Hold the change until impact is reduced or explicitly reviewed."
-            : verdict === "WARN"
-              ? "Proceed only with targeted review of affected files."
-              : "Safe to proceed based on current graph impact.";
-        const explanation =
-          verdict === "BLOCK"
-            ? "The current graph shape suggests the change reaches too far for the chosen threshold."
-            : verdict === "WARN"
-              ? "The change is not automatically blocked, but the graph suggests meaningful review is warranted."
-              : "The current graph suggests a relatively contained change, though this is not a runtime or test guarantee.";
-
-        const directScan = buildImpactScanability(impact.directlyAffected);
-        const transitiveScan = buildImpactScanability(impact.transitivelyAffected);
-
-        const scanSummary = [
-          buildDecisionSummary(verdict, totalAffected, directScan),
-          cycleDiagnostics ? `${cycleDiagnostics.count} cycle${cycleDiagnostics.count === 1 ? "" : "s"}` : null,
-        ].filter(Boolean).join(", ");
+        const directScan = buildImpactScanability(
+          workspaceResults.flatMap((workspace) => workspace.directlyAffected.map((file) => `${workspace.workspace}/${file}`)),
+        );
 
         return {
           verdict,
-          scanSummary,
-          recommendation,
-          explanation,
-          riskScore: impact.riskScore,
+          scanSummary: buildDecisionSummary(verdict, affectedFiles, directScan),
+          recommendation: buildRecommendation(verdict),
+          explanation: buildExplanation(verdict, affectedFiles, circularDependencies),
+          riskScore,
           threshold,
-          reasons,
+          reasons: reasons.length > 0 ? reasons : ["No changed files in any workspace exceeded the gate."],
           changedFiles: files,
-          directlyAffected: impact.directlyAffected,
-          transitivelyAffected: impact.transitivelyAffected,
+          directlyAffected: workspaceResults.flatMap((workspace) => workspace.directlyAffected.map((file) => `${workspace.workspace}/${file}`)),
+          transitivelyAffected: workspaceResults.flatMap((workspace) => workspace.transitivelyAffected.map((file) => `${workspace.workspace}/${file}`)),
           impactBreakdown: {
-            directCount: impact.directlyAffected.length,
-            transitiveCount: impact.transitivelyAffected.length,
-            directScan,
-            transitiveScan,
+            directCount: workspaceResults.reduce((sum, workspace) => sum + workspace.directlyAffected.length, 0),
+            transitiveCount: workspaceResults.reduce((sum, workspace) => sum + workspace.transitivelyAffected.length, 0),
+            directScan: workspaceResults.length,
+            transitiveScan: affectedFiles,
           },
-          affectedFiles: totalAffected,
-          circularDependencies: cycles.length,
-          cycleExamples: cycleExamples.length > 0 ? cycleExamples : undefined,
-          cycleDiagnostics,
-          cycles: cycles.length > 0 ? cycles : undefined,
-          affectedCycles,
+          affectedFiles,
+          circularDependencies,
+          workspaces: workspaceResults,
         };
       }),
   );

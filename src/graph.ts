@@ -6,7 +6,7 @@
 
 import { Project, SyntaxKind, type SourceFile } from "ts-morph";
 import { dirname, extname, isAbsolute, join, normalize, relative, resolve } from "node:path";
-import { existsSync, statSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 
 export class GraphBuildError extends Error {
   constructor(message: string, readonly code: "INVALID_PROJECT_ROOT" | "INVALID_TSCONFIG") {
@@ -61,6 +61,12 @@ export interface CycleDiagnostics {
     path: string[];
     summary: string;
   }>;
+}
+
+export interface WorkspacePackage {
+  name: string;
+  root: string;
+  relativeRoot: string;
 }
 
 const SOURCE_DIRS = ["src", "app", "components", "lib", "hooks", "stores", "utils", "pages", "tests", "scripts"];
@@ -411,4 +417,70 @@ function canonicalCycleKey(cycle: string[]): string {
   });
 
   return rotations.sort()[0];
+}
+
+function expandWorkspacePattern(projectRoot: string, pattern: string): string[] {
+  if (!pattern.includes("*")) {
+    const target = join(projectRoot, pattern);
+    return existsSync(target) && statSync(target).isDirectory() ? [target] : [];
+  }
+
+  const normalized = pattern.replace(/\\/g, "/").replace(/\/\*\*$/, "/*");
+  if (!normalized.endsWith("/*")) {
+    return [];
+  }
+
+  const baseDir = join(projectRoot, normalized.slice(0, -2));
+  if (!existsSync(baseDir) || !statSync(baseDir).isDirectory()) {
+    return [];
+  }
+
+  return readdirSync(baseDir, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => join(baseDir, entry.name));
+}
+
+export function detectWorkspacePackages(projectRoot: string): WorkspacePackage[] {
+  const patterns = new Set<string>();
+
+  const pnpmWorkspacePath = join(projectRoot, "pnpm-workspace.yaml");
+  if (existsSync(pnpmWorkspacePath)) {
+    for (const line of readFileSync(pnpmWorkspacePath, "utf8").split(/\r?\n/)) {
+      const match = line.match(/^\s*-\s*["']?([^"'#]+)["']?\s*$/);
+      if (match) patterns.add(match[1].trim());
+    }
+  }
+
+  const packageJsonPath = join(projectRoot, "package.json");
+  if (existsSync(packageJsonPath)) {
+    const pkg = JSON.parse(readFileSync(packageJsonPath, "utf8")) as {
+      workspaces?: string[] | { packages?: string[] };
+    };
+    const workspaces = Array.isArray(pkg.workspaces)
+      ? pkg.workspaces
+      : Array.isArray(pkg.workspaces?.packages)
+        ? pkg.workspaces.packages
+        : [];
+    for (const pattern of workspaces) {
+      if (typeof pattern === "string") patterns.add(pattern);
+    }
+  }
+
+  const lernaPath = join(projectRoot, "lerna.json");
+  if (existsSync(lernaPath)) {
+    const lerna = JSON.parse(readFileSync(lernaPath, "utf8")) as { packages?: string[] };
+    for (const pattern of lerna.packages ?? []) {
+      if (typeof pattern === "string") patterns.add(pattern);
+    }
+  }
+
+  return [...patterns]
+    .flatMap((pattern) => expandWorkspacePattern(projectRoot, pattern))
+    .filter((root, index, arr) => arr.indexOf(root) === index)
+    .map((root) => ({
+      name: root.split("/").pop() || root,
+      root,
+      relativeRoot: relative(projectRoot, root).replace(/\\/g, "/"),
+    }))
+    .sort((a, b) => a.relativeRoot.localeCompare(b.relativeRoot));
 }

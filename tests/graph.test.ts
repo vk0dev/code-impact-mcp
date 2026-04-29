@@ -3,7 +3,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { analyzeImpact, buildGraph, detectCycles, summarizeCycles } from "../src/graph.js";
+import { analyzeImpact, buildGraph, detectCycles, detectWorkspacePackages, summarizeCycles } from "../src/graph.js";
 
 function withTempProject(files: Record<string, string>, run: (root: string) => void) {
   const root = mkdtempSync(join(tmpdir(), "code-impact-graph-"));
@@ -165,6 +165,23 @@ describe("graph queries", () => {
             },
           ],
         });
+      },
+    );
+  });
+
+  it("detects workspace package roots from pnpm-workspace.yaml", () => {
+    withTempProject(
+      {
+        "pnpm-workspace.yaml": "packages:\n  - 'packages/*'\n",
+        "packages/app-a/package.json": '{"name":"app-a"}',
+        "packages/app-b/package.json": '{"name":"app-b"}',
+      },
+      (root) => {
+        const workspaces = detectWorkspacePackages(root);
+        expect(workspaces.map((workspace) => workspace.relativeRoot)).toEqual([
+          'packages/app-a',
+          'packages/app-b',
+        ]);
       },
     );
   });
