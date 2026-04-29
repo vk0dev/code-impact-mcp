@@ -103,6 +103,8 @@ Return compact strongly connected components for circular dependencies in the cu
 
 Analyze the blast radius of changing specific files. Returns which files would be directly and transitively affected, with a risk score (0-1). Use BEFORE committing multi-file changes to understand what might break. Does NOT modify any files.
 
+![analyze_impact demo](docs/demo-analyze-impact.gif)
+
 ### `get_dependencies`
 
 Get the import and importedBy relationships for a specific file. Shows what this file depends on and what depends on it. Use to understand coupling before refactoring a file.
@@ -141,6 +143,8 @@ Rebuild the dependency graph from scratch. Call this after significant file addi
 ```
 
 **Agent:** "The gate check returned BLOCK — routes.ts is part of a cycle, so I should untangle that before making more changes."
+
+![gate_check demo](docs/demo-gate-check.gif)
 
 **Agent calls** `detect_cycles`:
 ```json
