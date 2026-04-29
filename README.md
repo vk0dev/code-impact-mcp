@@ -93,7 +93,11 @@ Add to Cline MCP settings:
 
 ### `gate_check`
 
-Pre-commit safety gate. Analyzes specified changes and returns a **PASS/WARN/BLOCK verdict** with reasons. Use as a bounded decision aid before committing multi-file changes. BLOCK means risk exceeds threshold. WARN means human review recommended. PASS means low graph-based risk.
+Pre-commit safety gate. Analyzes specified changes and returns a **PASS/WARN/BLOCK verdict** with reasons. Use as a bounded decision aid before committing multi-file changes. BLOCK means risk exceeds threshold or a changed file participates in a detected cycle. WARN means human review recommended, including graphs that contain cycles elsewhere. PASS means low graph-based risk.
+
+### `detect_cycles`
+
+Return compact strongly connected components for circular dependencies in the current TS/JS graph. Use before refactors or release gating when you want a short list of cycle hotspots instead of a full graph visualization.
 
 ### `analyze_impact`
 
@@ -123,17 +127,39 @@ Rebuild the dependency graph from scratch. Call this after significant file addi
 **Result:**
 ```json
 {
-  "verdict": "WARN",
-  "scanSummary": "WARN, 8 affected across src/routes (4), src/pages (2), src (2)",
-  "recommendation": "Proceed only with targeted review of affected files.",
+  "verdict": "BLOCK",
+  "scanSummary": "BLOCK, 8 affected across src/routes (4), src/pages (2), src (2)",
+  "recommendation": "Refactor the circular dependency before shipping this change.",
   "riskScore": 0.35,
-  "reasons": ["Risk score 0.35 is approaching threshold. Review affected files."],
+  "reasons": [
+    "Changed files participate in a circular dependency. Example: src/router.ts → src/routes.ts"
+  ],
   "affectedFiles": 8,
-  "circularDependencies": 0
+  "circularDependencies": 1,
+  "affectedCycles": [["src/router.ts", "src/routes.ts"]]
 }
 ```
 
-**Agent:** "The gate check returned WARN — 8 files depend on routes.ts. I'll review the affected files before making changes."
+**Agent:** "The gate check returned BLOCK — routes.ts is part of a cycle, so I should untangle that before making more changes."
+
+**Agent calls** `detect_cycles`:
+```json
+{
+  "projectRoot": "/Users/you/projects/my-app"
+}
+```
+
+**Result:**
+```json
+{
+  "cycleCount": 2,
+  "hotspots": ["src/router.ts", "src/routes.ts"],
+  "cycles": [
+    ["src/router.ts", "src/routes.ts"],
+    ["src/cache/index.ts", "src/cache/store.ts"]
+  ]
+}
+```
 
 ## How it works
 
@@ -168,7 +194,7 @@ Supports: ESM imports, ESM re-exports, CommonJS `require()`, NodeNext-style `.js
 | Zero setup (no database) | **Yes** | SQLite required | Setup required | Yes |
 | Install time | **Seconds** | Minutes | Minutes | Seconds |
 | License | **MIT** | MIT | **BSL 1.1** | MIT |
-| Number of tools | 4 | 30+ | 10 | 3 |
+| Number of tools | 5 | 30+ | 10 | 3 |
 | Language support | TS/JS | 11 languages | Multi | Multi |
 | Circular dependency detection | **Yes** | Yes | Yes | No |
 | Agent-optimized output | **Yes** | Partial | Partial | Partial |
@@ -184,7 +210,7 @@ Supports: ESM imports, ESM re-exports, CommonJS `require()`, NodeNext-style `.js
 A: No. CodeImpact MCP is 100% local-first. It reads your project files via ts-morph and never makes network requests. No API keys, no cloud, no telemetry.
 
 **Q: Will it modify my code?**
-A: No. All 4 tools are read-only (annotated with `readOnlyHint: true`). They analyze but never write.
+A: No. All 5 tools are read-only (annotated with `readOnlyHint: true`). They analyze but never write.
 
 **Q: How accurate is the risk score?**
 A: The risk score is a graph-based heuristic (affected files / total files). It does not know about runtime behavior, tests, or data migrations. Treat it as a triage signal, not a guarantee.
