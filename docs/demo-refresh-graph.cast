@@ -1,0 +1,7 @@
+{"version":3,"term":{"cols":80,"rows":24},"timestamp":1777465073,"command":"node scripts/demo-tool.mjs refresh_graph"}
+[5.227, "o", "$ code-impact-mcp demo\r\n"]
+[0.255, "o", "Tool: refresh_graph\r\n"]
+[0.450, "o", "Project: /var/folders/_9/mdg6clp17s123gpw80gkqyfm0000gn/T/code-impact-demo-p7nnxh\r\n"]
+[0.451, "o", "Refreshing dependency graph...\r\n"]
+[0.450, "o", "{\r\n  \"status\": \"Graph rebuilt successfully\",\r\n  \"files\": 7,\r\n  \"edges\": 7,\r\n  \"buildTimeMs\": 3411,\r\n  \"circularDependencies\": 1,\r\n  \"cycles\": [\r\n    [\r\n      \"src/shared/logger.ts\",\r\n      \"src/shared/config.ts\",\r\n      \"src/shared/logger.ts\"\r\n    ]\r\n  ]\r\n}\r\n"]
+[0.047, "x", "0"]

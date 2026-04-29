@@ -1,0 +1,7 @@
+{"version":3,"term":{"cols":80,"rows":24},"timestamp":1777465060,"command":"node scripts/demo-tool.mjs get_dependencies"}
+[4.227, "o", "$ code-impact-mcp demo\r\n"]
+[0.251, "o", "Tool: get_dependencies\r\n"]
+[0.456, "o", "Project: /var/folders/_9/mdg6clp17s123gpw80gkqyfm0000gn/T/code-impact-demo-DmrdH6\r\n"]
+[0.447, "o", "Inspecting: src/api/handler.ts\r\n"]
+[0.454, "o", "{\r\n  \"file\": \"src/api/handler.ts\",\r\n  \"imports\": [\r\n    \"src/services/formatter.ts\",\r\n    \"src/shared/metrics.ts\"\r\n  ],\r\n  \"importedBy\": [\r\n    \"src/index.ts\"\r\n  ],\r\n  \"exports\": [\r\n    \"handler\"\r\n  ],\r\n  \"fanIn\": 1,\r\n  \"fanOut\": 2,\r\n  \"couplingRole\": \"orchestrator\"\r\n}\r\n"]
+[0.082, "x", "0"]

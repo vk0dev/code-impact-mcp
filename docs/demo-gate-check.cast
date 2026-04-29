@@ -1,0 +1,8 @@
+{"version":3,"term":{"cols":80,"rows":24},"timestamp":1777465066,"command":"node scripts/demo-tool.mjs gate_check"}
+[4.623, "o", "$ code-impact-mcp demo\r\n"]
+[0.257, "o", "Tool: gate_check\r\n"]
+[0.451, "o", "Project: /var/folders/_9/mdg6clp17s123gpw80gkqyfm0000gn/T/code-impact-demo-vQUxT0\r\n"]
+[0.452, "o", "Gate threshold: 0.35\r\n"]
+[0.455, "o", "Changed files: src/shared/logger.ts\r\n"]
+[0.456, "o", "{\r\n  \"verdict\": \"BLOCK\",\r\n  \"reasons\": [\r\n    \"Risk score 0.57 exceeds threshold 0.35. 4 files would be affected.\",\r\n    \"Changed files are part of 1 circular dependency cycle(s).\"\r\n  ],\r\n  \"riskScore\": 0.57,\r\n  \"directlyAffected\": [\r\n    \"src/services/formatter.ts\",\r\n    \"src/shared/config.ts\"\r\n  ],\r\n  \"transitivelyAffected\": [\r\n    \"src/api/handler.ts\",\r\n    \"src/index.ts\"\r\n  ],\r\n  \"affectedCycles\": [\r\n    [\r\n      \"src/shared/logger.ts\",\r\n      \"src/shared/config.ts\",\r\n      \"src/shared/logger.ts\"\r\n    ]\r\n  ]\r\n}\r\n"]
+[0.060, "x", "0"]

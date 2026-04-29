@@ -1,0 +1,7 @@
+{"version":3,"term":{"cols":80,"rows":24},"timestamp":1777465040,"command":"node scripts/demo-tool.mjs analyze_impact"}
+[2.753, "o", "$ code-impact-mcp demo\r\n"]
+[0.251, "o", "Tool: analyze_impact\r\n"]
+[0.450, "o", "Project: /var/folders/_9/mdg6clp17s123gpw80gkqyfm0000gn/T/code-impact-demo-nqpgsJ\r\n"]
+[0.451, "o", "Changed files: src/shared/logger.ts\r\n"]
+[0.451, "o", "{\r\n  \"summary\": \"Medium graph impact: review the 4 affected files before changing this area.\",\r\n  \"changedFiles\": [\r\n    \"src/shared/logger.ts\"\r\n  ],\r\n  \"directlyAffected\": [\r\n    \"src/services/formatter.ts\",\r\n    \"src/shared/config.ts\"\r\n  ],\r\n  \"transitivelyAffected\": [\r\n    \"src/api/handler.ts\",\r\n    \"src/index.ts\"\r\n  ],\r\n  \"riskScore\": 0.57,\r\n  \"totalAffected\": 4\r\n}\r\n"]
+[0.024, "x", "0"]
