@@ -1,4 +1,9 @@
 
+## [1.0.4] — 2026-04-29
+
+### Fixed
+- Triggered a no-op patch release after the CI OIDC registry publish path landed so tag pushes can republish to the Official MCP Registry without local device-flow OAuth.
+
 ## [1.0.3] — 2026-04-29
 
 ### Fixed
