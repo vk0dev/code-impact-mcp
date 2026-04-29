@@ -162,7 +162,36 @@ describe("registerTools", () => {
     );
   });
 
-  it("exposes gate_check with a WARN verdict when cycles are involved", async () => {
+  it("warns in gate_check when cycles exist elsewhere in the graph", async () => {
+    await withTempProject(
+      {
+        "src/a.ts": "import { b } from './b'; export const a = b;\n",
+        "src/b.ts": "import { a } from './a'; export const b = a;\n",
+        "src/c.ts": "export const c = 1;\n",
+      },
+      async (root) => {
+        const server = new FakeServer();
+        registerTools(server as any);
+
+        const payload = parseToolResult(
+          await server.handlers.get("gate_check")!({
+            projectRoot: root,
+            files: ["src/c.ts"],
+            threshold: 0.9,
+          }),
+        );
+
+        expect(payload.verdict).toBe("WARN");
+        expect(payload.explanation).toContain("review is warranted");
+        expect(payload.circularDependencies).toBe(1);
+        expect(payload.cycleExamples).toEqual([["src/a.ts", "src/b.ts"]]);
+        expect(payload.affectedCycles).toEqual([]);
+        expect(payload.scanSummary).toContain("1 cycle");
+      },
+    );
+  });
+
+  it("blocks in gate_check when a changed file participates in a cycle", async () => {
     await withTempProject(
       {
         "src/a.ts": "import { b } from './b'; export const a = b;\n",
@@ -180,23 +209,33 @@ describe("registerTools", () => {
           }),
         );
 
-        expect(payload.verdict).toBe("WARN");
-        expect(payload.explanation).toContain("review is warranted");
+        expect(payload.verdict).toBe("BLOCK");
         expect(payload.circularDependencies).toBe(1);
-        expect(payload.cycleExamples).toEqual([["src/a.ts", "src/b.ts", "src/a.ts"]]);
-        expect(payload.cycleDiagnostics).toEqual({
-          count: 1,
-          hotspots: ["src/a.ts", "src/b.ts"],
-          examples: [
-            {
-              path: ["src/a.ts", "src/b.ts", "src/a.ts"],
-              summary: "src/a.ts → src/b.ts → src/a.ts",
-            },
-          ],
-        });
-        expect(payload.scanSummary).toContain("1 cycle");
-        expect(payload.reasons.some((reason: string) => reason.includes("circular dependency"))).toBe(true);
-        expect(payload.reasons.some((reason: string) => reason.includes("src/a.ts → src/b.ts → src/a.ts"))).toBe(true);
+        expect(payload.cycleExamples).toEqual([["src/a.ts", "src/b.ts"]]);
+        expect(payload.affectedCycles).toEqual([["src/a.ts", "src/b.ts"]]);
+        expect(payload.reasons.some((reason: string) => reason.includes("Changed files participate in a circular dependency"))).toBe(true);
+      },
+    );
+  });
+
+  it("exposes detect_cycles with compact SCC output", async () => {
+    await withTempProject(
+      {
+        "src/a.ts": "import { b } from './b'; export const a = b;\n",
+        "src/b.ts": "import { a } from './a'; export const b = a;\n",
+        "src/c.ts": "export const c = 1;\n",
+      },
+      async (root) => {
+        const server = new FakeServer();
+        registerTools(server as any);
+
+        const payload = parseToolResult(
+          await server.handlers.get("detect_cycles")!({ projectRoot: root }),
+        );
+
+        expect(payload.cycleCount).toBe(1);
+        expect(payload.cycles).toEqual([["src/a.ts", "src/b.ts"]]);
+        expect(payload.hotspots).toEqual(["src/a.ts", "src/b.ts"]);
       },
     );
   });

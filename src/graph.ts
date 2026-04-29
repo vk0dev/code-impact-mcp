@@ -222,47 +222,49 @@ export function analyzeImpact(graph: DependencyGraph, changed: string | string[]
 }
 
 export function detectCycles(graph: DependencyGraph): string[][] {
-  const cycles: string[][] = [];
-  const visited = new Set<string>();
-  const visiting = new Set<string>();
+  const indexByNode = new Map<string, number>();
+  const lowLinkByNode = new Map<string, number>();
+  const onStack = new Set<string>();
   const stack: string[] = [];
-  const seenCycleKeys = new Set<string>();
+  const cycles: string[][] = [];
+  let index = 0;
 
-  const visit = (node: string) => {
-    if (visiting.has(node)) {
-      const start = stack.indexOf(node);
-      if (start >= 0) {
-        const cycle = [...stack.slice(start), node];
-        const key = canonicalCycleKey(cycle);
-        if (!seenCycleKeys.has(key)) {
-          seenCycleKeys.add(key);
-          cycles.push(cycle);
-        }
-      }
-      return;
-    }
-
-    if (visited.has(node)) {
-      return;
-    }
-
-    visiting.add(node);
+  const strongConnect = (node: string) => {
+    indexByNode.set(node, index);
+    lowLinkByNode.set(node, index);
+    index += 1;
     stack.push(node);
+    onStack.add(node);
+
     for (const dep of graph.nodes.get(node)?.imports || []) {
-      if (graph.nodes.has(dep)) {
-        visit(dep);
+      if (!graph.nodes.has(dep)) continue;
+      if (!indexByNode.has(dep)) {
+        strongConnect(dep);
+        lowLinkByNode.set(node, Math.min(lowLinkByNode.get(node)!, lowLinkByNode.get(dep)!));
+      } else if (onStack.has(dep)) {
+        lowLinkByNode.set(node, Math.min(lowLinkByNode.get(node)!, indexByNode.get(dep)!));
       }
     }
-    stack.pop();
-    visiting.delete(node);
-    visited.add(node);
+
+    if (lowLinkByNode.get(node) === indexByNode.get(node)) {
+      const component: string[] = [];
+      while (stack.length > 0) {
+        const current = stack.pop()!;
+        onStack.delete(current);
+        component.push(current);
+        if (current === node) break;
+      }
+      if (component.length > 1) {
+        cycles.push(component.sort((a, b) => a.localeCompare(b)));
+      }
+    }
   };
 
-  for (const node of graph.nodes.keys()) {
-    visit(node);
+  for (const node of [...graph.nodes.keys()].sort((a, b) => a.localeCompare(b))) {
+    if (!indexByNode.has(node)) strongConnect(node);
   }
 
-  return cycles;
+  return cycles.sort((a, b) => canonicalCycleKey(a).localeCompare(canonicalCycleKey(b)));
 }
 
 export function summarizeCycles(cycles: string[][], maxExamples = 3): CycleDiagnostics {

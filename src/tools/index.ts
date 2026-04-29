@@ -211,6 +211,31 @@ export function registerTools(server: McpServer): void {
   );
 
   server.registerTool(
+    "detect_cycles",
+    {
+      description:
+        "Return strongly connected components with more than one file from the current dependency graph. " +
+        "Use it to inspect circular dependencies before refactors or release gates.",
+      inputSchema: {
+        projectRoot: z.string().describe("Absolute path to the project root directory"),
+        tsconfigPath: z.string().optional().describe("Optional tsconfig path relative to projectRoot"),
+      },
+      annotations: { readOnlyHint: true },
+    },
+    async ({ projectRoot, tsconfigPath }) =>
+      runTool(projectRoot, tsconfigPath, () => {
+        const graph = getGraph(projectRoot, false, tsconfigPath);
+        const cycles = detectCycles(graph);
+        const summary = summarizeCycles(cycles);
+        return {
+          cycleCount: summary.count,
+          hotspots: summary.hotspots,
+          cycles,
+        };
+      }),
+  );
+
+  server.registerTool(
     "gate_check",
     {
       description:
@@ -249,12 +274,16 @@ export function registerTools(server: McpServer): void {
         }
 
         const affectedCycles = cycles.filter((cycle) => files.some((f) => cycle.includes(f)));
-        const cycleExamples = affectedCycles.slice(0, 3);
-        const cycleDiagnostics = affectedCycles.length > 0 ? summarizeCycles(affectedCycles) : undefined;
+        const cycleExamples = cycles.slice(0, 3);
+        const cycleDiagnostics = cycles.length > 0 ? summarizeCycles(cycles) : undefined;
         if (affectedCycles.length > 0) {
+          verdict = "BLOCK";
+          const preview = formatCyclePreview(affectedCycles[0]!);
+          reasons.push(`Changed files participate in a circular dependency. Example: ${preview}.`);
+        } else if (cycles.length > 0) {
           verdict = verdict === "PASS" ? "WARN" : verdict;
           const preview = formatCyclePreview(cycleExamples[0]!);
-          reasons.push(`Changed files are part of ${affectedCycles.length} circular dependency cycle(s). Example: ${preview}.`);
+          reasons.push(`The graph contains ${cycles.length} circular dependency cycle(s). Example: ${preview}.`);
         }
 
         if (reasons.length === 0) {
@@ -300,9 +329,11 @@ export function registerTools(server: McpServer): void {
             transitiveScan,
           },
           affectedFiles: totalAffected,
-          circularDependencies: affectedCycles.length,
+          circularDependencies: cycles.length,
           cycleExamples: cycleExamples.length > 0 ? cycleExamples : undefined,
           cycleDiagnostics,
+          cycles: cycles.length > 0 ? cycles : undefined,
+          affectedCycles,
         };
       }),
   );

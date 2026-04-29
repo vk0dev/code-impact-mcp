@@ -122,7 +122,7 @@ describe("graph queries", () => {
         const cycles = detectCycles(graph);
 
         expect(cycles.length).toBe(1);
-        expect(cycles[0]).toEqual(["src/a.ts", "src/b.ts", "src/a.ts"]);
+        expect(cycles[0]).toEqual(["src/a.ts", "src/b.ts"]);
       },
     );
   });
@@ -160,8 +160,8 @@ describe("graph queries", () => {
           hotspots: ['src/a.ts', 'src/b.ts'],
           examples: [
             {
-              path: ['src/a.ts', 'src/b.ts', 'src/a.ts'],
-              summary: 'src/a.ts → src/b.ts → src/a.ts',
+              path: ['src/a.ts', 'src/b.ts'],
+              summary: 'src/a.ts → src/b.ts',
             },
           ],
         });
