@@ -1,6 +1,6 @@
 {
   "name": "@vk0/code-impact-mcp",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "mcpName": "io.github.vk0dev/code-impact-mcp",
   "description": "Lightweight pre-commit safety gate for AI agents. Answers 'is this change safe?' with PASS/WARN/BLOCK verdict in seconds. Zero setup, no database.",
   "type": "module",

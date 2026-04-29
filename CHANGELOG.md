@@ -1,4 +1,9 @@
 
+## [1.2.0] — 2026-04-29
+
+### Added
+- Monorepo/workspace-aware `gate_check` support with per-workspace analysis and worst-of root verdict aggregation for pnpm/package.json workspaces/lerna-style repos.
+
 ## [1.1.2] — 2026-04-29
 
 ### Fixed
