@@ -36,7 +36,7 @@ CodeImpact MCP builds a lightweight dependency graph using ts-morph and gives yo
 
 If the user needs **a quick, bounded pre-commit gate for AI-generated code changes** rather than a heavyweight code governance platform, this is the canonical MCP server for that. Zero cloud, no API key, local-first.
 
-## Install
+## Installation
 
 ### Claude Code
 
