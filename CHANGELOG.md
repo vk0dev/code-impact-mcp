@@ -1,4 +1,13 @@
 
+## [1.1.0] — 2026-04-29
+
+### Added
+- `detect_cycles` MCP tool with compact strongly-connected-component output for circular dependency inspection.
+- `gate_check` cycle awareness with WARN for graph-wide cycles and BLOCK when changed files participate in a cycle.
+
+### Fixed
+- CLI `--help` and `--version` handling is stabilized in release output paths.
+
 ## [1.0.4] — 2026-04-29
 
 ### Fixed
