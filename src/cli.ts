@@ -47,7 +47,7 @@ if (args.includes("--help") || args.includes("-h")) {
 }
 
 if (args.includes("--version") || args.includes("-v")) {
-  process.stdout.write("@vk0/code-impact-mcp 1.0.2\n");
+  process.stdout.write("@vk0/code-impact-mcp 1.0.3\n");
   process.exit(0);
 }
 

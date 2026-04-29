@@ -1,4 +1,9 @@
 
+## [1.0.3] — 2026-04-29
+
+### Fixed
+- `--help` and `--version` now print useful output instead of nothing. Previously running `npx -y @vk0/code-impact-mcp --help` produced an empty response, which made it impossible to discover the configuration steps without reading the README. The default stdio MCP behavior is unchanged.
+
 ## [1.0.2] — 2026-04-22
 
 ### Added
