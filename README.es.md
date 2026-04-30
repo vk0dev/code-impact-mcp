@@ -1,57 +1,57 @@
 # CodeImpact MCP
 
 [![npm](https://img.shields.io/npm/v/@vk0/code-impact-mcp)](https://www.npmjs.com/package/@vk0/code-impact-mcp)
-[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
-[![CI](https://img.shields.io/github/actions/workflow/status/vk0dev/code-impact-mcp/ci.yml?branch=main)](https://github.com/vk0dev/code-impact-mcp/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![CI](https://github.com/vk0dev/code-impact-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/vk0dev/code-impact-mcp/actions/workflows/ci.yml)
 
-> **MCP local para análisis de dependencias y blast radius.** Ayuda al agente a evaluar impacto, rutas de dependencia, ciclos y nivel de riesgo antes de tocar código.
+**Puerta rápida de dependencias antes del commit para cambios asistidos por IA.** Responde a “¿esto es seguro de commitear?” con PASS/WARN/BLOCK en segundos, para detectar blast radius riesgoso antes de un mal commit, no después. Sin base de datos ni configuración pesada.
 
-**Idiomas:** [English](./README.md) · [日本語](./README.ja.md) · [简体中文](./README.zh-CN.md) · [Русский](./README.ru.md) · Español
+[日本語](./README.ja.md) | [中文](./README.zh-CN.md) | [Русский](./README.ru.md) | [English](./README.md)
 
----
+## Best for
 
-## Cuándo usarlo
+- **Checks de refactor antes del commit:** cuando cambias un archivo compartido, una ruta o un módulo y necesitas una respuesta rápida PASS/WARN/BLOCK.
+- **Ediciones multiarchivo por agentes:** cuando un agente de IA va a tocar varios archivos y quieres una puerta acotada con dependencias antes del commit.
+- **Triage de blast radius sin infraestructura:** cuando necesitas un risk score rápido y un resumen de archivos afectados sin montar base de datos, graph service o un layer pesado de governance.
 
-Usa CodeImpact MCP cuando el agente necesite responder **“qué rompe este cambio”** y no solo **“dónde está este símbolo”**.
+## Not for
 
-- revisar blast radius antes de refactors
-- usar un gate graph-aware antes del commit
-- detectar dependencias cíclicas
-- entender impacto entre paquetes en monorepos
-- comparar varias opciones de cambio por riesgo
+Esto **no** es una full policy platform, una suite de compliance ni un producto de graph visualization pesada.
 
-## Instalación
+Está pensado para checks locales y rápidos al momento del commit, no para governance de repositorio completo, exploración persistente del grafo o reporting ejecutivo.
 
-Todo usa `npx`, sin instalación global.
+## Why / When to use
 
-### Claude Desktop
+Usa este servidor MCP cuando:
 
-- macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
-- Windows: `%APPDATA%\Claude\claude_desktop_config.json`
+- el usuario pregunta: **“¿Qué se rompe si cambio este archivo?”**
+- el usuario pregunta: **“¿Es seguro commitear este refactor?”**
+- el usuario pide: **“Revisa el blast radius antes de hacer push”**
+- el usuario pregunta: **“¿Qué depende de este módulo?”**
+- un agente necesita una **puerta rápida pre-commit** antes de modificar varios archivos
+- un agente quiere un **risk score numérico (0-1)** para un cambio propuesto
+- necesitas dependency analysis **sin montar base de datos ni tree-sitter**
 
-```json
-{
-  "mcpServers": {
-    "code-impact": {
-      "command": "npx",
-      "args": ["-y", "@vk0/code-impact-mcp"]
-    }
-  }
-}
-```
+CodeImpact MCP construye un dependency graph ligero con ts-morph y te da una respuesta acotada: PASS, WARN o BLOCK. Zero cloud, no API key, local-first.
+
+Si necesitas **una puerta pre-commit rápida y acotada para cambios de código generados por IA**, y no una plataforma pesada de code governance, este es el servidor MCP canónico para ese caso. Zero cloud, no API key, local-first.
+
+## Installation
 
 ### Claude Code
 
 ```bash
-claude mcp add --transport stdio code-impact -- npx -y @vk0/code-impact-mcp
+claude mcp add code-impact-mcp -- npx -y @vk0/code-impact-mcp
 ```
 
-O mediante `.mcp.json`:
+### Claude Desktop
+
+Añade esto a `claude_desktop_config.json`:
 
 ```json
 {
   "mcpServers": {
-    "code-impact": {
+    "code-impact-mcp": {
       "command": "npx",
       "args": ["-y", "@vk0/code-impact-mcp"]
     }
@@ -59,74 +59,191 @@ O mediante `.mcp.json`:
 }
 ```
 
-### Verificación
+### Cursor
 
-Pregunta qué herramientas expone `code-impact`. Deben aparecer las **5 herramientas** actuales:
+Añade esto a `.cursor/mcp.json`:
 
-- `gate_check`
-- `analyze_impact`
-- `find_path`
-- `refresh_graph`
-- `detect_cycles`
+```json
+{
+  "mcpServers": {
+    "code-impact-mcp": {
+      "command": "npx",
+      "args": ["-y", "@vk0/code-impact-mcp"]
+    }
+  }
+}
+```
 
-## Herramientas
+### Cline
+
+Añádelo a la configuración de servidores MCP de Cline:
+
+```json
+{
+  "mcpServers": {
+    "code-impact-mcp": {
+      "command": "npx",
+      "args": ["-y", "@vk0/code-impact-mcp"]
+    }
+  }
+}
+```
+
+## Tools
 
 ### `gate_check`
 
-Gate de seguridad antes del commit. Analiza cambios específicos y devuelve **PASS / WARN / BLOCK**. El wording actual es cycle-aware: si hay ciclos existentes o señales de cycle-risk, el resultado puede subir a WARN o BLOCK.
-
-![gate_check demo](./docs/demo-gate-check.gif)
-
-### `analyze_impact`
-
-Muestra qué archivos, módulos y nodos quedan afectados por un cambio.
-
-### `find_path`
-
-Encuentra la ruta de dependencia entre dos nodos para explicar por qué un componente impacta a otro.
-
-### `refresh_graph`
-
-Reconstruye el grafo de dependencias desde cero a partir del estado actual del repo.
+Puerta de seguridad pre-commit. Analiza cambios especificados y devuelve un **PASS/WARN/BLOCK verdict** con razones. Úsalo como ayuda de decisión acotada antes de commitear cambios en varios archivos. BLOCK significa que el riesgo supera el threshold o que un archivo modificado participa en un ciclo detectado. WARN significa que se recomienda revisión humana, incluso si hay ciclos en otra parte del grafo. PASS significa riesgo bajo basado en el grafo.
 
 ### `detect_cycles`
 
-Detecta dependencias cíclicas. El producto actual ya no es el surface antiguo de 4 herramientas: ahora el surface correcto es de **5 herramientas** e incluye `detect_cycles`.
+Devuelve componentes fuertemente conectados compactos para dependencias circulares en el grafo TS/JS actual. Úsalo antes de refactors o release gating cuando quieras una lista corta de hotspots de ciclos y no una visualización completa del grafo.
 
-![cycle detection demo](./docs/demo-cycles.gif)
+### `analyze_impact`
 
-## Comparación
+Analiza el blast radius de cambiar archivos específicos. Devuelve qué archivos se verían afectados directa y transitivamente, con un risk score (0-1). Úsalo ANTES de commitear cambios en varios archivos para entender qué podría romperse. No modifica archivos.
 
-CodeImpact MCP encaja cuando necesitas análisis **local, invocable por el agente y realmente consciente del grafo**.
+![analyze_impact demo](docs/demo-analyze-impact.gif)
 
-- Más útil que una simple búsqueda de imports para blast radius y path reasoning.
-- Más liviano que plataformas externas pesadas.
-- Alineado con el README en inglés actual, incluyendo framing de comparación, soporte de monorepo y cycle detection.
+### `get_dependencies`
+
+Obtiene las relaciones import e importedBy para un archivo específico. Muestra de qué depende el archivo y qué depende de él. Úsalo para entender el acoplamiento antes de refactorizar.
+
+### `refresh_graph`
+
+Reconstruye el dependency graph desde cero. Llámalo después de adiciones/eliminaciones importantes de archivos o si los resultados parecen obsoletos. Devuelve estadísticas del grafo, incluido número de archivos, aristas, tiempo de construcción y dependencias circulares detectadas.
+
+## Example conversation
+
+**Usuario:** "Quiero refactorizar `src/routes.ts` — ¿es seguro?"
+
+**El agente llama** `gate_check`:
+```json
+{
+  "projectRoot": "/Users/you/projects/my-app",
+  "files": ["src/routes.ts"],
+  "threshold": 0.5
+}
+```
+
+**Resultado:**
+```json
+{
+  "verdict": "BLOCK",
+  "scanSummary": "BLOCK, 8 affected across src/routes (4), src/pages (2), src (2)",
+  "recommendation": "Refactor the circular dependency before shipping this change.",
+  "riskScore": 0.35,
+  "reasons": [
+    "Changed files participate in a circular dependency. Example: src/router.ts → src/routes.ts"
+  ],
+  "affectedFiles": 8,
+  "circularDependencies": 1,
+  "affectedCycles": [["src/router.ts", "src/routes.ts"]]
+}
+```
+
+**Agente:** "El gate check devolvió BLOCK: `routes.ts` forma parte de un ciclo, así que primero hay que desenredar esa dependencia."
+
+![gate_check demo](docs/demo-gate-check.gif)
+
+**El agente llama** `detect_cycles`:
+```json
+{
+  "projectRoot": "/Users/you/projects/my-app"
+}
+```
+
+**Resultado:**
+```json
+{
+  "cycleCount": 2,
+  "hotspots": ["src/router.ts", "src/routes.ts"],
+  "cycles": [
+    ["src/router.ts", "src/routes.ts"],
+    ["src/cache/index.ts", "src/cache/store.ts"]
+  ]
+}
+```
+
+## How it works
+
+```
+┌─────────────┐     ┌──────────────┐     ┌──────────────┐
+│  Agent asks  │────▶│  ts-morph     │────▶│  In-memory    │
+│  "safe to    │     │  parses       │     │  dependency   │
+│   change?"   │     │  imports      │     │  graph        │
+└─────────────┘     └──────────────┘     └──────┬───────┘
+                                                 │
+                    ┌──────────────┐     ┌───────▼───────┐
+                    │  PASS/WARN/  │◀────│  BFS traverse  │
+                    │  BLOCK       │     │  reverse deps  │
+                    │  + risk 0-1  │     │  + risk score  │
+                    └──────────────┘     └───────────────┘
+```
+
+1. **Parse:** ts-morph escanea tu proyecto en busca de ESM imports, re-exports y CommonJS require
+2. **Graph:** construye un dependency graph en memoria (sin base de datos ni persistence)
+3. **Analyze:** ejecuta un BFS traversal de reverse dependencies desde los archivos modificados
+4. **Score:** Riesgo = archivos afectados / total de archivos (0-1)
+5. **Verdict:** PASS (< 60% del threshold), WARN (60-100%), BLOCK (> threshold)
+
+Soporta: ESM imports, ESM re-exports, CommonJS `require()`, y resolución NodeNext-style `.js` → `.ts`.
+
+## Comparison
+
+| Feature | CodeImpact MCP | Codegraph | Depwire | dependency-mcp |
+|---------|:---:|:---:|:---:|:---:|
+| Pre-commit gate (PASS/WARN/BLOCK) | **Yes** | No | No | No |
+| Numeric risk score (0-1) | **Yes** | No | Health score | No |
+| Zero setup (no database) | **Yes** | SQLite required | Setup required | Yes |
+| Install time | **Seconds** | Minutes | Minutes | Seconds |
+| License | **MIT** | MIT | **BSL 1.1** | MIT |
+| Number of tools | 5 | 30+ | 10 | 3 |
+| Language support | TS/JS | 11 languages | Multi | Multi |
+| Circular dependency detection | **Yes** | Yes | Yes | No |
+| Agent-optimized output | **Yes** | Partial | Partial | Partial |
+| Local-first / zero cloud | **Yes** | Yes | Yes | Yes |
+
+**Cuándo elegir CodeImpact MCP:** cuando quieres una respuesta rápida y acotada (PASS/WARN/BLOCK) antes de commitear, no una herramienta de exploración profunda del codebase. Zero setup, licencia MIT, funciona en segundos.
+
+**Cuándo elegir Codegraph/Depwire:** cuando necesitas exploración profunda del codebase en muchos lenguajes con persistent storage y visualización.
 
 ## FAQ
 
-**¿Es solo para monorepos?**
-No. Ahí brilla más, pero también sirve en repos normales.
+**Q: ¿Accede a la red?**
+A: No. CodeImpact MCP es 100% local-first. Lee los archivos de tu proyecto mediante ts-morph y nunca hace solicitudes de red. Sin API keys, sin cloud y sin telemetry.
 
-**¿Qué hace `gate_check` hoy?**
-Devuelve PASS, WARN o BLOCK teniendo en cuenta el riesgo del cambio y los ciclos.
+**Q: ¿Modifica mi código?**
+A: No. Las 5 tools son read-only (`readOnlyHint: true`). Analizan, pero no escriben.
 
-**¿Por qué ahora son 5 herramientas?**
-Porque `detect_cycles` forma parte del surface actual y ya no debe omitirse en la documentación.
+**Q: ¿Qué tan preciso es el risk score?**
+A: Es una heurística basada en el grafo (archivos afectados / total de archivos). No conoce runtime behavior, tests ni data migrations. Tómalo como señal de triage, no como garantía.
 
-## Desarrollo
+**Q: ¿Soporta proyectos solo de JavaScript?**
+A: Sí. Funciona con archivos TypeScript y JavaScript (`.ts`, `.tsx`, `.js`, `.jsx`, `.mts`, `.cts`, `.mjs`, `.cjs`).
 
-```bash
-npm ci
-npm run build
-npm test
-npm run lint
-```
+**Q: ¿Qué tan rápido es?**
+A: La construcción del grafo suele tardar de 1 a 5 segundos según el tamaño del proyecto. Las tool calls individuales contra un grafo cacheado son casi instantáneas.
+
+**Q: ¿Hace caché del grafo?**
+A: Sí. El grafo se cachea en memoria por par `(projectRoot, tsconfigPath)`. Usa `refresh_graph` para reconstruirlo tras cambios importantes.
+
+## Limitations
+
+- Solo TypeScript/JavaScript (sin soporte multi-language)
+- No distingue entre runtime imports y type-only imports
+- El grafo existe solo en memoria (sin persistence tras reiniciar el servidor)
+- El risk score es estructural, no semántico; no sabe qué archivos son “más importantes”
+- No hay visualization output (solo texto/JSON)
 
 ## Changelog
 
-Consulta [CHANGELOG.md](./CHANGELOG.md).
+Consulta [CHANGELOG.md](./CHANGELOG.md) para el historial de versiones.
 
-## Licencia
+## License
 
-[MIT](./LICENSE) © vk0.dev
+[MIT](./LICENSE) — libre de usar en cualquier proyecto, comercial o personal.
+
+## Contributing
+
+Issues y PRs bienvenidos en [github.com/vk0dev/code-impact-mcp](https://github.com/vk0dev/code-impact-mcp).

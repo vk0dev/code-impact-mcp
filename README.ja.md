@@ -1,57 +1,57 @@
 # CodeImpact MCP
 
 [![npm](https://img.shields.io/npm/v/@vk0/code-impact-mcp)](https://www.npmjs.com/package/@vk0/code-impact-mcp)
-[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
-[![CI](https://img.shields.io/github/actions/workflow/status/vk0dev/code-impact-mcp/ci.yml?branch=main)](https://github.com/vk0dev/code-impact-mcp/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![CI](https://github.com/vk0dev/code-impact-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/vk0dev/code-impact-mcp/actions/workflows/ci.yml)
 
-> **依存グラフと blast radius 分析のためのローカル MCP サーバー。** 変更前に影響範囲、リスク、循環依存を把握しやすくします。
+**AI支援コード変更のための高速な pre-commit dependency gate。** 「これは安全にコミットできるか？」に PASS/WARN/BLOCK で数秒以内に答え、危険な blast radius を悪いコミットの前に見つけます。データベース不要、重いセットアップ不要。
 
-**Languages:** [English](./README.md) · 日本語 · [简体中文](./README.zh-CN.md) · [Русский](./README.ru.md) · [Español](./README.es.md)
+[English](./README.md) | [中文](./README.zh-CN.md) | [Русский](./README.ru.md) | [Español](./README.es.md)
 
----
+## Best for
 
-## 使いどころ
+- **コミット前のリファクタ確認:** 共有ファイル、ルート、モジュールを変更する前に PASS/WARN/BLOCK を素早く知りたいとき。
+- **エージェントによる複数ファイル編集:** AIエージェントが複数ファイルを触る前に、依存関係を踏まえた bounded gate が欲しいとき。
+- **インフラなしの blast-radius triage:** データベースや graph service、重い governance layer なしで risk score と影響ファイル要約が欲しいとき。
 
-CodeImpact MCP は、エージェントが単にシンボルを探すのではなく、**この変更で何が壊れうるか**を知る必要があるときに使います。
+## Not for
 
-- リファクタ前の blast radius 確認
-- コミット前の graph-aware gate
-- 循環依存の検出
-- モノレポでの影響経路の確認
-- 複数の変更候補をリスク比較したい場合
+これは **full policy platform** でも **compliance suite** でも **可視化中心のコードグラフ製品** でもありません。
 
-## インストール
+目的はローカルで素早い commit-time safety check であり、repo-wide governance、永続的なグラフ探索、経営向けレポートではありません。
 
-すべて `npx` ベースで、グローバルインストールは不要です。
+## Why / When to use
 
-### Claude Desktop
+次のようなときにこの MCP server を使います。
 
-- macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
-- Windows: `%APPDATA%\Claude\claude_desktop_config.json`
+- ユーザーが **「このファイルを変えると何が壊れる？」** と聞くとき
+- ユーザーが **「このリファクタは安全にコミットできる？」** と聞くとき
+- ユーザーが **「push 前に blast radius を見て」** と頼むとき
+- ユーザーが **「このモジュールに依存しているものは？」** と聞くとき
+- エージェントが複数ファイルを変更する前に **高速な pre-commit gate** が必要なとき
+- 提案変更に対して **数値 risk score (0-1)** が欲しいとき
+- データベースや tree-sitter を用意せずに **dependency analysis** したいとき
 
-```json
-{
-  "mcpServers": {
-    "code-impact": {
-      "command": "npx",
-      "args": ["-y", "@vk0/code-impact-mcp"]
-    }
-  }
-}
-```
+CodeImpact MCP は ts-morph で軽量な dependency graph を作り、PASS / WARN / BLOCK という bounded answer を返します。Zero cloud, no API key, local-first.
+
+AI生成コード変更に対して **重い governance platform ではなく、高速で bounded な pre-commit gate** が欲しいなら、これがその用途の canonical MCP server です。Zero cloud, no API key, local-first.
+
+## Installation
 
 ### Claude Code
 
 ```bash
-claude mcp add --transport stdio code-impact -- npx -y @vk0/code-impact-mcp
+claude mcp add code-impact-mcp -- npx -y @vk0/code-impact-mcp
 ```
 
-または `.mcp.json`:
+### Claude Desktop
+
+`claude_desktop_config.json` に追加します。
 
 ```json
 {
   "mcpServers": {
-    "code-impact": {
+    "code-impact-mcp": {
       "command": "npx",
       "args": ["-y", "@vk0/code-impact-mcp"]
     }
@@ -59,74 +59,191 @@ claude mcp add --transport stdio code-impact -- npx -y @vk0/code-impact-mcp
 }
 ```
 
-### 動作確認
+### Cursor
 
-`code-impact` が公開しているツールを尋ねると、次の **5 ツール** が見えるはずです。
+`.cursor/mcp.json` に追加します。
 
-- `gate_check`
-- `analyze_impact`
-- `find_path`
-- `refresh_graph`
-- `detect_cycles`
+```json
+{
+  "mcpServers": {
+    "code-impact-mcp": {
+      "command": "npx",
+      "args": ["-y", "@vk0/code-impact-mcp"]
+    }
+  }
+}
+```
 
-## ツール
+### Cline
+
+Cline の MCP server 設定に追加します。
+
+```json
+{
+  "mcpServers": {
+    "code-impact-mcp": {
+      "command": "npx",
+      "args": ["-y", "@vk0/code-impact-mcp"]
+    }
+  }
+}
+```
+
+## Tools
 
 ### `gate_check`
 
-Pre-commit safety gate。指定した変更を解析し、**PASS / WARN / BLOCK** を返します。現在は cycle-aware で、循環依存や cycle-risk を踏まえて WARN や BLOCK まで引き上げることがあります。
-
-![gate_check demo](./docs/demo-gate-check.gif)
-
-### `analyze_impact`
-
-変更がどのファイル、モジュール、ノードへ波及するかを示します。
-
-### `find_path`
-
-2 つのノード間の依存パスを見つけ、影響の理由を説明します。
-
-### `refresh_graph`
-
-依存グラフを現在のリポジトリ状態から再構築します。大きな構成変更後に便利です。
+Pre-commit safety gate。指定した変更を解析し、理由付きで **PASS/WARN/BLOCK verdict** を返します。複数ファイル変更をコミットする前の bounded decision aid として使ってください。BLOCK は risk が threshold を超えた、または変更ファイルが検出された cycle に参加していることを意味します。WARN は、グラフの別の場所に cycles がある場合を含め、人手レビュー推奨です。PASS はグラフベースのリスクが低いことを意味します。
 
 ### `detect_cycles`
 
-循環依存を検出します。現在の製品 surface は **4 ツールではなく 5 ツール** であり、`detect_cycles` は正式なツールです。
+現在の TS/JS graph にある circular dependencies を compact な strongly connected components として返します。リファクタ前や release gating 前に、完全な graph visualization ではなく cycle hotspot の短い一覧が欲しいときに使います。
 
-![cycle detection demo](./docs/demo-cycles.gif)
+### `analyze_impact`
 
-## 比較
+特定ファイル変更の blast radius を分析します。直接的・推移的に影響を受けるファイルと risk score (0-1) を返します。複数ファイル変更をコミットする前に、何が壊れそうか把握するために使います。ファイルは変更しません。
 
-CodeImpact MCP は、単なる import 検索ではなく **ローカルで agent が呼べる graph-aware 分析** が必要なときに向いています。
+![analyze_impact demo](docs/demo-analyze-impact.gif)
 
-- 単純な検索ツールよりも blast radius と path reasoning が強い
-- 重い外部プラットフォームよりローカル導入が簡単
-- 現行 README の英語版と同じく、cycle detection を含む 5-tool surface を前提にしている
+### `get_dependencies`
+
+特定ファイルの import / importedBy 関係を返します。リファクタ前に、そのファイルが何に依存し、何から依存されているかを把握できます。
+
+### `refresh_graph`
+
+dependency graph をゼロから再構築します。大きなファイル追加・削除のあとや、結果が古そうに見えるときに呼び出してください。ファイル数、edge 数、build time、検出した circular dependencies を返します。
+
+## Example conversation
+
+**ユーザー:** "`src/routes.ts` をリファクタしたい。安全？"
+
+**エージェントが** `gate_check` **を呼ぶ:**
+```json
+{
+  "projectRoot": "/Users/you/projects/my-app",
+  "files": ["src/routes.ts"],
+  "threshold": 0.5
+}
+```
+
+**結果:**
+```json
+{
+  "verdict": "BLOCK",
+  "scanSummary": "BLOCK, 8 affected across src/routes (4), src/pages (2), src (2)",
+  "recommendation": "Refactor the circular dependency before shipping this change.",
+  "riskScore": 0.35,
+  "reasons": [
+    "Changed files participate in a circular dependency. Example: src/router.ts → src/routes.ts"
+  ],
+  "affectedFiles": 8,
+  "circularDependencies": 1,
+  "affectedCycles": [["src/router.ts", "src/routes.ts"]]
+}
+```
+
+**エージェント:** "gate check は BLOCK でした。`routes.ts` は cycle に入っているので、まずその依存関係をほどく必要があります。"
+
+![gate_check demo](docs/demo-gate-check.gif)
+
+**エージェントが** `detect_cycles` **を呼ぶ:**
+```json
+{
+  "projectRoot": "/Users/you/projects/my-app"
+}
+```
+
+**結果:**
+```json
+{
+  "cycleCount": 2,
+  "hotspots": ["src/router.ts", "src/routes.ts"],
+  "cycles": [
+    ["src/router.ts", "src/routes.ts"],
+    ["src/cache/index.ts", "src/cache/store.ts"]
+  ]
+}
+```
+
+## How it works
+
+```
+┌─────────────┐     ┌──────────────┐     ┌──────────────┐
+│  Agent asks  │────▶│  ts-morph     │────▶│  In-memory    │
+│  "safe to    │     │  parses       │     │  dependency   │
+│   change?"   │     │  imports      │     │  graph        │
+└─────────────┘     └──────────────┘     └──────┬───────┘
+                                                 │
+                    ┌──────────────┐     ┌───────▼───────┐
+                    │  PASS/WARN/  │◀────│  BFS traverse  │
+                    │  BLOCK       │     │  reverse deps  │
+                    │  + risk 0-1  │     │  + risk score  │
+                    └──────────────┘     └───────────────┘
+```
+
+1. **Parse:** ts-morph が ESM imports、re-exports、CommonJS require を走査
+2. **Graph:** インメモリ dependency graph を構築（DB なし、永続化なし）
+3. **Analyze:** 変更ファイルから reverse dependencies を BFS traversal
+4. **Score:** Risk = affected files / total files (0-1)
+5. **Verdict:** PASS (< threshold の 60%)、WARN (60-100%)、BLOCK (> threshold)
+
+対応: ESM imports、ESM re-exports、CommonJS `require()`、NodeNext-style `.js` → `.ts` resolution。
+
+## Comparison
+
+| Feature | CodeImpact MCP | Codegraph | Depwire | dependency-mcp |
+|---------|:---:|:---:|:---:|:---:|
+| Pre-commit gate (PASS/WARN/BLOCK) | **Yes** | No | No | No |
+| Numeric risk score (0-1) | **Yes** | No | Health score | No |
+| Zero setup (no database) | **Yes** | SQLite required | Setup required | Yes |
+| Install time | **Seconds** | Minutes | Minutes | Seconds |
+| License | **MIT** | MIT | **BSL 1.1** | MIT |
+| Number of tools | 5 | 30+ | 10 | 3 |
+| Language support | TS/JS | 11 languages | Multi | Multi |
+| Circular dependency detection | **Yes** | Yes | Yes | No |
+| Agent-optimized output | **Yes** | Partial | Partial | Partial |
+| Local-first / zero cloud | **Yes** | Yes | Yes | Yes |
+
+**CodeImpact MCP を選ぶとき:** コミット前に PASS/WARN/BLOCK の高速で bounded な答えが欲しいとき。full codebase exploration tool は不要。Zero setup、MIT license、数秒で動きます。
+
+**Codegraph/Depwire を選ぶとき:** 多言語コードベースを persistent storage と visualization 付きで深く探索したいとき。
 
 ## FAQ
 
-**モノレポ専用ですか？**
-いいえ。モノレポで特に有用ですが、通常のリポジトリでも使えます。
+**Q: ネットワークにアクセスしますか？**
+A: いいえ。CodeImpact MCP は 100% local-first です。ts-morph でプロジェクトファイルを読み取るだけで、ネットワークリクエストは行いません。API key も cloud も telemetry もありません。
 
-**`gate_check` は今どう動きますか？**
-現在は cycle-aware で、変更リスクに応じて PASS / WARN / BLOCK を返します。
+**Q: コードを書き換えますか？**
+A: いいえ。5つの tools はすべて read-only (`readOnlyHint: true`) です。解析はしますが、書き込みはしません。
 
-**なぜ 5 ツールなのですか？**
-現在の製品には `detect_cycles` が正式に含まれているためです。
+**Q: risk score はどれくらい正確ですか？**
+A: graph-based heuristic（affected files / total files）です。runtime behavior、tests、data migrations は分かりません。保証ではなく triage signal として扱ってください。
 
-## 開発
+**Q: JavaScript-only プロジェクトも対応しますか？**
+A: はい。TypeScript / JavaScript ファイル（`.ts`, `.tsx`, `.js`, `.jsx`, `.mts`, `.cts`, `.mjs`, `.cjs`）に対応します。
 
-```bash
-npm ci
-npm run build
-npm test
-npm run lint
-```
+**Q: どれくらい速いですか？**
+A: グラフ構築はプロジェクト規模によりますが通常 1〜5 秒です。キャッシュ済みグラフに対する individual tool call はほぼ瞬時です。
+
+**Q: グラフはキャッシュされますか？**
+A: はい。グラフは `(projectRoot, tsconfigPath)` ペアごとにインメモリでキャッシュされます。大きな変更後は `refresh_graph` で再構築してください。
+
+## Limitations
+
+- TypeScript/JavaScript のみ（multi-language support なし）
+- runtime imports と type-only imports を区別しない
+- グラフはインメモリのみ（サーバー再起動後の persistence なし）
+- risk score は構造ベースであり、意味的ではない。どのファイルが「重要」かは分からない
+- visualization output はない（text/JSON のみ）
 
 ## Changelog
 
-[CHANGELOG.md](./CHANGELOG.md) を参照してください。
+リリース履歴は [CHANGELOG.md](./CHANGELOG.md) を参照してください。
 
-## ライセンス
+## License
 
-[MIT](./LICENSE) © vk0.dev
+[MIT](./LICENSE) — 商用・個人を問わず利用できます。
+
+## Contributing
+
+Issue と PR を歓迎します: [github.com/vk0dev/code-impact-mcp](https://github.com/vk0dev/code-impact-mcp)

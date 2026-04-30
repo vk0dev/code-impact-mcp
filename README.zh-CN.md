@@ -1,57 +1,57 @@
 # CodeImpact MCP
 
 [![npm](https://img.shields.io/npm/v/@vk0/code-impact-mcp)](https://www.npmjs.com/package/@vk0/code-impact-mcp)
-[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
-[![CI](https://img.shields.io/github/actions/workflow/status/vk0dev/code-impact-mcp/ci.yml?branch=main)](https://github.com/vk0dev/code-impact-mcp/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![CI](https://github.com/vk0dev/code-impact-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/vk0dev/code-impact-mcp/actions/workflows/ci.yml)
 
-> **本地依赖图与 blast radius 分析 MCP。** 帮助 agent 在改代码之前判断影响范围、路径关系、循环依赖和风险等级。
+**面向 AI 辅助代码修改的快速 pre-commit dependency gate。** 它会在几秒内用 PASS/WARN/BLOCK 回答“这个现在可以安全提交吗？”，帮助你在坏提交发生前发现风险 blast radius，而不是事后补救。无需数据库，也不需要重型配置。
 
-**语言:** [English](./README.md) · [日本語](./README.ja.md) · 简体中文 · [Русский](./README.ru.md) · [Español](./README.es.md)
+[English](./README.md) | [日本語](./README.ja.md) | [Русский](./README.ru.md) | [Español](./README.es.md)
 
----
+## Best for
 
-## 何时使用
+- **提交前重构检查：** 当你要改共享文件、路由或模块，并且想快速得到 PASS/WARN/BLOCK 结论时。
+- **代理执行多文件修改：** 当 AI 代理即将修改多个文件，而你想在提交前先做一次有边界的依赖关系闸门检查时。
+- **无基础设施的 blast-radius triage：** 当你想快速拿到 risk score 和受影响文件摘要，而不想搭建数据库、graph service 或重型治理层时。
 
-当 agent 需要回答的不是“这个符号在哪”，而是 **“改这里会影响什么”** 时，就该用 CodeImpact MCP。
+## Not for
 
-- 重构前做 blast radius 判断
-- 提交前做 graph-aware gate
-- 检测循环依赖
-- 在 monorepo 中解释跨包影响路径
-- 比较多个改动候选的风险
+这 **不是** full policy platform、compliance suite，也不是以可视化为核心的代码图谱产品。
 
-## 安装
+它面向快速的本地提交时安全检查，而不是 repo 级治理、持久化图谱探索或管理层汇报。
 
-全部通过 `npx` 运行，不需要全局安装。
+## Why / When to use
 
-### Claude Desktop
+在以下场景使用这个 MCP server：
 
-- macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
-- Windows: `%APPDATA%\Claude\claude_desktop_config.json`
+- 用户问：**“如果我改这个文件，会有什么东西坏掉？”**
+- 用户问：**“这个重构现在安全提交吗？”**
+- 用户要求：**“在 push 前看一下 blast radius”**
+- 用户问：**“哪些东西依赖这个模块？”**
+- 代理在修改多个文件前需要一个**快速的 pre-commit gate**
+- 代理想得到一个**数值 risk score（0-1）**
+- 你想做**dependency analysis**，但不想搭建数据库或 tree-sitter
 
-```json
-{
-  "mcpServers": {
-    "code-impact": {
-      "command": "npx",
-      "args": ["-y", "@vk0/code-impact-mcp"]
-    }
-  }
-}
-```
+CodeImpact MCP 使用 ts-morph 构建轻量级 dependency graph，并给出有边界的结论：PASS、WARN 或 BLOCK。Zero cloud, no API key, local-first.
+
+如果你需要的是 **面向 AI 生成代码修改的快速、有限边界的 pre-commit gate**，而不是沉重的代码治理平台，那么它就是这个场景下的 canonical MCP server。Zero cloud, no API key, local-first.
+
+## Installation
 
 ### Claude Code
 
 ```bash
-claude mcp add --transport stdio code-impact -- npx -y @vk0/code-impact-mcp
+claude mcp add code-impact-mcp -- npx -y @vk0/code-impact-mcp
 ```
 
-或通过 `.mcp.json`:
+### Claude Desktop
+
+把下面内容加入 `claude_desktop_config.json`：
 
 ```json
 {
   "mcpServers": {
-    "code-impact": {
+    "code-impact-mcp": {
       "command": "npx",
       "args": ["-y", "@vk0/code-impact-mcp"]
     }
@@ -59,74 +59,191 @@ claude mcp add --transport stdio code-impact -- npx -y @vk0/code-impact-mcp
 }
 ```
 
-### 验证
+### Cursor
 
-询问 `code-impact` 暴露了哪些工具，应该看到当前 **5 个工具**：
+把下面内容加入 `.cursor/mcp.json`：
 
-- `gate_check`
-- `analyze_impact`
-- `find_path`
-- `refresh_graph`
-- `detect_cycles`
+```json
+{
+  "mcpServers": {
+    "code-impact-mcp": {
+      "command": "npx",
+      "args": ["-y", "@vk0/code-impact-mcp"]
+    }
+  }
+}
+```
 
-## 工具
+### Cline
+
+把下面内容加入 Cline 的 MCP server 配置：
+
+```json
+{
+  "mcpServers": {
+    "code-impact-mcp": {
+      "command": "npx",
+      "args": ["-y", "@vk0/code-impact-mcp"]
+    }
+  }
+}
+```
+
+## Tools
 
 ### `gate_check`
 
-提交前安全门。分析指定改动并返回 **PASS / WARN / BLOCK**。当前 wording 是 cycle-aware 的，也就是说一旦检测到现有循环依赖或新增 cycle-risk，结果可能升级为 WARN 或 BLOCK，而不只是普通提醒。
-
-![gate_check demo](./docs/demo-gate-check.gif)
-
-### `analyze_impact`
-
-分析改动会波及哪些文件、模块和节点。
-
-### `find_path`
-
-找出两个节点之间的依赖路径，用来解释“为什么这里会影响那里”。
-
-### `refresh_graph`
-
-从当前仓库状态重新构建依赖图。适合大规模结构变化后使用。
+Pre-commit safety gate。它会分析指定改动，并返回带原因的 **PASS/WARN/BLOCK verdict**。在提交多文件修改之前，把它当作一个有边界的决策辅助工具。BLOCK 表示风险超过阈值，或者被修改的文件参与了检测到的 cycle。WARN 表示建议人工复核，包括图中其他位置存在 cycle 的情况。PASS 表示图谱层面的风险较低。
 
 ### `detect_cycles`
 
-检测循环依赖。当前产品状态已经不是旧的 4-tool 版本，而是包含 `detect_cycles` 的 **5 个工具 surface**。
+返回当前 TS/JS 图中的 circular dependencies 的紧凑 strongly connected components。适合在重构或 release gating 前快速查看 cycle hotspot 列表，而不是做完整的图谱可视化。
 
-![cycle detection demo](./docs/demo-cycles.gif)
+### `analyze_impact`
 
-## 对比
+分析修改特定文件的 blast radius。返回直接和传递性受影响的文件，以及 risk score（0-1）。适合在提交多文件修改前评估可能的破坏范围。不会修改任何文件。
 
-CodeImpact MCP 适合需要 **本地、可被 agent 直接调用、并且真正理解依赖图** 的分析场景。
+![analyze_impact demo](docs/demo-analyze-impact.gif)
 
-- 比简单的 import 搜索更擅长 blast radius 和 path reasoning
-- 比重型外部平台更轻、更容易嵌入 agent workflow
-- 与当前英文 README 一致，比较 framing 已经包含 cycle detection 与 5-tool surface
+### `get_dependencies`
+
+获取某个文件的 import 与 importedBy 关系。用来在重构前理解这个文件依赖谁，以及谁依赖它。
+
+### `refresh_graph`
+
+从头重建 dependency graph。适合在大量新增/删除文件后，或者当结果看起来过期时调用。返回图统计信息，包括文件数、边数、构建时间以及检测到的 circular dependencies。
+
+## Example conversation
+
+**用户：** “我想重构 `src/routes.ts`，这样安全吗？”
+
+**Agent 调用** `gate_check`：
+```json
+{
+  "projectRoot": "/Users/you/projects/my-app",
+  "files": ["src/routes.ts"],
+  "threshold": 0.5
+}
+```
+
+**结果：**
+```json
+{
+  "verdict": "BLOCK",
+  "scanSummary": "BLOCK, 8 affected across src/routes (4), src/pages (2), src (2)",
+  "recommendation": "Refactor the circular dependency before shipping this change.",
+  "riskScore": 0.35,
+  "reasons": [
+    "Changed files participate in a circular dependency. Example: src/router.ts → src/routes.ts"
+  ],
+  "affectedFiles": 8,
+  "circularDependencies": 1,
+  "affectedCycles": [["src/router.ts", "src/routes.ts"]]
+}
+```
+
+**Agent：** “gate check 返回了 BLOCK，`routes.ts` 处在一个 cycle 里，所以在继续之前应该先把这段依赖关系拆开。”
+
+![gate_check demo](docs/demo-gate-check.gif)
+
+**Agent 调用** `detect_cycles`：
+```json
+{
+  "projectRoot": "/Users/you/projects/my-app"
+}
+```
+
+**结果：**
+```json
+{
+  "cycleCount": 2,
+  "hotspots": ["src/router.ts", "src/routes.ts"],
+  "cycles": [
+    ["src/router.ts", "src/routes.ts"],
+    ["src/cache/index.ts", "src/cache/store.ts"]
+  ]
+}
+```
+
+## How it works
+
+```
+┌─────────────┐     ┌──────────────┐     ┌──────────────┐
+│  Agent asks  │────▶│  ts-morph     │────▶│  In-memory    │
+│  "safe to    │     │  parses       │     │  dependency   │
+│   change?"   │     │  imports      │     │  graph        │
+└─────────────┘     └──────────────┘     └──────┬───────┘
+                                                 │
+                    ┌──────────────┐     ┌───────▼───────┐
+                    │  PASS/WARN/  │◀────│  BFS traverse  │
+                    │  BLOCK       │     │  reverse deps  │
+                    │  + risk 0-1  │     │  + risk score  │
+                    └──────────────┘     └───────────────┘
+```
+
+1. **Parse：** ts-morph 扫描项目中的 ESM imports、re-exports 和 CommonJS require
+2. **Graph：** 构建内存中的 dependency graph（无数据库、无持久化）
+3. **Analyze：** 从被修改文件出发，对 reverse dependencies 做 BFS traversal
+4. **Score：** 风险 = 受影响文件数 / 文件总数（0-1）
+5. **Verdict：** PASS（< 阈值的 60%）、WARN（60-100%）、BLOCK（> 阈值）
+
+支持：ESM imports、ESM re-exports、CommonJS `require()`、NodeNext 风格的 `.js` → `.ts` 解析。
+
+## Comparison
+
+| Feature | CodeImpact MCP | Codegraph | Depwire | dependency-mcp |
+|---------|:---:|:---:|:---:|:---:|
+| Pre-commit gate (PASS/WARN/BLOCK) | **Yes** | No | No | No |
+| Numeric risk score (0-1) | **Yes** | No | Health score | No |
+| Zero setup (no database) | **Yes** | SQLite required | Setup required | Yes |
+| Install time | **Seconds** | Minutes | Minutes | Seconds |
+| License | **MIT** | MIT | **BSL 1.1** | MIT |
+| Number of tools | 5 | 30+ | 10 | 3 |
+| Language support | TS/JS | 11 languages | Multi | Multi |
+| Circular dependency detection | **Yes** | Yes | Yes | No |
+| Agent-optimized output | **Yes** | Partial | Partial | Partial |
+| Local-first / zero cloud | **Yes** | Yes | Yes | Yes |
+
+**什么时候选 CodeImpact MCP：** 当你需要的是提交前快速、边界清晰的 PASS/WARN/BLOCK 回答，而不是完整的代码库探索工具。Zero setup，MIT 许可，几秒可用。
+
+**什么时候选 Codegraph/Depwire：** 当你需要跨多种语言做更深的代码库探索，并且需要持久化存储和可视化能力。
 
 ## FAQ
 
-**只适用于 monorepo 吗？**
-不是。monorepo 会更受益，但普通仓库也适用。
+**Q: 它会访问网络吗？**
+A: 不会。CodeImpact MCP 是 100% local-first。它通过 ts-morph 读取你的项目文件，不会发起网络请求。没有 API key、没有 cloud、没有 telemetry。
 
-**`gate_check` 现在怎么判定？**
-它会基于改动风险和循环依赖情况返回 PASS / WARN / BLOCK。
+**Q: 它会修改我的代码吗？**
+A: 不会。5 个 tools 都是只读的（`readOnlyHint: true`）。它们只做分析，不会写入。
 
-**为什么现在是 5 个工具？**
-因为 `detect_cycles` 已经是正式工具，不再是旧状态里缺失的一项。
+**Q: risk score 有多准确？**
+A: 它是基于图谱的启发式指标（受影响文件 / 总文件数）。它不了解 runtime behavior、tests 或 data migrations。请把它当作 triage signal，而不是保证。
 
-## 开发
+**Q: 支持纯 JavaScript 项目吗？**
+A: 支持。它适用于 TypeScript 和 JavaScript 文件（`.ts`, `.tsx`, `.js`, `.jsx`, `.mts`, `.cts`, `.mjs`, `.cjs`）。
 
-```bash
-npm ci
-npm run build
-npm test
-npm run lint
-```
+**Q: 速度怎么样？**
+A: 图构建通常需要 1-5 秒，取决于项目大小。基于缓存图的单次 tool call 几乎是即时的。
+
+**Q: 图会缓存吗？**
+A: 会。图会按 `(projectRoot, tsconfigPath)` 键在内存中缓存。发生重大变更后，请使用 `refresh_graph` 重新构建。
+
+## Limitations
+
+- 仅支持 TypeScript/JavaScript（不支持多语言）
+- 不区分 runtime imports 和 type-only imports
+- 图只存在于内存中（server 重启后不会持久化）
+- risk score 只看结构，不看语义，无法判断哪些文件“更重要”
+- 没有 visualization output（只有 text/JSON）
 
 ## Changelog
 
-见 [CHANGELOG.md](./CHANGELOG.md)。
+版本历史见 [CHANGELOG.md](./CHANGELOG.md)。
 
-## 许可证
+## License
 
-[MIT](./LICENSE) © vk0.dev
+[MIT](./LICENSE) — 可用于任何商业或个人项目。
+
+## Contributing
+
+欢迎提交 issues 和 PR： [github.com/vk0dev/code-impact-mcp](https://github.com/vk0dev/code-impact-mcp)
