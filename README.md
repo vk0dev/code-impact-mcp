@@ -191,22 +191,16 @@ Supports: ESM imports, ESM re-exports, CommonJS `require()`, NodeNext-style `.js
 
 ## Comparison
 
-| Feature | CodeImpact MCP | Codegraph | Depwire | dependency-mcp |
-|---------|:---:|:---:|:---:|:---:|
-| Pre-commit gate (PASS/WARN/BLOCK) | **Yes** | No | No | No |
-| Numeric risk score (0-1) | **Yes** | No | Health score | No |
-| Zero setup (no database) | **Yes** | SQLite required | Setup required | Yes |
-| Install time | **Seconds** | Minutes | Minutes | Seconds |
-| License | **MIT** | MIT | **BSL 1.1** | MIT |
-| Number of tools | 5 | 30+ | 10 | 3 |
-| Language support | TS/JS | 11 languages | Multi | Multi |
-| Circular dependency detection | **Yes** | Yes | Yes | No |
-| Agent-optimized output | **Yes** | Partial | Partial | Partial |
-| Local-first / zero cloud | **Yes** | Yes | Yes | Yes |
+| Tool | Best at | Where CodeImpact MCP is different |
+| --- | --- | --- |
+| **CodeImpact MCP** | Single-verdict pre-commit gate answers for TS/JS repos | **This repo is optimized for one fast question:** PASS, WARN, or BLOCK before you merge or hand work back to an agent. |
+| **code-graph-mcp / Codegraph** | Rich graph exploration, larger tool surface, and broader codebase inspection workflows | CodeImpact is intentionally narrower: no graph database, no exploration-heavy surface, no claim of parity on breadth. It wins when you want zero-setup blast-radius gating in seconds. |
+| **Depwire** | Multi-language dependency intelligence, stored analysis, and deeper dependency health workflows | CodeImpact does not try to replace multi-language dependency platforms. It is stronger when you want a lightweight local verdict gate instead of a larger analysis system. |
+| **RepoGraph-style tools** | Repository graph browsing, visualization, and graph-first discovery | CodeImpact is not a visualization or graph navigation tool. It is a verdict-first guardrail that turns changed files into a bounded risk score and gate outcome. |
 
-**When to choose CodeImpact MCP:** You want a quick, bounded answer (PASS/WARN/BLOCK) before committing — not a full codebase exploration tool. Zero setup, MIT license, works in seconds.
+**When to choose CodeImpact MCP:** You want a quick, bounded answer before committing or letting an agent proceed, not a graph explorer. The shipped surface is five read-only tools, a numeric risk score, and a PASS/WARN/BLOCK gate that works locally in seconds.
 
-**When to choose Codegraph/Depwire:** You need deep codebase exploration across many languages with persistent storage and visualization.
+**When to choose graph-explorer alternatives:** You need persistent graph storage, rich visualization, multi-language discovery, or broader repository exploration than a single-verdict gate can honestly provide.
 
 ## FAQ
 
