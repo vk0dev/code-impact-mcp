@@ -11,7 +11,7 @@
 ## Best for
 
 - **Pre-commit refactor checks:** before changing a shared file, route, or module and needing a fast PASS/WARN/BLOCK answer.
-- **Agent multi-file edits:** when an AI agent is about to touch several files and you want a bounded dependency-aware gate before commit.
+- **Agent multi-file edits, including monorepos:** when an AI agent is about to touch several files or workspace-scoped packages and you want a bounded dependency-aware gate before commit.
 - **Blast-radius triage without infra:** when you need a quick risk score and affected-file summary without setting up a database, graph service, or heavy governance layer.
 
 ## Not for
@@ -93,7 +93,7 @@ Add to Cline MCP settings:
 
 ### `gate_check`
 
-Pre-commit safety gate. Analyzes specified changes and returns a **PASS/WARN/BLOCK verdict** with reasons. Use as a bounded decision aid before committing multi-file changes. BLOCK means risk exceeds threshold or a changed file participates in a detected cycle. WARN means human review recommended, including graphs that contain cycles elsewhere. PASS means low graph-based risk.
+Pre-commit safety gate. Analyzes specified changes and returns a **PASS/WARN/BLOCK verdict** with reasons. Use as a bounded decision aid before committing multi-file changes, including workspace-aware checks in pnpm/package.json workspaces and lerna-style monorepos. BLOCK means risk exceeds threshold or a changed file participates in a detected cycle. WARN means human review recommended, including graphs that contain cycles elsewhere. PASS means low graph-based risk.
 
 ### `detect_cycles`
 
@@ -144,7 +144,7 @@ Rebuild the dependency graph from scratch. Call this after significant file addi
 
 **Agent:** "The gate check returned BLOCK — routes.ts is part of a cycle, so I should untangle that before making more changes."
 
-![gate_check demo](docs/demo-gate-check.gif)
+![gate_check demo: single changed file triggers a decision-first BLOCK verdict before commit](docs/demo-gate-check.gif)
 
 **Agent calls** `detect_cycles`:
 ```json
@@ -191,16 +191,18 @@ Supports: ESM imports, ESM re-exports, CommonJS `require()`, NodeNext-style `.js
 
 ## Comparison
 
-| Tool | Best at | Where CodeImpact MCP is different |
+| Alternative | Best at | Where CodeImpact MCP is different |
 | --- | --- | --- |
-| **CodeImpact MCP** | Single-verdict pre-commit gate answers for TS/JS repos | **This repo is optimized for one fast question:** PASS, WARN, or BLOCK before you merge or hand work back to an agent. |
-| **code-graph-mcp / Codegraph** | Rich graph exploration, larger tool surface, and broader codebase inspection workflows | CodeImpact is intentionally narrower: no graph database, no exploration-heavy surface, no claim of parity on breadth. It wins when you want zero-setup blast-radius gating in seconds. |
-| **Depwire** | Multi-language dependency intelligence, stored analysis, and deeper dependency health workflows | CodeImpact does not try to replace multi-language dependency platforms. It is stronger when you want a lightweight local verdict gate instead of a larger analysis system. |
-| **RepoGraph-style tools** | Repository graph browsing, visualization, and graph-first discovery | CodeImpact is not a visualization or graph navigation tool. It is a verdict-first guardrail that turns changed files into a bounded risk score and gate outcome. |
+| **CodeImpact MCP** | One fast pre-commit verdict for TS/JS repos | **This repo is optimized for a single gate answer:** PASS, WARN, or BLOCK before you merge or hand work back to another agent. |
+| **CodeGraphContext** | Rich context retrieval and repository understanding for long-form reasoning | CodeGraphContext helps agents reason over more code context. CodeImpact is narrower on purpose: it turns a proposed change into a fast local gate verdict instead of acting like a context provider. |
+| **Depwire** | Multi-language dependency intelligence, stored analysis, and deeper dependency health workflows | Depwire is broader and heavier. CodeImpact stays zero-setup, MIT-licensed, and focused on a quick local pre-commit decision rather than a larger dependency platform. |
+| **code-graph-mcp** | Graph exploration and codebase inspection through a wider MCP tool surface | CodeImpact does not try to be a graph explorer. It wins when you want a simple verdict-first workflow that starts instantly and stays bounded. |
+| **RepoGraph** | Repository graph browsing, graph-first discovery, and visual exploration | RepoGraph-style tools are better when you want to explore. CodeImpact is better when you already know the touched files and need a fast PASS/WARN/BLOCK answer. |
+| **code-pathfinder** | Code navigation and path tracing across a repo | code-pathfinder is aimed at finding routes through code. CodeImpact is aimed at stopping risky edits before commit with one explicit gate result. |
 
-**When to choose CodeImpact MCP:** You want a quick, bounded answer before committing or letting an agent proceed, not a graph explorer. The shipped surface is five read-only tools, a numeric risk score, and a PASS/WARN/BLOCK gate that works locally in seconds.
+**When to choose CodeImpact MCP:** You want a fast, local, MIT-licensed gate with zero setup. It gives a single verdict, a numeric risk score, and a pre-commit answer in seconds.
 
-**When to choose graph-explorer alternatives:** You need persistent graph storage, rich visualization, multi-language discovery, or broader repository exploration than a single-verdict gate can honestly provide.
+**When to choose context-provider or graph-explorer alternatives:** You want broader repository reasoning, graph traversal, visualization, or persistent multi-language analysis. Those tools help agents think over the codebase. CodeImpact helps you gate the change.
 
 ## FAQ
 

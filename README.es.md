@@ -11,7 +11,7 @@
 ## Best for
 
 - **Checks de refactor antes del commit:** cuando cambias un archivo compartido, una ruta o un módulo y necesitas una respuesta rápida PASS/WARN/BLOCK.
-- **Ediciones multiarchivo por agentes:** cuando un agente de IA va a tocar varios archivos y quieres una puerta acotada con dependencias antes del commit.
+- **Ediciones multiarchivo por agentes, incluso en monorepos:** cuando un agente de IA va a tocar varios archivos o paquetes por workspace y quieres una puerta acotada con dependencias antes del commit.
 - **Triage de blast radius sin infraestructura:** cuando necesitas un risk score rápido y un resumen de archivos afectados sin montar base de datos, graph service o un layer pesado de governance.
 
 ## Not for
@@ -93,7 +93,7 @@ Añádelo a la configuración de servidores MCP de Cline:
 
 ### `gate_check`
 
-Puerta de seguridad pre-commit. Analiza cambios especificados y devuelve un **PASS/WARN/BLOCK verdict** con razones. Úsalo como ayuda de decisión acotada antes de commitear cambios en varios archivos. BLOCK significa que el riesgo supera el threshold o que un archivo modificado participa en un ciclo detectado. WARN significa que se recomienda revisión humana, incluso si hay ciclos en otra parte del grafo. PASS significa riesgo bajo basado en el grafo.
+Puerta de seguridad pre-commit. Analiza cambios especificados y devuelve un **PASS/WARN/BLOCK verdict** con razones. Úsalo como ayuda de decisión acotada antes de commitear cambios en varios archivos, incluyendo análisis workspace-aware para pnpm/package.json workspaces y monorepos estilo lerna. BLOCK significa que el riesgo supera el threshold o que un archivo modificado participa en un ciclo detectado. WARN significa que se recomienda revisión humana, incluso si hay ciclos en otra parte del grafo. PASS significa riesgo bajo basado en el grafo.
 
 ### `detect_cycles`
 
@@ -191,22 +191,18 @@ Soporta: ESM imports, ESM re-exports, CommonJS `require()`, y resolución NodeNe
 
 ## Comparison
 
-| Feature | CodeImpact MCP | Codegraph | Depwire | dependency-mcp |
-|---------|:---:|:---:|:---:|:---:|
-| Pre-commit gate (PASS/WARN/BLOCK) | **Yes** | No | No | No |
-| Numeric risk score (0-1) | **Yes** | No | Health score | No |
-| Zero setup (no database) | **Yes** | SQLite required | Setup required | Yes |
-| Install time | **Seconds** | Minutes | Minutes | Seconds |
-| License | **MIT** | MIT | **BSL 1.1** | MIT |
-| Number of tools | 5 | 30+ | 10 | 3 |
-| Language support | TS/JS | 11 languages | Multi | Multi |
-| Circular dependency detection | **Yes** | Yes | Yes | No |
-| Agent-optimized output | **Yes** | Partial | Partial | Partial |
-| Local-first / zero cloud | **Yes** | Yes | Yes | Yes |
+| Alternativa | Mejor para | En qué se diferencia CodeImpact MCP |
+| --- | --- | --- |
+| **CodeImpact MCP** | Un pre-commit verdict rápido para repos TS/JS | **Este repositorio está optimizado para una sola gate answer:** PASS / WARN / BLOCK antes de hacer merge o devolver trabajo a otro agente. |
+| **CodeGraphContext** | Context retrieval rico y repository understanding para reasoning más largo | CodeGraphContext ayuda a que el agente razone con más contexto del repositorio. CodeImpact es más estrecho a propósito: no actúa como context provider, sino como fast local gate verdict. |
+| **Depwire** | Multi-language dependency intelligence, stored analysis y workflows más profundos de dependency health | Depwire es más amplio y pesado. CodeImpact se mantiene zero setup, con licencia MIT, y enfocado en una decisión local rápida antes del commit, no en una gran dependency platform. |
+| **code-graph-mcp** | Graph exploration y codebase inspection con una MCP tool surface más amplia | CodeImpact no intenta ser un graph explorer. Gana cuando quieres un verdict-first workflow acotado que arranca al instante. |
+| **RepoGraph** | Repository graph browsing, graph-first discovery y visual exploration | Las herramientas tipo RepoGraph son mejores para explorar. CodeImpact es mejor cuando ya conoces los touched files y solo necesitas un PASS / WARN / BLOCK rápido. |
+| **code-pathfinder** | Code navigation y path tracing dentro del repositorio | code-pathfinder está pensado para encontrar rutas por el código. CodeImpact está pensado para frenar risky edits antes del commit con un gate result explícito. |
 
-**Cuándo elegir CodeImpact MCP:** cuando quieres una respuesta rápida y acotada (PASS/WARN/BLOCK) antes de commitear, no una herramienta de exploración profunda del codebase. Zero setup, licencia MIT, funciona en segundos.
+**Cuándo elegir CodeImpact MCP:** cuando quieres un fast local gate, sin setup, con licencia MIT y respuesta en segundos. Se centra en single verdict, numeric risk score y pre-commit answer.
 
-**Cuándo elegir Codegraph/Depwire:** cuando necesitas exploración profunda del codebase en muchos lenguajes con persistent storage y visualización.
+**Cuándo elegir alternativas context-provider / graph-explorer:** cuando necesitas repository reasoning más amplio, graph traversal, visualización o persistent multi-language analysis. Esas herramientas ayudan al agente a razonar sobre el codebase; CodeImpact ayuda a gate the change.
 
 ## FAQ
 

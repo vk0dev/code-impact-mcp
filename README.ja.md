@@ -11,7 +11,7 @@
 ## Best for
 
 - **コミット前のリファクタ確認:** 共有ファイル、ルート、モジュールを変更する前に PASS/WARN/BLOCK を素早く知りたいとき。
-- **エージェントによる複数ファイル編集:** AIエージェントが複数ファイルを触る前に、依存関係を踏まえた bounded gate が欲しいとき。
+- **エージェントによる複数ファイル編集（monorepo 含む）:** AIエージェントが複数ファイルや workspace 単位のパッケージを触る前に、依存関係を踏まえた bounded gate が欲しいとき。
 - **インフラなしの blast-radius triage:** データベースや graph service、重い governance layer なしで risk score と影響ファイル要約が欲しいとき。
 
 ## Not for
@@ -93,7 +93,7 @@ Cline の MCP server 設定に追加します。
 
 ### `gate_check`
 
-Pre-commit safety gate。指定した変更を解析し、理由付きで **PASS/WARN/BLOCK verdict** を返します。複数ファイル変更をコミットする前の bounded decision aid として使ってください。BLOCK は risk が threshold を超えた、または変更ファイルが検出された cycle に参加していることを意味します。WARN は、グラフの別の場所に cycles がある場合を含め、人手レビュー推奨です。PASS はグラフベースのリスクが低いことを意味します。
+Pre-commit safety gate。指定した変更を解析し、理由付きで **PASS/WARN/BLOCK verdict** を返します。複数ファイル変更をコミットする前の bounded decision aid として使ってください。pnpm/package.json workspaces や lerna-style monorepos に対する workspace-aware analysis も含みます。BLOCK は risk が threshold を超えた、または変更ファイルが検出された cycle に参加していることを意味します。WARN は、グラフの別の場所に cycles がある場合を含め、人手レビュー推奨です。PASS はグラフベースのリスクが低いことを意味します。
 
 ### `detect_cycles`
 
@@ -191,22 +191,18 @@ dependency graph をゼロから再構築します。大きなファイル追加
 
 ## Comparison
 
-| Feature | CodeImpact MCP | Codegraph | Depwire | dependency-mcp |
-|---------|:---:|:---:|:---:|:---:|
-| Pre-commit gate (PASS/WARN/BLOCK) | **Yes** | No | No | No |
-| Numeric risk score (0-1) | **Yes** | No | Health score | No |
-| Zero setup (no database) | **Yes** | SQLite required | Setup required | Yes |
-| Install time | **Seconds** | Minutes | Minutes | Seconds |
-| License | **MIT** | MIT | **BSL 1.1** | MIT |
-| Number of tools | 5 | 30+ | 10 | 3 |
-| Language support | TS/JS | 11 languages | Multi | Multi |
-| Circular dependency detection | **Yes** | Yes | Yes | No |
-| Agent-optimized output | **Yes** | Partial | Partial | Partial |
-| Local-first / zero cloud | **Yes** | Yes | Yes | Yes |
+| 代替ツール | 得意なこと | CodeImpact MCP の違い |
+| --- | --- | --- |
+| **CodeImpact MCP** | TS/JS リポジトリ向けの高速な pre-commit verdict | **このリポジトリは 1 つの gate answer に最適化されています:** merge や agent handoff の前に PASS / WARN / BLOCK を返します。 |
+| **CodeGraphContext** | 長い reasoning のための豊富な context retrieval と repository understanding | CodeGraphContext は agent が広い code context を読んで考えるのに向いています。CodeImpact は意図的に狭く、context provider ではなく fast local gate verdict を返します。 |
+| **Depwire** | multi-language dependency intelligence、stored analysis、deeper dependency health workflows | Depwire はより広くて重い選択肢です。CodeImpact は zero setup、MIT license、fast local pre-commit decision に集中します。 |
+| **code-graph-mcp** | graph exploration と広い MCP tool surface による codebase inspection | CodeImpact は graph explorer を目指していません。すぐ起動して bounded な verdict-first workflow が欲しいときに向いています。 |
+| **RepoGraph** | repository graph browsing、graph-first discovery、visual exploration | RepoGraph 系は探索向けです。CodeImpact は touched files が分かっていて PASS / WARN / BLOCK を素早く出したいときに強いです。 |
+| **code-pathfinder** | repository 内の code navigation と path tracing | code-pathfinder は code path を見つけるためのものです。CodeImpact は risky edits を commit 前に止めるための single gate result です。 |
 
-**CodeImpact MCP を選ぶとき:** コミット前に PASS/WARN/BLOCK の高速で bounded な答えが欲しいとき。full codebase exploration tool は不要。Zero setup、MIT license、数秒で動きます。
+**CodeImpact MCP を選ぶとき:** zero setup のまま、MIT license で、数秒で動く fast local gate が欲しいとき。single verdict、numeric risk score、pre-commit answer に集中しています。
 
-**Codegraph/Depwire を選ぶとき:** 多言語コードベースを persistent storage と visualization 付きで深く探索したいとき。
+**context-provider / graph-explorer を選ぶとき:** repository reasoning、graph traversal、visualization、persistent multi-language analysis が必要なとき。そうしたツールは考える助けになり、CodeImpact は change を gate します。
 
 ## FAQ
 

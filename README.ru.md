@@ -11,7 +11,7 @@
 ## Best for
 
 - **Проверка рефакторинга перед коммитом:** когда меняете общий файл, роут или модуль и нужен быстрый PASS/WARN/BLOCK ответ.
-- **Мультифайловые правки агентом:** когда AI-агент собирается тронуть несколько файлов и нужен ограниченный dependency-aware gate до коммита.
+- **Мультифайловые правки агентом, включая monorepo:** когда AI-агент собирается тронуть несколько файлов или workspace-пакетов и нужен ограниченный dependency-aware gate до коммита.
 - **Triage blast radius без инфраструктуры:** когда нужен быстрый risk score и список затронутых файлов без базы, graph-сервиса или тяжёлого governance-слоя.
 
 ## Not for
@@ -93,7 +93,7 @@ claude mcp add code-impact-mcp -- npx -y @vk0/code-impact-mcp
 
 ### `gate_check`
 
-Pre-commit safety gate. Анализирует указанные изменения и возвращает **PASS/WARN/BLOCK verdict** с причинами. Используйте как ограниченный decision aid перед коммитом мультифайловых изменений. BLOCK означает, что risk превышает threshold или изменённый файл участвует в обнаруженном cycle. WARN означает, что нужен human review, включая случаи, когда cycles есть в графе в другом месте. PASS означает низкий graph-based risk.
+Pre-commit safety gate. Анализирует указанные изменения и возвращает **PASS/WARN/BLOCK verdict** с причинами. Используйте как ограниченный decision aid перед коммитом мультифайловых изменений, включая workspace-aware проверки для pnpm/package.json workspaces и lerna-style monorepos. BLOCK означает, что risk превышает threshold или изменённый файл участвует в обнаруженном cycle. WARN означает, что нужен human review, включая случаи, когда cycles есть в графе в другом месте. PASS означает низкий graph-based risk.
 
 ### `detect_cycles`
 
@@ -191,22 +191,18 @@ Pre-commit safety gate. Анализирует указанные изменен
 
 ## Comparison
 
-| Feature | CodeImpact MCP | Codegraph | Depwire | dependency-mcp |
-|---------|:---:|:---:|:---:|:---:|
-| Pre-commit gate (PASS/WARN/BLOCK) | **Yes** | No | No | No |
-| Numeric risk score (0-1) | **Yes** | No | Health score | No |
-| Zero setup (no database) | **Yes** | SQLite required | Setup required | Yes |
-| Install time | **Seconds** | Minutes | Minutes | Seconds |
-| License | **MIT** | MIT | **BSL 1.1** | MIT |
-| Number of tools | 5 | 30+ | 10 | 3 |
-| Language support | TS/JS | 11 languages | Multi | Multi |
-| Circular dependency detection | **Yes** | Yes | Yes | No |
-| Agent-optimized output | **Yes** | Partial | Partial | Partial |
-| Local-first / zero cloud | **Yes** | Yes | Yes | Yes |
+| Альтернатива | Лучше всего подходит для | Чем отличается CodeImpact MCP |
+| --- | --- | --- |
+| **CodeImpact MCP** | Быстрого pre-commit verdict для TS/JS-репозиториев | **Этот репозиторий оптимизирован под один gate answer:** PASS / WARN / BLOCK перед merge или handoff другому агенту. |
+| **CodeGraphContext** | Богатого context retrieval и repository understanding для длинного reasoning | CodeGraphContext помогает агенту читать больше контекста и рассуждать по репозиторию. CodeImpact намеренно уже: это не context provider, а fast local gate verdict. |
+| **Depwire** | Multi-language dependency intelligence, stored analysis и более глубоких dependency health workflows | Depwire шире и тяжелее. CodeImpact остаётся zero setup, MIT license и сфокусирован на быстром local pre-commit decision, а не на большой dependency platform. |
+| **code-graph-mcp** | Graph exploration и codebase inspection через более широкий MCP tool surface | CodeImpact не пытается быть graph explorer. Он выигрывает, когда нужен мгновенный bounded verdict-first workflow. |
+| **RepoGraph** | Repository graph browsing, graph-first discovery и visual exploration | Инструменты класса RepoGraph лучше для исследования. CodeImpact лучше, когда touched files уже известны и нужен быстрый PASS / WARN / BLOCK ответ. |
+| **code-pathfinder** | Code navigation и path tracing внутри репозитория | code-pathfinder помогает искать пути по коду. CodeImpact помогает остановить risky edits до commit одним явным gate result. |
 
-**Когда выбирать CodeImpact MCP:** если нужен быстрый ограниченный ответ (PASS/WARN/BLOCK) перед коммитом, а не full codebase exploration tool. Zero setup, MIT license, работает за секунды.
+**Когда выбирать CodeImpact MCP:** когда нужен fast local gate без setup, с MIT license и ответом за секунды. Он сфокусирован на single verdict, numeric risk score и pre-commit answer.
 
-**Когда выбирать Codegraph/Depwire:** если нужен глубокий codebase exploration across many languages с persistent storage и visualization.
+**Когда выбирать context-provider / graph-explorer альтернативы:** когда нужны более широкие repository reasoning, graph traversal, visualization или persistent multi-language analysis. Эти инструменты помогают думать о кодовой базе, а CodeImpact помогает gate change.
 
 ## FAQ
 

@@ -11,7 +11,7 @@
 ## Best for
 
 - **提交前重构检查：** 当你要改共享文件、路由或模块，并且想快速得到 PASS/WARN/BLOCK 结论时。
-- **代理执行多文件修改：** 当 AI 代理即将修改多个文件，而你想在提交前先做一次有边界的依赖关系闸门检查时。
+- **代理执行多文件修改（包括 monorepo）：** 当 AI 代理即将修改多个文件或 workspace 级包，而你想在提交前先做一次有边界的依赖关系闸门检查时。
 - **无基础设施的 blast-radius triage：** 当你想快速拿到 risk score 和受影响文件摘要，而不想搭建数据库、graph service 或重型治理层时。
 
 ## Not for
@@ -93,7 +93,7 @@ claude mcp add code-impact-mcp -- npx -y @vk0/code-impact-mcp
 
 ### `gate_check`
 
-Pre-commit safety gate。它会分析指定改动，并返回带原因的 **PASS/WARN/BLOCK verdict**。在提交多文件修改之前，把它当作一个有边界的决策辅助工具。BLOCK 表示风险超过阈值，或者被修改的文件参与了检测到的 cycle。WARN 表示建议人工复核，包括图中其他位置存在 cycle 的情况。PASS 表示图谱层面的风险较低。
+Pre-commit safety gate。它会分析指定改动，并返回带原因的 **PASS/WARN/BLOCK verdict**。在提交多文件修改之前，把它当作一个有边界的决策辅助工具，也包括对 pnpm/package.json workspaces 和 lerna-style monorepos 的 workspace-aware analysis。BLOCK 表示风险超过阈值，或者被修改的文件参与了检测到的 cycle。WARN 表示建议人工复核，包括图中其他位置存在 cycle 的情况。PASS 表示图谱层面的风险较低。
 
 ### `detect_cycles`
 
@@ -191,22 +191,18 @@ Pre-commit safety gate。它会分析指定改动，并返回带原因的 **PASS
 
 ## Comparison
 
-| Feature | CodeImpact MCP | Codegraph | Depwire | dependency-mcp |
-|---------|:---:|:---:|:---:|:---:|
-| Pre-commit gate (PASS/WARN/BLOCK) | **Yes** | No | No | No |
-| Numeric risk score (0-1) | **Yes** | No | Health score | No |
-| Zero setup (no database) | **Yes** | SQLite required | Setup required | Yes |
-| Install time | **Seconds** | Minutes | Minutes | Seconds |
-| License | **MIT** | MIT | **BSL 1.1** | MIT |
-| Number of tools | 5 | 30+ | 10 | 3 |
-| Language support | TS/JS | 11 languages | Multi | Multi |
-| Circular dependency detection | **Yes** | Yes | Yes | No |
-| Agent-optimized output | **Yes** | Partial | Partial | Partial |
-| Local-first / zero cloud | **Yes** | Yes | Yes | Yes |
+| 替代方案 | 最擅长 | CodeImpact MCP 的区别 |
+| --- | --- | --- |
+| **CodeImpact MCP** | 面向 TS/JS 仓库的一次性 pre-commit verdict | **这个仓库专门优化一个 gate answer：** 在 merge 或 agent 交接前给出 PASS / WARN / BLOCK。 |
+| **CodeGraphContext** | 面向长链 reasoning 的丰富 context retrieval 和 repository understanding | CodeGraphContext 更适合让 agent 读取更多代码上下文并进行推理。CodeImpact 刻意更窄，它不是 context provider，而是快速本地 gate verdict。 |
+| **Depwire** | multi-language dependency intelligence、stored analysis、deeper dependency health workflows | Depwire 更宽、更重。CodeImpact 保持 zero setup、MIT license，并专注于快速本地 pre-commit decision，而不是更大的 dependency platform。 |
+| **code-graph-mcp** | 通过更宽的 MCP tool surface 做 graph exploration 和 codebase inspection | CodeImpact 不打算成为 graph explorer。它适合需要立即启动、范围清晰、verdict-first workflow 的场景。 |
+| **RepoGraph** | repository graph browsing、graph-first discovery、visual exploration | RepoGraph 类工具更适合探索。CodeImpact 更适合你已经知道 touched files，只想快速拿到 PASS / WARN / BLOCK 结论的时候。 |
+| **code-pathfinder** | 仓库内的 code navigation 和 path tracing | code-pathfinder 关注的是找到代码路径。CodeImpact 关注的是在 commit 前用一个明确 gate result 挡住高风险改动。 |
 
-**什么时候选 CodeImpact MCP：** 当你需要的是提交前快速、边界清晰的 PASS/WARN/BLOCK 回答，而不是完整的代码库探索工具。Zero setup，MIT 许可，几秒可用。
+**什么时候选 CodeImpact MCP：** 你想要一个 zero setup、MIT 许可、几秒内完成的 fast local gate。它提供 single verdict、numeric risk score 和 pre-commit answer。
 
-**什么时候选 Codegraph/Depwire：** 当你需要跨多种语言做更深的代码库探索，并且需要持久化存储和可视化能力。
+**什么时候选 context-provider / graph-explorer：** 你需要更广的 repository reasoning、graph traversal、visualization 或 persistent multi-language analysis。这些工具帮助 agent 理解代码库，CodeImpact 帮你 gate change。
 
 ## FAQ
 
