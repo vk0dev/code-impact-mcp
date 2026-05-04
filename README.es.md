@@ -32,7 +32,7 @@ Usa este servidor MCP cuando:
 - un agente quiere un **risk score numérico (0-1)** para un cambio propuesto
 - necesitas dependency analysis **sin montar base de datos ni tree-sitter**
 
-CodeImpact MCP construye un dependency graph ligero con ts-morph y te da una respuesta acotada: PASS, WARN o BLOCK. Zero cloud, no API key, local-first.
+CodeImpact MCP construye un dependency graph ligero con ts-morph y te da una respuesta acotada: PASS, WARN o BLOCK. Zero cloud, no API key, local-first. Hoy eso significa soporte completo para TypeScript/JavaScript más una ruta Python acotada a nivel file-level para `analyze_impact` y `gate_check`, incluyendo import-graph blast radius y el mismo verdict framing, sin convertir el producto en una plataforma amplia multi-language.
 
 Si necesitas **una puerta pre-commit rápida y acotada para cambios de código generados por IA**, y no una plataforma pesada de code governance, este es el servidor MCP canónico para ese caso. Zero cloud, no API key, local-first.
 
@@ -43,6 +43,16 @@ Si necesitas **una puerta pre-commit rápida y acotada para cambios de código g
 ```bash
 claude mcp add code-impact-mcp -- npx -y @vk0/code-impact-mcp
 ```
+
+### Optional pre-commit hook helper
+
+Si ya usas Husky, puedes añadir el gate runner acotado sin cablear el hook a mano:
+
+```bash
+npx -y @vk0/code-impact-mcp install-hook
+```
+
+Si `.husky/` ya existe, el comando crea o actualiza solo el bloque marcado `code-impact-mcp` dentro de `.husky/pre-commit` y deja intacto el resto del contenido del hook. Si Husky todavía no está inicializado, el comando se detiene con un mensaje accionable en lugar de crear la infraestructura de hooks por ti.
 
 ### Claude Desktop
 
@@ -215,8 +225,8 @@ A: No. Las 5 tools son read-only (`readOnlyHint: true`). Analizan, pero no escri
 **Q: ¿Qué tan preciso es el risk score?**
 A: Es una heurística basada en el grafo (archivos afectados / total de archivos). No conoce runtime behavior, tests ni data migrations. Tómalo como señal de triage, no como garantía.
 
-**Q: ¿Soporta proyectos solo de JavaScript?**
-A: Sí. Funciona con archivos TypeScript y JavaScript (`.ts`, `.tsx`, `.js`, `.jsx`, `.mts`, `.cts`, `.mjs`, `.cjs`).
+**Q: ¿Qué lenguajes soporta hoy?**
+A: El soporte completo sigue centrado en TypeScript y JavaScript (`.ts`, `.tsx`, `.js`, `.jsx`, `.mts`, `.cts`, `.mjs`, `.cjs`). Además, `analyze_impact` y `gate_check` tienen una ruta Python acotada, pero se queda en impacto a nivel file/module y no implica una plataforma amplia multi-language.
 
 **Q: ¿Qué tan rápido es?**
 A: La construcción del grafo suele tardar de 1 a 5 segundos según el tamaño del proyecto. Las tool calls individuales contra un grafo cacheado son casi instantáneas.
@@ -226,7 +236,7 @@ A: Sí. El grafo se cachea en memoria por par `(projectRoot, tsconfigPath)`. Usa
 
 ## Limitations
 
-- Solo TypeScript/JavaScript (sin soporte multi-language)
+- La graph depth completa sigue siendo más fuerte en TypeScript/JavaScript; el soporte Python está limitado a impacto local a nivel file/module y no a una plataforma completa multi-language
 - No distingue entre runtime imports y type-only imports
 - El grafo existe solo en memoria (sin persistence tras reiniciar el servidor)
 - El risk score es estructural, no semántico; no sabe qué archivos son “más importantes”
