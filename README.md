@@ -103,7 +103,7 @@ Return compact strongly connected components for circular dependencies in the cu
 
 Analyze the blast radius of changing specific files. Returns which files would be directly and transitively affected, with a risk score (0-1). Use BEFORE committing multi-file changes to understand what might break. Does NOT modify any files.
 
-![analyze_impact demo](docs/demo-analyze-impact.gif)
+![analyze_impact demo](docs/demo-blast-radius.gif)
 
 ### `get_dependencies`
 
