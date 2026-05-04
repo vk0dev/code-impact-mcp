@@ -191,18 +191,19 @@ Supports: ESM imports, ESM re-exports, CommonJS `require()`, NodeNext-style `.js
 
 ## Comparison
 
-| Alternative | Best at | Where CodeImpact MCP is different |
-| --- | --- | --- |
-| **CodeImpact MCP** | One fast pre-commit verdict for TS/JS repos | **This repo is optimized for a single gate answer:** PASS, WARN, or BLOCK before you merge or hand work back to another agent. |
-| **CodeGraphContext** | Rich context retrieval and repository understanding for long-form reasoning | CodeGraphContext helps agents reason over more code context. CodeImpact is narrower on purpose: it turns a proposed change into a fast local gate verdict instead of acting like a context provider. |
-| **Depwire** | Multi-language dependency intelligence, stored analysis, and deeper dependency health workflows | Depwire is broader and heavier. CodeImpact stays zero-setup, MIT-licensed, and focused on a quick local pre-commit decision rather than a larger dependency platform. |
-| **code-graph-mcp** | Graph exploration and codebase inspection through a wider MCP tool surface | CodeImpact does not try to be a graph explorer. It wins when you want a simple verdict-first workflow that starts instantly and stays bounded. |
-| **RepoGraph** | Repository graph browsing, graph-first discovery, and visual exploration | RepoGraph-style tools are better when you want to explore. CodeImpact is better when you already know the touched files and need a fast PASS/WARN/BLOCK answer. |
-| **code-pathfinder** | Code navigation and path tracing across a repo | code-pathfinder is aimed at finding routes through code. CodeImpact is aimed at stopping risky edits before commit with one explicit gate result. |
+If you are choosing a tool for an agent or reviewer, the key question is simple: do you need to **explore the graph**, or do you need to **gate one proposed change**?
 
-**When to choose CodeImpact MCP:** You want a fast, local, MIT-licensed gate with zero setup. It gives a single verdict, a numeric risk score, and a pre-commit answer in seconds.
+| Alternative | Best at | Where it wins | Where CodeImpact MCP wins |
+| --- | --- | --- | --- |
+| **CodeImpact MCP** | Fast single-verdict dependency gating for TS/JS repos | Immediate PASS/WARN/BLOCK decision, local-first workflow, zero setup | Best fit when the job is "is this safe to commit?" rather than "help me explore the whole repo" |
+| **code-graph-mcp** | Wider graph inspection through an MCP tool surface | Better when the agent wants to traverse relationships and inspect the code graph from multiple angles | Better when you want one bounded pre-commit verdict instead of a graph-exploration session |
+| **Depwire** | Broader dependency intelligence across larger dependency workflows | Better when you need a heavier platform view, deeper dependency management, or wider language coverage | Better when you want a small MIT tool that runs locally and answers the gating question quickly |
+| **RepoGraph** | Graph-first browsing and repository discovery | Better when the user is still learning the codebase and wants to inspect structure interactively | Better when the touched files are already known and you only need blast-radius triage plus a gate result |
+| **CodeGraphContext** | Repository context retrieval for longer-form agent reasoning | Better when the agent needs broad code context for planning, synthesis, or explanation | Better when you want decision-first output, not a general context provider |
 
-**When to choose context-provider or graph-explorer alternatives:** You want broader repository reasoning, graph traversal, visualization, or persistent multi-language analysis. Those tools help agents think over the codebase. CodeImpact helps you gate the change.
+**Choose CodeImpact MCP when:** you already know the files in play and want a fast, local, MIT-licensed answer with a risk score and a clear PASS/WARN/BLOCK verdict.
+
+**Choose one of the alternatives when:** the main job is graph exploration, repo understanding, wider dependency workflow coverage, or context retrieval for longer reasoning loops.
 
 ## FAQ
 
