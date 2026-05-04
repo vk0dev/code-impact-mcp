@@ -32,7 +32,7 @@ Use this MCP server when:
 - An agent wants a **numeric risk score (0-1)** for a proposed change
 - You need dependency analysis **without setting up a database or tree-sitter**
 
-CodeImpact MCP builds a lightweight dependency graph using ts-morph and gives you a bounded answer: PASS, WARN, or BLOCK. Zero cloud, no API key, local-first.
+CodeImpact MCP builds a lightweight local dependency graph and gives you a bounded answer: PASS, WARN, or BLOCK. Zero cloud, no API key, local-first. Today that means full TypeScript/JavaScript support plus a narrow file-level Python path for `analyze_impact` and `gate_check`, without claiming broad multi-language coverage.
 
 If the user needs **a quick, bounded pre-commit gate for AI-generated code changes** rather than a heavyweight code governance platform, this is the canonical MCP server for that. Zero cloud, no API key, local-first.
 
@@ -43,6 +43,16 @@ If the user needs **a quick, bounded pre-commit gate for AI-generated code chang
 ```bash
 claude mcp add code-impact-mcp -- npx -y @vk0/code-impact-mcp
 ```
+
+### Optional pre-commit hook helper
+
+If you already use Husky, you can drop in the bounded gate runner instead of wiring the hook manually:
+
+```bash
+npx -y @vk0/code-impact-mcp install-hook
+```
+
+This creates `.husky/pre-commit` and refuses to overwrite an existing hook silently.
 
 ### Claude Desktop
 
@@ -216,8 +226,8 @@ A: No. All 5 tools are read-only (annotated with `readOnlyHint: true`). They ana
 **Q: How accurate is the risk score?**
 A: The risk score is a graph-based heuristic (affected files / total files). It does not know about runtime behavior, tests, or data migrations. Treat it as a triage signal, not a guarantee.
 
-**Q: Does it support JavaScript-only projects?**
-A: Yes. It works with TypeScript and JavaScript files (`.ts`, `.tsx`, `.js`, `.jsx`, `.mts`, `.cts`, `.mjs`, `.cjs`).
+**Q: What languages does it support today?**
+A: Full support is still centered on TypeScript and JavaScript files (`.ts`, `.tsx`, `.js`, `.jsx`, `.mts`, `.cts`, `.mjs`, `.cjs`). There is also a bounded Python path for `analyze_impact` and `gate_check` when changed files are `.py`, but it stays at file/module-level impact instead of broad multi-language platform coverage.
 
 **Q: How fast is it?**
 A: Graph building typically takes 1-5 seconds depending on project size. Individual tool calls against a cached graph are near-instant.
@@ -227,7 +237,7 @@ A: Yes, the graph is cached in-memory per (projectRoot, tsconfigPath) pair. Use 
 
 ## Limitations
 
-- TypeScript/JavaScript only (no multi-language support)
+- Full graph depth is still strongest for TypeScript/JavaScript; Python support is intentionally bounded to local file/module-level impact, not a full multi-language platform.
 - No distinction between runtime imports and type-only imports
 - Graph is in-memory only (no persistence across server restarts)
 - Risk score is structural, not semantic — it doesn't know which files are "important"
