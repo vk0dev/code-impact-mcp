@@ -1,4 +1,12 @@
 
+## [1.5.0] — 2026-05-04
+
+### Added
+- `install-hook` now supports safe Husky block updates and idempotent re-runs instead of only one-shot creation.
+
+### Fixed
+- CLI `--help` now shows the correct `install-hook` command surface while still documenting the installed `run-hook` path.
+
 ## [1.4.0] — 2026-05-04
 
 ### Added
