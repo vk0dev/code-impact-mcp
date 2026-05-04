@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 
 import { analyzeImpact, buildGraph, detectCycles, detectWorkspacePackages, summarizeCycles } from "../src/graph.js";
 
@@ -187,38 +187,44 @@ describe("graph queries", () => {
   });
 });
 
-describe("Python graph adapter", () => {
-  it("resolves relative imports and package __init__.py targets", () => {
-    const root = mkdtempSync(join(tmpdir(), "impact-python-"));
-    mkdirSync(join(root, "pkg", "sub"), { recursive: true });
-    writeFileSync(join(root, "pkg", "__init__.py"), "");
-    writeFileSync(join(root, "pkg", "util.py"), ["def helper():", "    return 1", ""].join(String.raw`\n`));
-    writeFileSync(join(root, "pkg", "sub", "__init__.py"), "");
-    writeFileSync(join(root, "pkg", "sub", "worker.py"), ["from ..util import helper", "import pkg.sub", ""].join(String.raw`\n`));
+const fixtureRoot = resolve("test/fixtures");
 
-    try {
-      const graph = buildGraph(root, undefined, { changedFiles: ["pkg/sub/worker.py"] });
-      expect(graph.nodes.get("pkg/sub/worker.py")?.imports).toEqual([
-        "pkg/sub/__init__.py",
-        "pkg/util.py",
-      ]);
-    } finally {
-      rmSync(root, { recursive: true, force: true });
-    }
+describe("Python graph adapter", () => {
+  it("resolves relative imports from fixture repos", () => {
+    const root = resolve(fixtureRoot, "python-package-rel");
+    const graph = buildGraph(root, undefined, { changedFiles: ["pkg/sub/worker.py"] });
+
+    expect(graph.nodes.get("pkg/sub/worker.py")?.imports).toEqual([
+      "pkg/sub/__init__.py",
+      "pkg/util.py",
+    ]);
   });
 
-  it("tolerates unresolved imports while keeping conditional import edges", () => {
-    const root = mkdtempSync(join(tmpdir(), "impact-python-"));
-    mkdirSync(join(root, "pkg"), { recursive: true });
-    writeFileSync(join(root, "pkg", "__init__.py"), "");
-    writeFileSync(join(root, "pkg", "fallback.py"), "VALUE = 1\n");
-    writeFileSync(join(root, "pkg", "main.py"), ["try:", "    import missing_lib", "except ImportError:", "    from . import fallback", ""].join(String.raw`\n`));
+  it("maps package imports to __init__.py fixtures", () => {
+    const root = resolve(fixtureRoot, "python-package-rel");
+    const graph = buildGraph(root, undefined, { changedFiles: ["pkg/sub/worker.py"] });
 
-    try {
-      const graph = buildGraph(root, undefined, { changedFiles: ["pkg/main.py"] });
-      expect(graph.nodes.get("pkg/main.py")?.imports).toEqual(["pkg/fallback.py"]);
-    } finally {
-      rmSync(root, { recursive: true, force: true });
-    }
+    expect(graph.nodes.get("pkg/sub/worker.py")?.imports).toContain("pkg/sub/__init__.py");
+    expect(graph.reverseDeps.get("pkg/sub/__init__.py")).toEqual(new Set(["pkg/sub/worker.py"]));
+  });
+
+  it("tolerates unresolved imports without overclaiming dependencies", () => {
+    const root = resolve(fixtureRoot, "python-basic");
+    const graph = buildGraph(root, undefined, { changedFiles: ["main.py"] });
+
+    expect(graph.nodes.get("main.py")?.imports).toEqual(["pkg/fallback.py"]);
+    expect(graph.nodes.get("main.py")?.imports).not.toContain("missing_lib");
+  });
+
+  it("uses Python adapter only when changed files are .py in mixed repos", () => {
+    const root = resolve(fixtureRoot, "python-mixed-repo");
+
+    const pythonGraph = buildGraph(root, undefined, { changedFiles: ["py_pkg/worker.py"] });
+    expect(pythonGraph.nodes.has("py_pkg/worker.py")).toBe(true);
+    expect(pythonGraph.nodes.has("src/index.ts")).toBe(false);
+
+    const tsGraph = buildGraph(root, undefined, { changedFiles: ["src/index.ts"] });
+    expect(tsGraph.nodes.has("src/index.ts")).toBe(true);
+    expect(tsGraph.nodes.has("py_pkg/worker.py")).toBe(false);
   });
 });

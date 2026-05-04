@@ -90,8 +90,23 @@ function extractImports(relPath: string, source: string, knownFiles: Set<string>
 
         if (dots) {
           if (modulePart) {
-            const resolved = resolveRelativeImport(relPath, dots.length, modulePart, knownFiles);
-            if (resolved) deps.add(resolved);
+            let matchedImportedModule = false;
+            for (const importedName of importedNames) {
+              const resolvedImported = resolveRelativeImport(
+                relPath,
+                dots.length,
+                `${modulePart}.${importedName}`,
+                knownFiles,
+              );
+              if (resolvedImported) {
+                deps.add(resolvedImported);
+                matchedImportedModule = true;
+              }
+            }
+            if (!matchedImportedModule) {
+              const resolved = resolveRelativeImport(relPath, dots.length, modulePart, knownFiles);
+              if (resolved) deps.add(resolved);
+            }
           } else {
             for (const importedName of importedNames) {
               const resolved = resolveRelativeImport(relPath, dots.length, importedName, knownFiles);
@@ -99,8 +114,18 @@ function extractImports(relPath: string, source: string, knownFiles: Set<string>
             }
           }
         } else if (modulePart) {
-          const resolved = resolveAbsoluteImport(modulePart, knownFiles);
-          if (resolved) deps.add(resolved);
+          let matchedImportedModule = false;
+          for (const importedName of importedNames) {
+            const resolvedImported = resolveAbsoluteImport(`${modulePart}.${importedName}`, knownFiles);
+            if (resolvedImported) {
+              deps.add(resolvedImported);
+              matchedImportedModule = true;
+            }
+          }
+          if (!matchedImportedModule) {
+            const resolved = resolveAbsoluteImport(modulePart, knownFiles);
+            if (resolved) deps.add(resolved);
+          }
         }
       }
     }
