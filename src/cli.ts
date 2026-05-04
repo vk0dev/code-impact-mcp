@@ -57,6 +57,8 @@ CONFIGURE in Claude Code
 
 HOOK INSTALL
   install-hook manages a marked code-impact-mcp block inside .husky/pre-commit:
+    npx -y @vk0/code-impact-mcp install-hook
+  The installed hook then runs:
     npx -y @vk0/code-impact-mcp run-hook
   If Husky exists, it creates or updates only that block and keeps unrelated hook content intact.
   If Husky is absent, it returns an actionable message instead of scaffolding hook infra.

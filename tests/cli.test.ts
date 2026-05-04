@@ -16,6 +16,8 @@ describe("CLI help/version UX", () => {
     expect(out).toContain("USAGE");
     expect(out).toContain("gate_check");
     expect(out).toContain("install-hook");
+    expect(out).toContain("npx -y @vk0/code-impact-mcp install-hook");
+    expect(out).toContain("npx -y @vk0/code-impact-mcp run-hook");
     expect(out.trim().length).toBeGreaterThan(40);
     expect(out).toBe(HELP);
   });
