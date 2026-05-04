@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { cpSync, mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { tmpdir } from "node:os";
+import { fileURLToPath } from "node:url";
 
 import { registerTools } from "../src/tools/index.js";
 
@@ -33,6 +34,18 @@ function parseToolResult(result: { content: Array<{ type: string; text: string }
   expect(result.content).toHaveLength(1);
   expect(result.content[0]?.type).toBe("text");
   return JSON.parse(result.content[0]!.text);
+}
+
+const fixturesRoot = join(dirname(fileURLToPath(import.meta.url)), "..", "test", "fixtures");
+
+function withFixtureProject(fixtureName: string, run: (root: string) => Promise<void> | void) {
+  const root = mkdtempSync(join(tmpdir(), `code-impact-fixture-${fixtureName}-`));
+  try {
+    cpSync(join(fixturesRoot, fixtureName), root, { recursive: true });
+    return run(root);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
 }
 
 describe("registerTools", () => {
@@ -317,36 +330,86 @@ describe("registerTools", () => {
   });
 
   it("aggregates per-workspace gate results for pnpm workspaces", async () => {
-    await withTempProject(
-      {
-        "pnpm-workspace.yaml": "packages:\n  - 'packages/*'\n",
-        "packages/app-a/src/a.ts": "import { b } from './b'; export const a = b;\n",
-        "packages/app-a/src/b.ts": "import { a } from './a'; export const b = a;\n",
-        "packages/app-a/package.json": '{"name":"app-a"}',
-        "packages/app-b/src/index.ts": "export const ok = 1;\n",
-        "packages/app-b/package.json": '{"name":"app-b"}',
-      },
-      async (root) => {
-        const server = new FakeServer();
-        registerTools(server as any);
+    await withFixtureProject("monorepo-pnpm", async (root) => {
+      const server = new FakeServer();
+      registerTools(server as any);
 
-        const payload = parseToolResult(
-          await server.handlers.get("gate_check")!({
-            projectRoot: root,
-            files: ["packages/app-a/src/a.ts", "packages/app-b/src/index.ts"],
-            threshold: 0.9,
-          }),
-        );
+      const payload = parseToolResult(
+        await server.handlers.get("gate_check")!({
+          projectRoot: root,
+          files: ["packages/app-a/src/a.ts", "packages/app-b/src/index.ts"],
+          threshold: 0.9,
+        }),
+      );
 
-        expect(payload.verdict).toBe("BLOCK");
-        expect(payload.workspaces).toHaveLength(2);
-        expect(payload.workspaces.map((workspace: any) => [workspace.workspace, workspace.verdict])).toEqual([
-          ["packages/app-a", "BLOCK"],
-          ["packages/app-b", "PASS"],
-        ]);
-      },
-    );
+      expect(payload.verdict).toBe("BLOCK");
+      expect(payload.workspaces).toHaveLength(2);
+      expect(payload.workspaces.map((workspace: any) => [workspace.workspace, workspace.verdict])).toEqual([
+        ["packages/app-a", "BLOCK"],
+        ["packages/app-b", "PASS"],
+      ]);
+      expect(payload.reasons).toContain(
+        "[packages/app-a] Changed files participate in a circular dependency. Example: src/a.ts → src/b.ts.",
+      );
+    });
   });
+
+  it("aggregates per-workspace gate results for npm workspaces", async () => {
+    await withFixtureProject("monorepo-npm", async (root) => {
+      const server = new FakeServer();
+      registerTools(server as any);
+
+      const payload = parseToolResult(
+        await server.handlers.get("gate_check")!({
+          projectRoot: root,
+          files: ["apps/web/src/core.ts", "apps/docs/src/index.ts"],
+          threshold: 0.5,
+        }),
+      );
+
+      expect(payload.verdict).toBe("BLOCK");
+      expect(payload.workspaces.map((workspace: any) => [workspace.workspace, workspace.verdict])).toEqual([
+        ["apps/docs", "PASS"],
+        ["apps/web", "BLOCK"],
+      ]);
+      expect(payload.directlyAffected).toEqual(["apps/web/src/service.ts"]);
+      expect(payload.transitivelyAffected).toEqual(["apps/web/src/feature.ts"]);
+      expect(payload.affectedFiles).toBe(2);
+    });
+  });
+
+  it("uses the worst workspace verdict for mixed monorepos with cycle cases", async () => {
+    await withFixtureProject("monorepo-mixed-cycle", async (root) => {
+      const server = new FakeServer();
+      registerTools(server as any);
+
+      const payload = parseToolResult(
+        await server.handlers.get("gate_check")!({
+          projectRoot: root,
+          files: [
+            "packages/cycle-app/src/a.ts",
+            "packages/warn-app/src/index.ts",
+            "packages/pass-app/src/index.ts",
+          ],
+          threshold: 0.9,
+        }),
+      );
+
+      expect(payload.verdict).toBe("BLOCK");
+      expect(payload.workspaces.map((workspace: any) => [workspace.workspace, workspace.verdict])).toEqual([
+        ["packages/cycle-app", "BLOCK"],
+        ["packages/pass-app", "PASS"],
+        ["packages/warn-app", "WARN"],
+      ]);
+      expect(payload.circularDependencies).toBe(2);
+      expect(payload.reasons).toContain(
+        "[packages/cycle-app] Changed files participate in a circular dependency. Example: src/a.ts → src/b.ts.",
+      );
+      expect(payload.reasons).toContain(
+        "[packages/warn-app] The graph contains 1 circular dependency cycle(s). Example: src/a.ts → src/b.ts.",
+      );
+    });
+  }, 15_000);
 
   it("returns a bounded error for broken tsconfig", async () => {
     await withTempProject(
