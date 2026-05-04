@@ -24,7 +24,7 @@ describe("CLI help/version UX", () => {
 
     expect(mode).toBe("version");
     expect(out).toBe(renderVersion());
-    expect(out).toContain("@vk0/code-impact-mcp 1.2.0");
+    expect(out).toMatch(/^@vk0\/code-impact-mcp \d+\.\d+\.\d+\n$/);
   });
 
   it("falls through to server mode for normal MCP startup", () => {

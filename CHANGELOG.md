@@ -1,4 +1,10 @@
 
+## [1.3.0] — 2026-05-04
+
+### Added
+- Transparent Python `analyze_impact` support for changed `.py` files via a bounded tree-sitter-based import graph adapter.
+- Python import resolution coverage for relative imports, `__init__.py` package mapping, unresolved import tolerance, and conditional import edge retention without changing the external `analyze_impact` API.
+
 ## [1.2.0] — 2026-04-29
 
 ### Added
