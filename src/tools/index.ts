@@ -6,14 +6,23 @@ import { GraphBuildError, buildGraph, analyzeImpact, detectCycles, detectWorkspa
 let cachedGraph: DependencyGraph | null = null;
 let cachedRoot: string | null = null;
 let cachedTsconfigPath: string | undefined;
+let cachedGraphMode: "ts" | "python" | null = null;
 
-function getGraph(projectRoot: string, force = false, tsconfigPath?: string): DependencyGraph {
-  if (!force && cachedGraph && cachedRoot === projectRoot && cachedTsconfigPath === tsconfigPath) {
+function getGraph(projectRoot: string, force = false, tsconfigPath?: string, changedFiles?: string[]): DependencyGraph {
+  const graphMode: "ts" | "python" = (changedFiles ?? []).some((file) => file.endsWith('.py')) ? "python" : "ts";
+  if (
+    !force &&
+    cachedGraph &&
+    cachedRoot === projectRoot &&
+    cachedTsconfigPath === tsconfigPath &&
+    cachedGraphMode === graphMode
+  ) {
     return cachedGraph;
   }
-  cachedGraph = buildGraph(projectRoot, tsconfigPath);
+  cachedGraph = buildGraph(projectRoot, tsconfigPath, { changedFiles });
   cachedRoot = projectRoot;
   cachedTsconfigPath = tsconfigPath;
+  cachedGraphMode = graphMode;
   return cachedGraph;
 }
 
@@ -201,7 +210,7 @@ export function registerTools(server: McpServer): void {
     },
     async ({ projectRoot, files, tsconfigPath }) =>
       runTool(projectRoot, tsconfigPath, () => {
-        const graph = getGraph(projectRoot, false, tsconfigPath);
+        const graph = getGraph(projectRoot, false, tsconfigPath, files);
         const impact = analyzeImpact(graph, files);
 
         const totalAffected = impact.directlyAffected.length + impact.transitivelyAffected.length;

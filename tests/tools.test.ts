@@ -373,3 +373,30 @@ describe("registerTools", () => {
     );
   });
 });
+
+describe("analyze_impact Python adapter", () => {
+  it("routes Python changed files through the Python graph path", async () => {
+    const root = mkdtempSync(join(tmpdir(), "impact-python-tool-"));
+    mkdirSync(join(root, "pkg", "sub"), { recursive: true });
+    writeFileSync(join(root, "pkg", "__init__.py"), "");
+    writeFileSync(join(root, "pkg", "util.py"), ["def helper():", "    return 1", ""].join(String.raw`\n`));
+    writeFileSync(join(root, "pkg", "sub", "__init__.py"), "");
+    writeFileSync(join(root, "pkg", "sub", "worker.py"), ["from ..util import helper", ""].join(String.raw`\n`));
+
+    try {
+      const server = new FakeServer();
+      registerTools(server as any);
+      const payload = parseToolResult(
+        await server.handlers.get("analyze_impact")!({
+          projectRoot: root,
+          files: ["pkg/util.py"],
+        }),
+      );
+      expect(payload.directlyAffected).toContain("pkg/sub/worker.py");
+      expect(payload.transitivelyAffected).toEqual([]);
+      expect(payload.changedFiles).toEqual(["pkg/util.py"]);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+});

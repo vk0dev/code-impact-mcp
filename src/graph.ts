@@ -7,6 +7,7 @@
 import { Project, SyntaxKind, type SourceFile } from "ts-morph";
 import { dirname, extname, isAbsolute, join, normalize, relative, resolve } from "node:path";
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
+import { buildPythonGraph } from "./pythonGraph.js";
 
 export class GraphBuildError extends Error {
   constructor(message: string, readonly code: "INVALID_PROJECT_ROOT" | "INVALID_TSCONFIG") {
@@ -39,6 +40,10 @@ export interface DependencyGraph {
   fileCount: number;
   edgeCount: number;
   buildTimeMs: number;
+}
+
+export interface BuildGraphOptions {
+  changedFiles?: string[];
 }
 
 export interface ImpactAnalysis {
@@ -87,7 +92,11 @@ const SOURCE_EXTENSION_ALIASES: Record<string, string[]> = {
   ".cjs": [".cts", ".ts"],
 };
 
-export function buildGraph(projectRoot: string, tsconfigPath?: string): DependencyGraph {
+export function buildGraph(projectRoot: string, tsconfigPath?: string, options?: BuildGraphOptions): DependencyGraph {
+  const changedFiles = options?.changedFiles ?? [];
+  if (changedFiles.some((file) => file.endsWith('.py'))) {
+    return buildPythonGraph(projectRoot);
+  }
   const startedAt = Date.now();
   const root = resolve(projectRoot);
 

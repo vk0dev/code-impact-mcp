@@ -186,3 +186,39 @@ describe("graph queries", () => {
     );
   });
 });
+
+describe("Python graph adapter", () => {
+  it("resolves relative imports and package __init__.py targets", () => {
+    const root = mkdtempSync(join(tmpdir(), "impact-python-"));
+    mkdirSync(join(root, "pkg", "sub"), { recursive: true });
+    writeFileSync(join(root, "pkg", "__init__.py"), "");
+    writeFileSync(join(root, "pkg", "util.py"), ["def helper():", "    return 1", ""].join(String.raw`\n`));
+    writeFileSync(join(root, "pkg", "sub", "__init__.py"), "");
+    writeFileSync(join(root, "pkg", "sub", "worker.py"), ["from ..util import helper", "import pkg.sub", ""].join(String.raw`\n`));
+
+    try {
+      const graph = buildGraph(root, undefined, { changedFiles: ["pkg/sub/worker.py"] });
+      expect(graph.nodes.get("pkg/sub/worker.py")?.imports).toEqual([
+        "pkg/sub/__init__.py",
+        "pkg/util.py",
+      ]);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  it("tolerates unresolved imports while keeping conditional import edges", () => {
+    const root = mkdtempSync(join(tmpdir(), "impact-python-"));
+    mkdirSync(join(root, "pkg"), { recursive: true });
+    writeFileSync(join(root, "pkg", "__init__.py"), "");
+    writeFileSync(join(root, "pkg", "fallback.py"), "VALUE = 1\n");
+    writeFileSync(join(root, "pkg", "main.py"), ["try:", "    import missing_lib", "except ImportError:", "    from . import fallback", ""].join(String.raw`\n`));
+
+    try {
+      const graph = buildGraph(root, undefined, { changedFiles: ["pkg/main.py"] });
+      expect(graph.nodes.get("pkg/main.py")?.imports).toEqual(["pkg/fallback.py"]);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+});
