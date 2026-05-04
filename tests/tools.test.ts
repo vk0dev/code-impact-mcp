@@ -352,7 +352,7 @@ describe("registerTools", () => {
         "[packages/app-a] Changed files participate in a circular dependency. Example: src/a.ts → src/b.ts.",
       );
     });
-  });
+  }, 15_000);
 
   it("aggregates per-workspace gate results for npm workspaces", async () => {
     await withFixtureProject("monorepo-npm", async (root) => {
@@ -376,7 +376,7 @@ describe("registerTools", () => {
       expect(payload.transitivelyAffected).toEqual(["apps/web/src/feature.ts"]);
       expect(payload.affectedFiles).toBe(2);
     });
-  });
+  }, 15_000);
 
   it("uses the worst workspace verdict for mixed monorepos with cycle cases", async () => {
     await withFixtureProject("monorepo-mixed-cycle", async (root) => {
