@@ -29,7 +29,7 @@ USAGE
   npx -y @vk0/code-impact-mcp               Start the MCP server on stdio.
   npx -y @vk0/code-impact-mcp --help        Show this help.
   npx -y @vk0/code-impact-mcp --version     Show the package version.
-  npx -y @vk0/code-impact-mcp install-hook  Create .husky/pre-commit.
+  npx -y @vk0/code-impact-mcp install-hook  Install the managed hook block when safe.
 
 WHAT IT IS
   A Model Context Protocol (MCP) server. It is meant to be configured as an MCP
@@ -60,8 +60,9 @@ HOOK INSTALL
     npx -y @vk0/code-impact-mcp install-hook
   The installed hook then runs:
     npx -y @vk0/code-impact-mcp run-hook
-  If Husky exists, it creates or updates only that block and keeps unrelated hook content intact.
-  If Husky is absent, it returns an actionable message instead of scaffolding hook infra.
+  If Husky exists, it installs or updates only the managed block.
+  If Husky is absent, it prints a safe snippet instead of scaffolding hook infra.
+  It refuses to overwrite unrelated hook content and remains idempotent for the managed block.
 
 LINKS
   npm:  https://www.npmjs.com/package/@vk0/code-impact-mcp
@@ -138,8 +139,12 @@ export async function executeCliMode(
 
   if (mode === "install-hook") {
     const result = installHook(options.cwd, pkg.name);
-    if (result.status === "missing-infra") {
-      options.write(`${result.message}\n`);
+    if (result.status === "print-only") {
+      options.write(`${result.message}\n\n${result.snippet}\n`);
+      return 0;
+    }
+    if (result.status === "refused") {
+      options.write(`${result.message}\n\nSuggested snippet:\n${result.snippet}\n`);
       return 1;
     }
     if (result.status === "created") {

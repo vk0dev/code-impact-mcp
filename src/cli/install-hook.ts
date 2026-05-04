@@ -1,4 +1,4 @@
-import { chmodSync, existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 const BLOCK_START = "# BEGIN code-impact-mcp";
@@ -14,10 +14,24 @@ export type InstallHookResult =
   | { status: "created"; hookPath: string; snippet: string }
   | { status: "updated"; hookPath: string; snippet: string }
   | { status: "unchanged"; hookPath: string; snippet: string }
-  | { status: "missing-infra"; hookPath: string; message: string };
+  | { status: "print-only"; hookPath: string; message: string; snippet: string }
+  | { status: "refused"; hookPath: string; message: string; snippet: string };
 
 function ensureTrailingNewline(text: string): string {
   return text.endsWith("\n") ? text : `${text}\n`;
+}
+
+function renderHuskyInstallSnippet(packageName: string): string {
+  return [
+    "mkdir -p .husky",
+    "cat > .husky/pre-commit <<'EOF'",
+    "#!/usr/bin/env sh",
+    "set -eu",
+    "",
+    renderHuskyPreCommitSnippet(packageName),
+    "EOF",
+    "chmod +x .husky/pre-commit",
+  ].join("\n");
 }
 
 export function installHook(projectRoot: string, packageName: string): InstallHookResult {
@@ -27,9 +41,10 @@ export function installHook(projectRoot: string, packageName: string): InstallHo
 
   if (!existsSync(huskyDir) || !statSync(huskyDir).isDirectory()) {
     return {
-      status: "missing-infra",
+      status: "print-only",
       hookPath,
-      message: ` .husky directory not found at ${huskyDir}. Initialize Husky first, then rerun install-hook.`,
+      message: `.husky directory not found at ${huskyDir}. Printing a safe snippet instead of scaffolding Husky automatically.`,
+      snippet: renderHuskyInstallSnippet(packageName),
     };
   }
 
@@ -49,8 +64,12 @@ export function installHook(projectRoot: string, packageName: string): InstallHo
     next = existing.replace(blockPattern, snippet);
     status = next === existing ? "unchanged" : "updated";
   } else {
-    next = `${ensureTrailingNewline(existing)}\n${snippet}\n`;
-    status = "updated";
+    return {
+      status: "refused",
+      hookPath,
+      message: `Refusing to overwrite existing pre-commit hook at ${hookPath}. The file already contains unrelated content and no managed code-impact-mcp block.`,
+      snippet: renderHuskyInstallSnippet(packageName),
+    };
   }
 
   if (next !== existing) {

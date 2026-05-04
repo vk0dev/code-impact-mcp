@@ -18,8 +18,8 @@ describe("CLI help/version UX", () => {
     expect(out).toContain("install-hook");
     expect(out).toContain("npx -y @vk0/code-impact-mcp install-hook");
     expect(out).toContain("npx -y @vk0/code-impact-mcp run-hook");
-    expect(out).toContain("creates or updates only that block");
-    expect(out).toContain("If Husky is absent");
+    expect(out).toContain("refuses to overwrite unrelated hook content");
+    expect(out).toContain("prints a safe snippet");
     expect(out.trim().length).toBeGreaterThan(40);
     expect(out).toBe(HELP);
   });
@@ -70,10 +70,30 @@ describe("CLI install-hook", () => {
     expect(hook).toContain("npx -y @vk0/code-impact-mcp run-hook");
   });
 
-  it("appends or updates its own block without clobbering unrelated hook content", async () => {
+  it("refuses unsafe overwrite when a pre-commit hook already exists with unrelated content", async () => {
     const hookDir = join(root, ".husky");
     mkdirSync(hookDir, { recursive: true });
-    writeFileSync(join(hookDir, "pre-commit"), "#!/usr/bin/env sh\necho existing\n", "utf8");
+    const hookPath = join(hookDir, "pre-commit");
+    writeFileSync(hookPath, "#!/usr/bin/env sh\necho existing\n", "utf8");
+
+    let out = "";
+    const exitCode = await executeCliMode("install-hook", {
+      cwd: root,
+      write: (text) => {
+        out += text;
+      },
+    });
+
+    const hook = readFileSync(hookPath, "utf8");
+    expect(exitCode).toBe(1);
+    expect(out).toContain("Refusing to overwrite existing");
+    expect(out).toContain("BEGIN code-impact-mcp");
+    expect(hook).toBe("#!/usr/bin/env sh\necho existing\n");
+  });
+
+  it("remains idempotent when the managed block is already installed", async () => {
+    const hookDir = join(root, ".husky");
+    mkdirSync(hookDir, { recursive: true });
 
     let firstOut = "";
     const firstExit = await executeCliMode("install-hook", {
@@ -86,9 +106,7 @@ describe("CLI install-hook", () => {
     const hookPath = join(hookDir, "pre-commit");
     const firstHook = readFileSync(hookPath, "utf8");
     expect(firstExit).toBe(0);
-    expect(firstOut).toContain("Updated");
-    expect(firstHook).toContain("echo existing");
-    expect(firstHook.match(/BEGIN code-impact-mcp/g)).toHaveLength(1);
+    expect(firstOut).toContain("Created");
 
     let secondOut = "";
     const secondExit = await executeCliMode("install-hook", {
@@ -105,7 +123,7 @@ describe("CLI install-hook", () => {
     expect(secondHook.match(/BEGIN code-impact-mcp/g)).toHaveLength(1);
   });
 
-  it("returns an actionable message when husky infra is absent", async () => {
+  it("prints a safe snippet when husky infra is absent", async () => {
     let out = "";
     const exitCode = await executeCliMode("install-hook", {
       cwd: root,
@@ -114,9 +132,11 @@ describe("CLI install-hook", () => {
       },
     });
 
-    expect(exitCode).toBe(1);
+    expect(exitCode).toBe(0);
     expect(out).toContain(".husky directory not found");
-    expect(out).toContain("Initialize Husky first");
+    expect(out).toContain("mkdir -p .husky");
+    expect(out).toContain("BEGIN code-impact-mcp");
+    expect(out).toContain("npx -y @vk0/code-impact-mcp run-hook");
   });
 });
 
