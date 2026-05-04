@@ -6,7 +6,7 @@ export function createServer(): McpServer {
   const server = new McpServer(
     {
       name: "code-impact-mcp",
-      version: "1.5.0",
+      version: "1.6.0",
       description:
         "Dependency graph, blast-radius analysis, and lightweight gate checks for local TypeScript and JavaScript repositories.",
     },

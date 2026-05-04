@@ -1,4 +1,9 @@
 
+## [1.6.0] — 2026-05-04
+
+### Added
+- Added a safe `install-hook` CLI helper that installs a managed Husky pre-commit block when safe, prints a bounded snippet when hook infra is absent, refuses unsafe overwrite of unrelated hook content, and remains idempotent for the managed block.
+
 ## [1.5.0] — 2026-05-04
 
 ### Added
