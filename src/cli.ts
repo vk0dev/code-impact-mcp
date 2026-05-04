@@ -56,9 +56,10 @@ CONFIGURE in Claude Code
   claude mcp add --transport stdio code-impact -- npx -y @vk0/code-impact-mcp
 
 HOOK INSTALL
-  install-hook writes a minimal .husky/pre-commit that calls:
+  install-hook manages a marked code-impact-mcp block inside .husky/pre-commit:
     npx -y @vk0/code-impact-mcp run-hook
-  The helper refuses to overwrite an existing hook.
+  If Husky exists, it creates or updates only that block and keeps unrelated hook content intact.
+  If Husky is absent, it returns an actionable message instead of scaffolding hook infra.
 
 LINKS
   npm:  https://www.npmjs.com/package/@vk0/code-impact-mcp
@@ -135,11 +136,19 @@ export async function executeCliMode(
 
   if (mode === "install-hook") {
     const result = installHook(options.cwd, pkg.name);
-    if (result.status === "conflict") {
+    if (result.status === "missing-infra") {
       options.write(`${result.message}\n`);
       return 1;
     }
-    options.write(`Created ${result.hookPath}\n`);
+    if (result.status === "created") {
+      options.write(`Created ${result.hookPath}\n`);
+      return 0;
+    }
+    if (result.status === "updated") {
+      options.write(`Updated ${result.hookPath}\n`);
+      return 0;
+    }
+    options.write(`Already installed in ${result.hookPath}\n`);
     return 0;
   }
 

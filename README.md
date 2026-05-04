@@ -52,7 +52,7 @@ If you already use Husky, you can drop in the bounded gate runner instead of wir
 npx -y @vk0/code-impact-mcp install-hook
 ```
 
-This creates `.husky/pre-commit` and refuses to overwrite an existing hook silently.
+If `.husky/` already exists, this creates or updates only the marked `code-impact-mcp` block inside `.husky/pre-commit` and leaves unrelated hook content alone. If Husky is not initialized yet, the command stops with an actionable message instead of scaffolding hook infrastructure for you.
 
 ### Claude Desktop
 
