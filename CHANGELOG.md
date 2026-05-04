@@ -1,4 +1,9 @@
 
+## [1.4.0] — 2026-05-04
+
+### Added
+- `install-hook` CLI helper that safely creates a bounded `.husky/pre-commit` runner for the existing `gate_check` flow without silently overwriting an existing hook.
+
 ## [1.3.0] — 2026-05-04
 
 ### Added
