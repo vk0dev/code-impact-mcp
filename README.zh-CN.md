@@ -46,13 +46,17 @@ claude mcp add code-impact-mcp -- npx -y @vk0/code-impact-mcp
 
 ### Optional pre-commit hook helper
 
+v1.6.0 新增了一个安全的 Husky-only helper，用来接入这个有边界的 gate runner，而不用手动改 pre-commit hook。
+
 如果你已经在使用 Husky，可以直接接入这个有边界的 gate runner，而不用手动改 hook：
 
 ```bash
 npx -y @vk0/code-impact-mcp install-hook
 ```
 
-如果 `.husky/` 已存在，这个命令只会创建或更新 `.husky/pre-commit` 里带 `code-impact-mcp` 标记的那一段，不会动其他 hook 内容。如果 Husky 还没初始化，它会停下来并给出可执行的提示，而不是替你搭建整套 hook 基础设施。
+![install-hook demo: helper 只插入带标记的 code-impact-mcp 片段，并且重复运行仍保持 idempotent](docs/demo-install-hook.gif)
+
+如果 `.husky/` 已存在，这个命令只会创建或更新 `.husky/pre-commit` 里带 `code-impact-mcp` 标记的那一段，重复运行仍保持 idempotent，不会动其他 hook 内容。如果 Husky 还没初始化，它会停下来并给出可执行的提示，而不是替你搭建整套 hook 基础设施。
 
 ### Claude Desktop
 

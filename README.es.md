@@ -46,13 +46,17 @@ claude mcp add code-impact-mcp -- npx -y @vk0/code-impact-mcp
 
 ### Optional pre-commit hook helper
 
+La versión v1.6.0 añadió un helper seguro, solo para Husky, para conectar el gate runner acotado sin editar a mano el pre-commit hook.
+
 Si ya usas Husky, puedes añadir el gate runner acotado sin cablear el hook a mano:
 
 ```bash
 npx -y @vk0/code-impact-mcp install-hook
 ```
 
-Si `.husky/` ya existe, el comando crea o actualiza solo el bloque marcado `code-impact-mcp` dentro de `.husky/pre-commit` y deja intacto el resto del contenido del hook. Si Husky todavía no está inicializado, el comando se detiene con un mensaje accionable en lugar de crear la infraestructura de hooks por ti.
+![install-hook demo: el helper inserta solo el bloque marcado code-impact-mcp y sigue siendo idempotente al volver a ejecutarlo](docs/demo-install-hook.gif)
+
+Si `.husky/` ya existe, el comando crea o actualiza solo el bloque marcado `code-impact-mcp` dentro de `.husky/pre-commit`, sigue siendo idempotente al volver a ejecutarlo y deja intacto el resto del contenido del hook. Si Husky todavía no está inicializado, el comando se detiene con un mensaje accionable en lugar de crear la infraestructura de hooks por ti.
 
 ### Claude Desktop
 
