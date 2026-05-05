@@ -54,9 +54,9 @@ v1.6.0 では、pre-commit hook を手で編集せずに bounded gate runner を
 npx -y @vk0/code-impact-mcp install-hook
 ```
 
-![install-hook demo: helper は印付きの code-impact-mcp ブロックだけを挿入し、再実行しても idempotent のままです](docs/demo-install-hook.gif)
+![install-hook demo: helper は managed な code-impact-mcp ブロックがない既存 Husky hook の変更を拒否します](docs/demo-install-hook.gif)
 
-`.husky/` がすでに存在する場合、このコマンドは `.husky/pre-commit` 内の `code-impact-mcp` と印の付いたブロックだけを作成または更新し、再実行しても idempotent のまま、他の hook 内容はそのまま残します。Husky がまだ初期化されていない場合は、hook 基盤を勝手に作らず、実行可能なメッセージを返して停止します。
+`.husky/pre-commit` にすでに無関係な内容があり、managed な `code-impact-mcp` ブロックが存在しない場合、このコマンドは変更を拒否して hook をそのまま残します。managed block がすでにある場合だけ、その owned ブロック内で再実行しても idempotent のままです。Husky がまだ初期化されていない場合は、hook 基盤を勝手に作らず、実行可能なメッセージを返して停止します。
 
 ### Claude Desktop
 

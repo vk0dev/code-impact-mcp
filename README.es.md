@@ -54,9 +54,9 @@ Si ya usas Husky, puedes añadir el gate runner acotado sin cablear el hook a ma
 npx -y @vk0/code-impact-mcp install-hook
 ```
 
-![install-hook demo: el helper inserta solo el bloque marcado code-impact-mcp y sigue siendo idempotente al volver a ejecutarlo](docs/demo-install-hook.gif)
+![install-hook demo: el helper se niega a modificar un hook existente de Husky sin un bloque managed de code-impact-mcp](docs/demo-install-hook.gif)
 
-Si `.husky/` ya existe, el comando crea o actualiza solo el bloque marcado `code-impact-mcp` dentro de `.husky/pre-commit`, sigue siendo idempotente al volver a ejecutarlo y deja intacto el resto del contenido del hook. Si Husky todavía no está inicializado, el comando se detiene con un mensaje accionable en lugar de crear la infraestructura de hooks por ti.
+Si `.husky/pre-commit` ya contiene contenido ajeno y no incluye un bloque managed de `code-impact-mcp`, este comando se niega a modificarlo y deja el hook intacto. Solo cuando ese managed block ya existe, las re-ejecuciones siguen siendo idempotentes dentro de ese bloque owned. Si Husky todavía no está inicializado, el comando se detiene con un mensaje accionable en lugar de crear la infraestructura de hooks por ti.
 
 ### Claude Desktop
 

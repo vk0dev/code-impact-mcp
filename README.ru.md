@@ -54,9 +54,9 @@ claude mcp add code-impact-mcp -- npx -y @vk0/code-impact-mcp
 npx -y @vk0/code-impact-mcp install-hook
 ```
 
-![install-hook demo: helper вставляет только помеченный блок code-impact-mcp и остаётся idempotent при повторном запуске](docs/demo-install-hook.gif)
+![install-hook demo: helper отказывается менять чужой существующий Husky hook без managed блока code-impact-mcp](docs/demo-install-hook.gif)
 
-Если `.husky/` уже существует, команда создаёт или обновляет только помеченный блок `code-impact-mcp` внутри `.husky/pre-commit`, остаётся idempotent при повторном запуске и не трогает остальное содержимое hook. Если Husky ещё не инициализирован, команда останавливается с понятным сообщением вместо того, чтобы разворачивать hook-инфраструктуру за вас.
+Если `.husky/pre-commit` уже содержит посторонний контент и в нём нет managed блока `code-impact-mcp`, команда отказывается что-либо менять и оставляет hook нетронутым. Если managed block уже существует, повторные запуски остаются idempotent внутри этого owned блока. Если Husky ещё не инициализирован, команда останавливается с понятным сообщением вместо того, чтобы разворачивать hook-инфраструктуру за вас.
 
 ### Claude Desktop
 
