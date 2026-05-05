@@ -81,7 +81,7 @@ Use a workspace or project-specific launch directory so the server can read the 
 
 Shipped in v1.6.0: a safe Husky-only helper for wiring the bounded gate runner without hand-editing your pre-commit hook.
 
-If you already use Husky, you can drop in the bounded gate runner instead of wiring the hook manually:
+If you already use Husky, `code-impact-mcp install-hook` is the direct path for pre-commit wiring, so you can drop in the bounded gate runner instead of wiring the hook manually:
 
 ```bash
 npx -y @vk0/code-impact-mcp install-hook
