@@ -8,6 +8,8 @@
 
 [English](./README.md) | [日本語](./README.ja.md) | [Русский](./README.ru.md) | [Español](./README.es.md)
 
+> Listing status：`awesome-mcp-servers` 的提交内容已经准备好，MCP Hive 的提交流程也已确认，但这个 README 目前还不会声称任何外部 listing 已经 live。
+
 ## Best for
 
 - **提交前重构检查：** 当你要改共享文件、路由或模块，并且想快速得到 PASS/WARN/BLOCK 结论时。
@@ -32,7 +34,7 @@
 - 代理想得到一个**数值 risk score（0-1）**
 - 你想做**dependency analysis**，但不想搭建数据库或 tree-sitter
 
-CodeImpact MCP 使用 ts-morph 构建轻量级 dependency graph，并给出有边界的结论：PASS、WARN 或 BLOCK。Zero cloud, no API key, local-first。当前它仍以 TypeScript/JavaScript 的完整支持为主，同时为 `analyze_impact` 和 `gate_check` 提供一个有边界的 file-level Python path，能返回 import-graph blast radius 和同样的 verdict framing，但这并不意味着宽泛的多语言平台能力。
+CodeImpact MCP 使用 ts-morph 构建轻量级 dependency graph，并给出有边界的结论：PASS、WARN 或 BLOCK。Zero cloud, no API key, local-first。当前它仍以 TypeScript/JavaScript 的完整支持为主，而 Python 只在 `analyze_impact` 和 `gate_check` 中提供更窄的 file-level path，并不等同于完整的 TS/JS graph surface。
 
 如果你需要的是 **面向 AI 生成代码修改的快速、有限边界的 pre-commit gate**，而不是沉重的代码治理平台，那么它就是这个场景下的 canonical MCP server。Zero cloud, no API key, local-first.
 
@@ -48,7 +50,7 @@ claude mcp add code-impact-mcp -- npx -y @vk0/code-impact-mcp
 
 v1.6.0 新增了一个安全的 Husky-only helper，用来接入这个有边界的 gate runner，而不用手动改 pre-commit hook。
 
-如果你已经在使用 Husky，可以直接接入这个有边界的 gate runner，而不用手动改 hook：
+如果你已经在使用 Husky，`code-impact-mcp install-hook` 就是接入 pre-commit wiring 的直接路径，所以可以直接接入这个有边界的 gate runner，而不用手动改 hook：
 
 ```bash
 npx -y @vk0/code-impact-mcp install-hook

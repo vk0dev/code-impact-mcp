@@ -8,6 +8,8 @@
 
 [日本語](./README.ja.md) | [中文](./README.zh-CN.md) | [English](./README.md) | [Español](./README.es.md)
 
+> Статус листингов: payload для `awesome-mcp-servers` подготовлен, путь сабмита в MCP Hive подтверждён, но этот README пока не утверждает, что какой-либо внешний листинг уже live.
+
 ## Best for
 
 - **Проверка рефакторинга перед коммитом:** когда меняете общий файл, роут или модуль и нужен быстрый PASS/WARN/BLOCK ответ.
@@ -32,7 +34,7 @@
 - агенту нужен **числовой risk score (0-1)** для предлагаемого изменения
 - нужен dependency analysis **без настройки базы данных или tree-sitter**
 
-CodeImpact MCP строит лёгкий dependency graph на ts-morph и даёт ограниченный ответ: PASS, WARN или BLOCK. Zero cloud, no API key, local-first. Сегодня это означает полную поддержку TypeScript/JavaScript плюс узкий file-level Python path для `analyze_impact` и `gate_check`, включая import-graph blast radius и тот же verdict framing, без заявлений о широкой multi-language coverage.
+CodeImpact MCP строит лёгкий dependency graph на ts-morph и даёт ограниченный ответ: PASS, WARN или BLOCK. Zero cloud, no API key, local-first. Сегодня это означает полную поддержку TypeScript/JavaScript, а Python остаётся ограниченным более узким file-level path для `analyze_impact` и `gate_check`, а не полной TS/JS graph surface.
 
 Если нужен **быстрый ограниченный pre-commit gate для AI-generated code changes**, а не тяжёлая governance-платформа, это и есть canonical MCP server для такого сценария. Zero cloud, no API key, local-first.
 
@@ -48,7 +50,7 @@ claude mcp add code-impact-mcp -- npx -y @vk0/code-impact-mcp
 
 Релиз v1.6.0 добавил безопасный Husky-only helper для подключения ограниченного gate runner без ручной правки pre-commit hook.
 
-Если у вас уже используется Husky, можно подключить ограниченный gate runner без ручной правки hook:
+Если у вас уже используется Husky, `code-impact-mcp install-hook` это прямой путь для wiring pre-commit, так что можно подключить ограниченный gate runner без ручной правки hook:
 
 ```bash
 npx -y @vk0/code-impact-mcp install-hook

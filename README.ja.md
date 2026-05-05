@@ -8,6 +8,8 @@
 
 [English](./README.md) | [中文](./README.zh-CN.md) | [Русский](./README.ru.md) | [Español](./README.es.md)
 
+> Listing status: `awesome-mcp-servers` 向けの payload は準備済みで、MCP Hive の submission path も確認済みですが、この README では外部 listing が live だとはまだ主張しません。
+
 ## Best for
 
 - **コミット前のリファクタ確認:** 共有ファイル、ルート、モジュールを変更する前に PASS/WARN/BLOCK を素早く知りたいとき。
@@ -32,7 +34,7 @@
 - 提案変更に対して **数値 risk score (0-1)** が欲しいとき
 - データベースや tree-sitter を用意せずに **dependency analysis** したいとき
 
-CodeImpact MCP は ts-morph で軽量な dependency graph を作り、PASS / WARN / BLOCK という bounded answer を返します。Zero cloud, no API key, local-first. 現在は TypeScript/JavaScript をフルサポートしつつ、`analyze_impact` と `gate_check` には import-graph blast radius を返す狭い file-level Python path もありますが、広い multi-language coverage をうたうものではありません。
+CodeImpact MCP は ts-morph で軽量な dependency graph を作り、PASS / WARN / BLOCK という bounded answer を返します。Zero cloud, no API key, local-first. 現在は TypeScript/JavaScript をフルサポートしつつ、Python は `analyze_impact` と `gate_check` に限られた、より狭い file-level path にとどまり、TS/JS の完全な graph surface をそのまま提供するものではありません。
 
 AI生成コード変更に対して **重い governance platform ではなく、高速で bounded な pre-commit gate** が欲しいなら、これがその用途の canonical MCP server です。Zero cloud, no API key, local-first.
 
@@ -48,7 +50,7 @@ claude mcp add code-impact-mcp -- npx -y @vk0/code-impact-mcp
 
 v1.6.0 では、pre-commit hook を手で編集せずに bounded gate runner を配線できる安全な Husky-only helper が追加されました。
 
-すでに Husky を使っている場合は、hook を手で配線し直さずに bounded gate runner を追加できます。
+すでに Husky を使っている場合は、`code-impact-mcp install-hook` が pre-commit wiring への直接ルートなので、hook を手で配線し直さずに bounded gate runner を追加できます。
 
 ```bash
 npx -y @vk0/code-impact-mcp install-hook

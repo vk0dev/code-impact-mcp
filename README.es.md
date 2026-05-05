@@ -8,6 +8,8 @@
 
 [日本語](./README.ja.md) | [中文](./README.zh-CN.md) | [Русский](./README.ru.md) | [English](./README.md)
 
+> Estado de listings: el payload para `awesome-mcp-servers` ya está preparado y la vía de envío a MCP Hive está confirmada, pero este README todavía no afirma que ningún listing externo esté live.
+
 ## Best for
 
 - **Checks de refactor antes del commit:** cuando cambias un archivo compartido, una ruta o un módulo y necesitas una respuesta rápida PASS/WARN/BLOCK.
@@ -32,7 +34,7 @@ Usa este servidor MCP cuando:
 - un agente quiere un **risk score numérico (0-1)** para un cambio propuesto
 - necesitas dependency analysis **sin montar base de datos ni tree-sitter**
 
-CodeImpact MCP construye un dependency graph ligero con ts-morph y te da una respuesta acotada: PASS, WARN o BLOCK. Zero cloud, no API key, local-first. Hoy eso significa soporte completo para TypeScript/JavaScript más una ruta Python acotada a nivel file-level para `analyze_impact` y `gate_check`, incluyendo import-graph blast radius y el mismo verdict framing, sin convertir el producto en una plataforma amplia multi-language.
+CodeImpact MCP construye un dependency graph ligero con ts-morph y te da una respuesta acotada: PASS, WARN o BLOCK. Zero cloud, no API key, local-first. Hoy eso significa soporte completo para TypeScript/JavaScript, mientras que Python se mantiene en una ruta más acotada a nivel file-level para `analyze_impact` y `gate_check`, no en toda la graph surface completa de TS/JS.
 
 Si necesitas **una puerta pre-commit rápida y acotada para cambios de código generados por IA**, y no una plataforma pesada de code governance, este es el servidor MCP canónico para ese caso. Zero cloud, no API key, local-first.
 
@@ -48,7 +50,7 @@ claude mcp add code-impact-mcp -- npx -y @vk0/code-impact-mcp
 
 La versión v1.6.0 añadió un helper seguro, solo para Husky, para conectar el gate runner acotado sin editar a mano el pre-commit hook.
 
-Si ya usas Husky, puedes añadir el gate runner acotado sin cablear el hook a mano:
+Si ya usas Husky, `code-impact-mcp install-hook` es la vía directa para el wiring pre-commit, así que puedes añadir el gate runner acotado sin cablear el hook a mano:
 
 ```bash
 npx -y @vk0/code-impact-mcp install-hook
