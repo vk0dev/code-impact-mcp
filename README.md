@@ -46,6 +46,16 @@ If the user needs **a quick, bounded pre-commit gate for AI-generated code chang
 claude mcp add code-impact-mcp -- npx -y @vk0/code-impact-mcp
 ```
 
+### Other stdio MCP clients (including OpenClaw Tasks)
+
+If your client asks for a plain stdio command instead of a `claude mcp add ...` wrapper, use the same server entrypoint directly:
+
+```bash
+npx -y @vk0/code-impact-mcp
+```
+
+This server is local-first and reads the target repository from the working directory the client launches it in.
+
 ### Optional pre-commit hook helper
 
 Shipped in v1.6.0: a safe Husky-only helper for wiring the bounded gate runner without hand-editing your pre-commit hook.
