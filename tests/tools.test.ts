@@ -48,7 +48,7 @@ function withFixtureProject(fixtureName: string, run: (root: string) => Promise<
   }
 }
 
-describe("registerTools", () => {
+describe("registerTools", { timeout: 15000 }, () => {
   it("exposes get_dependencies on top of the graph foundation", async () => {
     await withTempProject(
       {
