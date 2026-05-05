@@ -56,6 +56,38 @@ npx -y @vk0/code-impact-mcp
 
 This server is local-first and reads the target repository from the working directory the client launches it in.
 
+### JSON config examples for stdio clients
+
+If your MCP client wants JSON instead of a shell wrapper, point it at the same shipped entrypoint:
+
+#### Claude Desktop
+
+```json
+{
+  "mcpServers": {
+    "code-impact-mcp": {
+      "command": "npx",
+      "args": ["-y", "@vk0/code-impact-mcp"]
+    }
+  }
+}
+```
+
+#### Generic stdio client
+
+```json
+{
+  "mcpServers": {
+    "code-impact-mcp": {
+      "command": "npx",
+      "args": ["-y", "@vk0/code-impact-mcp"]
+    }
+  }
+}
+```
+
+Use a workspace or project-specific launch directory so the server can read the repository you want to analyze.
+
 ### Optional pre-commit hook helper
 
 Shipped in v1.6.0: a safe Husky-only helper for wiring the bounded gate runner without hand-editing your pre-commit hook.
