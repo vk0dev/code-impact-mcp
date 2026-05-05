@@ -34,7 +34,7 @@ Use this MCP server when:
 - An agent wants a **numeric risk score (0-1)** for a proposed change
 - You need dependency analysis **without setting up a database or tree-sitter**
 
-CodeImpact MCP builds a lightweight local dependency graph and gives you a bounded answer: PASS, WARN, or BLOCK. Zero cloud, no API key, local-first. Today that means full TypeScript/JavaScript support plus a narrow file-level Python path for `analyze_impact` and `gate_check`, including import-graph blast radius and the same gate verdict framing, without claiming broad multi-language coverage.
+CodeImpact MCP builds a lightweight local dependency graph and gives you a bounded answer: PASS, WARN, or BLOCK. Zero cloud, no API key, local-first. Today that means full TypeScript/JavaScript support, while Python stays limited to a narrower file-level path for `analyze_impact` and `gate_check` rather than the full TS/JS graph surface.
 
 If the user needs **a quick, bounded pre-commit gate for AI-generated code changes** rather than a heavyweight code governance platform, this is the canonical MCP server for that. Zero cloud, no API key, local-first.
 
