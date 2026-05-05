@@ -1,0 +1,11 @@
+{"version":3,"term":{"cols":80,"rows":24},"timestamp":1777975590,"command":"node scripts/demo-detect-cycles.mjs"}
+[0.683, "o", "\u001b[2m# Quick cycle hotspot check before a refactor.\u001b[0m\r\n"]
+[1.060, "o", "\u001b[1m$ detect_cycles\u001b[0m\r\n"]
+[0.701, "o", "\u001b[2m  project: /var/folders/_9/mdg6clp17s123gpw80gkqyfm0000gn/T/code-impact-cycles-n2Cdo1\u001b[0m\r\n"]
+[0.902, "o", "\r\n"]
+[1.719, "o", "\u001b[36m\u001b[1m>>> cycleCount\u001b[0m 1\r\n"]
+[0.700, "o", "\u001b[36m\u001b[1m>>> hotspots\u001b[0m src/router.ts, src/routes.ts\r\n"]
+[1.002, "o", "\u001b[36m\u001b[1m>>> cycles\u001b[0m [\r\n  [\r\n    \"src/router.ts\",\r\n    \"src/routes.ts\"\r\n  ]\r\n]\r\n"]
+[1.503, "o", "\r\n"]
+[0.427, "o", "\u001b[32m\u001b[1mDecision first:\u001b[0m untangle router ↔ routes before widening the change.\r\n"]
+[1.717, "x", "0"]
