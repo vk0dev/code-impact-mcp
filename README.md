@@ -71,6 +71,8 @@ If your MCP client wants JSON instead of a shell wrapper, Claude Desktop uses `~
 }
 ```
 
+After saving `claude_desktop_config.json`, fully restart Claude Desktop so it reloads the MCP server configuration.
+
 Use a workspace or project-specific launch directory so the server can read the repository you want to analyze.
 
 ### Optional pre-commit hook helper
