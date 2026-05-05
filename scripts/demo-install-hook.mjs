@@ -50,7 +50,7 @@ async function main() {
   await out(`${CYAN}${BOLD}>>> .husky/pre-commit after rerun${RESET}`, 650);
   await out(readFileSync(hookPath, 'utf8').trimEnd(), 1500);
   await out();
-  await out(`${GREEN}${BOLD}Only the marked block changes.${RESET} Existing hook lines stay intact, reruns stay idempotent.`, 1700);
+  await out(`${YELLOW}${BOLD}Refusal is intentional.${RESET} Existing hook lines stay untouched unless the helper already owns a managed code-impact-mcp block.`, 1700);
 }
 
 main().catch((error) => {
