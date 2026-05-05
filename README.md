@@ -56,24 +56,9 @@ npx -y @vk0/code-impact-mcp
 
 This server is local-first and reads the target repository from the working directory the client launches it in.
 
-### JSON config examples for stdio clients
+### JSON config example for stdio clients
 
-If your MCP client wants JSON instead of a shell wrapper, point it at the same shipped entrypoint:
-
-#### Claude Desktop
-
-```json
-{
-  "mcpServers": {
-    "code-impact-mcp": {
-      "command": "npx",
-      "args": ["-y", "@vk0/code-impact-mcp"]
-    }
-  }
-}
-```
-
-#### Generic stdio client
+If your MCP client wants JSON instead of a shell wrapper, Claude Desktop uses `~/Library/Application Support/Claude/claude_desktop_config.json` on macOS:
 
 ```json
 {
@@ -101,51 +86,6 @@ npx -y @vk0/code-impact-mcp install-hook
 ![install-hook demo: helper refuses to modify unrelated existing Husky hook content without a managed code-impact-mcp block](docs/demo-install-hook.gif)
 
 This is a Husky-only helper. If `.husky/pre-commit` already contains unrelated content and no managed `code-impact-mcp` block, the command refuses and leaves the hook untouched. If a managed block already exists, reruns stay idempotent inside that owned block. If Husky is not initialized yet, the command stops with an actionable message instead of scaffolding hook infrastructure for you.
-
-### Claude Desktop
-
-Add to `claude_desktop_config.json`:
-
-```json
-{
-  "mcpServers": {
-    "code-impact-mcp": {
-      "command": "npx",
-      "args": ["-y", "@vk0/code-impact-mcp"]
-    }
-  }
-}
-```
-
-### Cursor
-
-Add to `.cursor/mcp.json`:
-
-```json
-{
-  "mcpServers": {
-    "code-impact-mcp": {
-      "command": "npx",
-      "args": ["-y", "@vk0/code-impact-mcp"]
-    }
-  }
-}
-```
-
-### Cline
-
-Add to Cline MCP settings:
-
-```json
-{
-  "mcpServers": {
-    "code-impact-mcp": {
-      "command": "npx",
-      "args": ["-y", "@vk0/code-impact-mcp"]
-    }
-  }
-}
-```
 
 ## Tools
 
