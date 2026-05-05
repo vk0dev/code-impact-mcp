@@ -46,6 +46,8 @@ If the user needs **a quick, bounded pre-commit gate for AI-generated code chang
 claude mcp add code-impact-mcp -- npx -y @vk0/code-impact-mcp
 ```
 
+Windows users can wrap the command via `cmd /c` if plain `npx` does not resolve cleanly in their Claude Code shell.
+
 ### Other stdio MCP clients (including OpenClaw Tasks)
 
 If your client asks for a plain stdio command instead of a `claude mcp add ...` wrapper, use the same server entrypoint directly:
