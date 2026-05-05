@@ -58,7 +58,7 @@ This server is local-first and reads the target repository from the working dire
 
 ### JSON config example for stdio clients
 
-If your MCP client wants JSON instead of a shell wrapper, Claude Desktop uses `~/Library/Application Support/Claude/claude_desktop_config.json` on macOS:
+If your MCP client wants JSON instead of a shell wrapper, Claude Desktop uses `~/Library/Application Support/Claude/claude_desktop_config.json` on macOS and `%APPDATA%\Claude\claude_desktop_config.json` on Windows:
 
 ```json
 {
