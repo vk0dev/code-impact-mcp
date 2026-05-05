@@ -115,6 +115,8 @@ Pre-commit safety gate. Analyzes specified changes and returns a **PASS/WARN/BLO
 
 Return compact strongly connected components for circular dependencies in the current TS/JS graph. Use before refactors or release gating when you want a short list of cycle hotspots instead of a full graph visualization.
 
+![detect_cycles demo: surfaces compact cycle hotspots instead of a full graph dump](docs/demo-detect-cycles.gif)
+
 ### `analyze_impact`
 
 Analyze the blast radius of changing specific files. Returns which files would be directly and transitively affected, with a risk score (0-1). Use BEFORE committing multi-file changes to understand what might break. Does NOT modify any files.

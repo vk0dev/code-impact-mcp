@@ -113,6 +113,8 @@ Pre-commit safety gate. Анализирует указанные изменен
 
 Возвращает компактные strongly connected components для circular dependencies в текущем TS/JS graph. Используйте перед рефакторингом или release gating, когда нужен короткий список cycle hotspots, а не полная graph visualization.
 
+![detect_cycles demo: показывает компактные cycle hotspots вместо полного graph dump](docs/demo-detect-cycles.gif)
+
 ### `analyze_impact`
 
 Анализирует blast radius изменения конкретных файлов. Возвращает, какие файлы будут затронуты напрямую и транзитивно, с risk score (0-1). Используйте ДО коммита мультифайловых изменений, чтобы понять, что может сломаться. Код не изменяет.

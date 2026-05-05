@@ -113,6 +113,8 @@ Pre-commit safety gate。它会分析指定改动，并返回带原因的 **PASS
 
 返回当前 TS/JS 图中的 circular dependencies 的紧凑 strongly connected components。适合在重构或 release gating 前快速查看 cycle hotspot 列表，而不是做完整的图谱可视化。
 
+![detect_cycles demo: 展示紧凑的 cycle hotspot，而不是完整的 graph dump](docs/demo-detect-cycles.gif)
+
 ### `analyze_impact`
 
 分析修改特定文件的 blast radius。返回直接和传递性受影响的文件，以及 risk score（0-1）。适合在提交多文件修改前评估可能的破坏范围。不会修改任何文件。

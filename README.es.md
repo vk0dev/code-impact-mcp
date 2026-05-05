@@ -113,6 +113,8 @@ Puerta de seguridad pre-commit. Analiza cambios especificados y devuelve un **PA
 
 Devuelve componentes fuertemente conectados compactos para dependencias circulares en el grafo TS/JS actual. Úsalo antes de refactors o release gating cuando quieras una lista corta de hotspots de ciclos y no una visualización completa del grafo.
 
+![detect_cycles demo: muestra hotspots de ciclos compactos en vez de un graph dump completo](docs/demo-detect-cycles.gif)
+
 ### `analyze_impact`
 
 Analiza el blast radius de cambiar archivos específicos. Devuelve qué archivos se verían afectados directa y transitivamente, con un risk score (0-1). Úsalo ANTES de commitear cambios en varios archivos para entender qué podría romperse. No modifica archivos.

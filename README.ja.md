@@ -113,6 +113,8 @@ Pre-commit safety gate。指定した変更を解析し、理由付きで **PASS
 
 現在の TS/JS graph にある circular dependencies を compact な strongly connected components として返します。リファクタ前や release gating 前に、完全な graph visualization ではなく cycle hotspot の短い一覧が欲しいときに使います。
 
+![detect_cycles demo: 完全な graph dump ではなく compact な cycle hotspot を見せます](docs/demo-detect-cycles.gif)
+
 ### `analyze_impact`
 
 特定ファイル変更の blast radius を分析します。直接的・推移的に影響を受けるファイルと risk score (0-1) を返します。複数ファイル変更をコミットする前に、何が壊れそうか把握するために使います。ファイルは変更しません。
