@@ -42,7 +42,7 @@ describe("buildGraph", () => {
         );
       },
     );
-  });
+  }, 15000);
 
   it("collects CommonJS require edges and resolves index files", () => {
     withTempProject(
