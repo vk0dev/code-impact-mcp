@@ -8,7 +8,7 @@
 
 [日本語](./README.ja.md) | [中文](./README.zh-CN.md) | [Русский](./README.ru.md) | [Español](./README.es.md)
 
-> Listing status: the `awesome-mcp-servers` payload is prepared, Official MCP Registry package metadata is live via `server.json`, and the MCP Hive submission path is confirmed as a manual follow-up path, but this README does not claim any new third-party listing as live unless it is already verified.
+> Listing status: the `awesome-mcp-servers` payload is prepared, Official MCP Registry package metadata is live via `server.json`, Glama still needs a real listing before the external PR lane can move, and MCP Hive is a manual submit-next operator step, not a currently claimed live listing. This README does not claim any new third-party listing as live unless it is already verified.
 
 ## Best for
 
