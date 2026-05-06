@@ -8,7 +8,7 @@
 
 [日本語](./README.ja.md) | [中文](./README.zh-CN.md) | [Русский](./README.ru.md) | [Español](./README.es.md)
 
-> Listing status: the `awesome-mcp-servers` payload is prepared and the MCP Hive submission path is confirmed, but no external submission is claimed as live from this README yet.
+> Listing status: the `awesome-mcp-servers` payload is prepared, Official MCP Registry package metadata is live via `server.json`, and the MCP Hive submission path is confirmed as a manual follow-up path, but this README does not claim any new third-party listing as live unless it is already verified.
 
 ## Best for
 
@@ -204,10 +204,11 @@ If you are choosing a tool for an agent or reviewer, the key question is simple:
 | **Depwire** | Broader dependency intelligence across larger dependency workflows | Better when you need a heavier platform view, deeper dependency management, or wider language coverage than CodeImpact intentionally targets | Better when you want a small MIT tool that runs locally, is already live in the Official MCP Registry, and answers the gating question quickly |
 | **RepoGraph** | Graph-first browsing and repository discovery | Better when the user is still learning the codebase and wants to inspect structure interactively | Better when the touched files are already known and you only need bounded blast-radius triage plus a gate result |
 | **CodeGraphContext** | Repository context retrieval for longer-form agent reasoning | Better when the agent needs broad code context for planning, synthesis, or explanation | Better when you want decision-first output from a local gate, not a general context provider |
+| **MCP Hive style marketplace follow-up** | Manual marketplace/discovery submission after the repo truth is already stable | Better when the job is marketplace packaging, screenshots, and operator copy for a directory workflow rather than technical gating itself | Better when you need the product wedge first: local verdicts, install-hook wiring, and bounded Python impact checks that are already shipped before any manual listing follow-up |
 
-**Choose CodeImpact MCP when:** you already know the files in play and want a fast, local, MIT-licensed answer with a risk score, explicit cycle surfacing, file-level blast-radius output, monorepo-aware checks, and a clear PASS/WARN/BLOCK verdict before commit.
+**Choose CodeImpact MCP when:** you already know the files in play and want a fast, local, MIT-licensed answer with a risk score, explicit cycle surfacing, file-level blast-radius output, monorepo-aware checks, the shipped Husky install-hook helper, and a clear PASS/WARN/BLOCK verdict before commit.
 
-**Choose one of the alternatives when:** the main job is graph exploration, repo understanding, wider dependency workflow coverage, or context retrieval for longer reasoning loops.
+**Choose one of the alternatives when:** the main job is graph exploration, repo understanding, wider dependency workflow coverage, context retrieval for longer reasoning loops, or manual marketplace packaging after the core repo surface is already settled.
 
 ## FAQ
 
