@@ -46,6 +46,37 @@ AI生成コード変更に対して **重い governance platform ではなく、
 claude mcp add code-impact-mcp -- npx -y @vk0/code-impact-mcp
 ```
 
+Windows では、Claude Code の shell で通常の `npx` が正しく解決されない場合、`cmd /c` でコマンドを包めます。
+
+### Other stdio MCP clients (OpenClaw Tasks を含む)
+
+クライアントが `claude mcp add ...` ラッパーではなく、素の stdio コマンドを要求する場合は、同じ server entrypoint をそのまま使います。
+
+```bash
+npx -y @vk0/code-impact-mcp
+```
+
+この server は local-first で、クライアントが起動した working directory から対象 repository を読み取ります。
+
+### stdio clients 向け JSON config 例
+
+MCP client が shell wrapper ではなく JSON を要求する場合、Claude Desktop では macOS で `~/Library/Application Support/Claude/claude_desktop_config.json`、Windows で `%APPDATA%\Claude\claude_desktop_config.json` を使います。
+
+```json
+{
+  "mcpServers": {
+    "code-impact-mcp": {
+      "command": "npx",
+      "args": ["-y", "@vk0/code-impact-mcp"]
+    }
+  }
+}
+```
+
+`claude_desktop_config.json` を保存したら、Claude Desktop を完全に再起動して MCP server 設定を再読み込みさせてください。
+
+分析したい repository を読めるよう、workspace 単位または project 単位の launch directory を使ってください。
+
 ### Optional pre-commit hook helper
 
 v1.6.0 では、pre-commit hook を手で編集せずに bounded gate runner を配線できる安全な Husky-only helper が追加されました。
@@ -58,7 +89,7 @@ npx -y @vk0/code-impact-mcp install-hook
 
 ![install-hook demo: helper は managed な code-impact-mcp ブロックがない既存 Husky hook の変更を拒否します](docs/demo-install-hook.gif)
 
-`.husky/pre-commit` にすでに無関係な内容があり、managed な `code-impact-mcp` ブロックが存在しない場合、このコマンドは変更を拒否して hook をそのまま残します。managed block がすでにある場合だけ、その owned ブロック内で再実行しても idempotent のままです。Husky がまだ初期化されていない場合は、hook 基盤を勝手に作らず、実行可能なメッセージを返して停止します。
+これは Husky-only helper です。`.husky/pre-commit` にすでに無関係な内容があり、managed な `code-impact-mcp` ブロックが存在しない場合、このコマンドは変更を拒否して hook をそのまま残します。managed block がすでにある場合だけ、その owned ブロック内で再実行しても idempotent のままです。Husky がまだ初期化されていない場合は、hook 基盤を勝手に作らず、実行可能なメッセージを返して停止します。
 
 ### Claude Desktop
 

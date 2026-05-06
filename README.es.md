@@ -46,6 +46,37 @@ Si necesitas **una puerta pre-commit rápida y acotada para cambios de código g
 claude mcp add code-impact-mcp -- npx -y @vk0/code-impact-mcp
 ```
 
+Los usuarios de Windows pueden envolver el comando con `cmd /c` si `npx` normal no se resuelve bien dentro del shell de Claude Code.
+
+### Otros stdio MCP clients (incluyendo OpenClaw Tasks)
+
+Si tu cliente pide un comando stdio simple en lugar del wrapper `claude mcp add ...`, usa directamente el mismo server entrypoint:
+
+```bash
+npx -y @vk0/code-impact-mcp
+```
+
+Este server es local-first y lee el repository objetivo desde el working directory en el que el cliente lo lanza.
+
+### Ejemplo de config JSON para stdio clients
+
+Si tu MCP client quiere JSON en lugar de un shell wrapper, Claude Desktop usa `~/Library/Application Support/Claude/claude_desktop_config.json` en macOS y `%APPDATA%\Claude\claude_desktop_config.json` en Windows:
+
+```json
+{
+  "mcpServers": {
+    "code-impact-mcp": {
+      "command": "npx",
+      "args": ["-y", "@vk0/code-impact-mcp"]
+    }
+  }
+}
+```
+
+Después de guardar `claude_desktop_config.json`, reinicia por completo Claude Desktop para que vuelva a cargar la configuración del MCP server.
+
+Usa un launch directory específico de workspace o proyecto para que el server pueda leer el repository que realmente quieres analizar.
+
 ### Optional pre-commit hook helper
 
 La versión v1.6.0 añadió un helper seguro, solo para Husky, para conectar el gate runner acotado sin editar a mano el pre-commit hook.
@@ -58,7 +89,7 @@ npx -y @vk0/code-impact-mcp install-hook
 
 ![install-hook demo: el helper se niega a modificar un hook existente de Husky sin un bloque managed de code-impact-mcp](docs/demo-install-hook.gif)
 
-Si `.husky/pre-commit` ya contiene contenido ajeno y no incluye un bloque managed de `code-impact-mcp`, este comando se niega a modificarlo y deja el hook intacto. Solo cuando ese managed block ya existe, las re-ejecuciones siguen siendo idempotentes dentro de ese bloque owned. Si Husky todavía no está inicializado, el comando se detiene con un mensaje accionable en lugar de crear la infraestructura de hooks por ti.
+Este es un helper solo para Husky. Si `.husky/pre-commit` ya contiene contenido ajeno y no incluye un bloque managed de `code-impact-mcp`, este comando se niega a modificarlo y deja el hook intacto. Solo cuando ese managed block ya existe, las re-ejecuciones siguen siendo idempotentes dentro de ese bloque owned. Si Husky todavía no está inicializado, el comando se detiene con un mensaje accionable en lugar de crear la infraestructura de hooks por ti.
 
 ### Claude Desktop
 
