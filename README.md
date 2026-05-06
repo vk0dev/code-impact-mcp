@@ -79,6 +79,8 @@ Use a workspace or project-specific launch directory so the server can read the 
 
 ### Optional pre-commit hook helper
 
+Need quick recipes for the install-hook helper, the bounded Python gate wedge, or the shipped `gate_check` / `analyze_impact` demos? See [docs/README.md](./docs/README.md).
+
 Shipped in v1.6.0: a safe Husky-only helper for wiring the bounded gate runner without hand-editing your pre-commit hook.
 
 If you already use Husky, `code-impact-mcp install-hook` is the direct path for pre-commit wiring, so you can drop in the bounded gate runner instead of wiring the hook manually:
