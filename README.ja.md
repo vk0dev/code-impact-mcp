@@ -209,18 +209,19 @@ dependency graph をゼロから再構築します。大きなファイル追加
 
 ## Comparison
 
-| 代替ツール | 得意なこと | CodeImpact MCP の違い |
-| --- | --- | --- |
-| **CodeImpact MCP** | TS/JS リポジトリ向けの高速な pre-commit verdict | **このリポジトリは 1 つの gate answer に最適化されています:** merge や agent handoff の前に PASS / WARN / BLOCK を返します。 |
-| **CodeGraphContext** | 長い reasoning のための豊富な context retrieval と repository understanding | CodeGraphContext は agent が広い code context を読んで考えるのに向いています。CodeImpact は意図的に狭く、context provider ではなく fast local gate verdict を返します。 |
-| **Depwire** | multi-language dependency intelligence、stored analysis、deeper dependency health workflows | Depwire はより広くて重い選択肢です。CodeImpact は zero setup、MIT license、fast local pre-commit decision に集中します。 |
-| **code-graph-mcp** | graph exploration と広い MCP tool surface による codebase inspection | CodeImpact は graph explorer を目指していません。すぐ起動して bounded な verdict-first workflow が欲しいときに向いています。 |
-| **RepoGraph** | repository graph browsing、graph-first discovery、visual exploration | RepoGraph 系は探索向けです。CodeImpact は touched files が分かっていて PASS / WARN / BLOCK を素早く出したいときに強いです。 |
-| **code-pathfinder** | repository 内の code navigation と path tracing | code-pathfinder は code path を見つけるためのものです。CodeImpact は risky edits を commit 前に止めるための single gate result です。 |
+agent や reviewer のためにツールを選ぶなら、問いはシンプルです。必要なのは **graph を探索すること** なのか、それとも **提案された 1 つの変更を commit 前に gate すること** なのか。
 
-**CodeImpact MCP を選ぶとき:** zero setup のまま、MIT license で、数秒で動く fast local gate が欲しいとき。single verdict、numeric risk score、pre-commit answer に集中しています。
+| 代替ツール | 得意なこと | どこで勝つか | CodeImpact MCP が勝つ場面 |
+| --- | --- | --- | --- |
+| **CodeImpact MCP** | monorepo を含む提案済み TS/JS 変更に対する decision-first dependency gate | 即座の PASS/WARN/BLOCK 出力、組み込みの `detect_cycles`、workspace-aware gate checks、local-first workflow、そして直接使える Husky `install-hook` helper | 仕事が「この変更は安全に commit できるか？」であって、「repo 全体を探索したい」ではないときに最適 |
+| **code-graph-mcp** | MCP tool surface を通じたより広い graph inspection | agent が関係性をたどり、より多くの graph detail を見て、exploration mode のままでいたいときに強い | graph exploration session ではなく、bounded な pre-commit verdict を 1 つ欲しいときに強い |
+| **Depwire** | より大きな dependency workflows にまたがる幅広い dependency intelligence | より重い platform view、深い dependency management、または CodeImpact が意図的に狙わない広い language coverage が必要なときに強い | ローカルで動く小さな MIT ツールとして、gating question に素早く答えてほしいときに強い |
+| **RepoGraph** | graph-first browsing と repository discovery | ユーザーがまだ codebase を学習中で、構造を対話的に見たいときに強い | touched files がすでに分かっていて、必要なのが blast-radius triage と gate result だけのときに強い |
+| **CodeGraphContext** | より長い agent reasoning のための repository context retrieval | planning、synthesis、explanation のために agent が広い code context を必要とするときに強い | general context provider ではなく、decision-first output が欲しいときに強い |
 
-**context-provider / graph-explorer を選ぶとき:** repository reasoning、graph traversal、visualization、persistent multi-language analysis が必要なとき。そうしたツールは考える助けになり、CodeImpact は change を gate します。
+**CodeImpact MCP を選ぶとき:** すでに対象ファイルが分かっていて、risk score、明示的な cycle surfacing、そして commit 前の明確な PASS/WARN/BLOCK verdict を、ローカルで素早く MIT license のまま得たいときです。
+
+**他の代替を選ぶとき:** 主な仕事が graph exploration、repo 理解、より広い dependency workflow coverage、または長い reasoning loop のための context retrieval であるときです.
 
 ## FAQ
 

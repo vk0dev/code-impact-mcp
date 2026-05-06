@@ -209,18 +209,19 @@ Soporta: ESM imports, ESM re-exports, CommonJS `require()`, y resolución NodeNe
 
 ## Comparison
 
-| Alternativa | Mejor para | En qué se diferencia CodeImpact MCP |
-| --- | --- | --- |
-| **CodeImpact MCP** | Un pre-commit verdict rápido para repos TS/JS | **Este repositorio está optimizado para una sola gate answer:** PASS / WARN / BLOCK antes de hacer merge o devolver trabajo a otro agente. |
-| **CodeGraphContext** | Context retrieval rico y repository understanding para reasoning más largo | CodeGraphContext ayuda a que el agente razone con más contexto del repositorio. CodeImpact es más estrecho a propósito: no actúa como context provider, sino como fast local gate verdict. |
-| **Depwire** | Multi-language dependency intelligence, stored analysis y workflows más profundos de dependency health | Depwire es más amplio y pesado. CodeImpact se mantiene zero setup, con licencia MIT, y enfocado en una decisión local rápida antes del commit, no en una gran dependency platform. |
-| **code-graph-mcp** | Graph exploration y codebase inspection con una MCP tool surface más amplia | CodeImpact no intenta ser un graph explorer. Gana cuando quieres un verdict-first workflow acotado que arranca al instante. |
-| **RepoGraph** | Repository graph browsing, graph-first discovery y visual exploration | Las herramientas tipo RepoGraph son mejores para explorar. CodeImpact es mejor cuando ya conoces los touched files y solo necesitas un PASS / WARN / BLOCK rápido. |
-| **code-pathfinder** | Code navigation y path tracing dentro del repositorio | code-pathfinder está pensado para encontrar rutas por el código. CodeImpact está pensado para frenar risky edits antes del commit con un gate result explícito. |
+Si estás eligiendo una herramienta para un agente o reviewer, la pregunta clave es simple: ¿necesitas **explorar el grafo** o necesitas **gatear un cambio propuesto antes del commit**?
 
-**Cuándo elegir CodeImpact MCP:** cuando quieres un fast local gate, sin setup, con licencia MIT y respuesta en segundos. Se centra en single verdict, numeric risk score y pre-commit answer.
+| Alternativa | Mejor para | Dónde gana | Dónde gana CodeImpact MCP |
+| --- | --- | --- | --- |
+| **CodeImpact MCP** | Dependency gating decision-first para cambios TS/JS propuestos, incluso en monorepos | Salida inmediata PASS/WARN/BLOCK, `detect_cycles` integrado, workspace-aware gate checks, workflow local-first y un helper directo de Husky `install-hook` | Es la mejor opción cuando el trabajo es “¿esto es seguro de commitear?” y no “ayúdame a explorar todo el repo” |
+| **code-graph-mcp** | Inspección más amplia del grafo a través de una MCP tool surface | Gana cuando el agente quiere recorrer relaciones, inspeccionar más detalle del grafo y quedarse en modo exploración | Gana cuando quieres un único verdict pre-commit acotado en lugar de una sesión de graph exploration |
+| **Depwire** | Inteligencia de dependencias más amplia para workflows de dependencias mayores | Gana cuando necesitas una vista de plataforma más pesada, dependency management más profundo o una cobertura de lenguajes más amplia que la que CodeImpact apunta intencionalmente | Gana cuando quieres una herramienta pequeña con licencia MIT, que corre localmente y responde rápido a la gating question |
+| **RepoGraph** | Browsing graph-first y discovery del repositorio | Gana cuando la persona todavía está aprendiendo el codebase y quiere inspeccionar la estructura de forma interactiva | Gana cuando los touched files ya son conocidos y solo necesitas blast-radius triage más un gate result |
+| **CodeGraphContext** | Repository context retrieval para reasoning más largo del agente | Gana cuando el agente necesita contexto amplio del código para planning, synthesis o explanation | Gana cuando quieres salida decision-first y no un context provider general |
 
-**Cuándo elegir alternativas context-provider / graph-explorer:** cuando necesitas repository reasoning más amplio, graph traversal, visualización o persistent multi-language analysis. Esas herramientas ayudan al agente a razonar sobre el codebase; CodeImpact ayuda a gate the change.
+**Elige CodeImpact MCP cuando:** ya sabes qué archivos están en juego y quieres una respuesta rápida, local y con licencia MIT, con risk score, cycle surfacing explícito y un PASS/WARN/BLOCK claro antes del commit.
+
+**Elige una de las alternativas cuando:** el trabajo principal es graph exploration, entender el repo, cubrir workflows de dependencias más amplios o recuperar contexto para reasoning loops más largos.
 
 ## FAQ
 

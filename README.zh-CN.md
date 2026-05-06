@@ -209,18 +209,19 @@ Pre-commit safety gate。它会分析指定改动，并返回带原因的 **PASS
 
 ## Comparison
 
-| 替代方案 | 最擅长 | CodeImpact MCP 的区别 |
-| --- | --- | --- |
-| **CodeImpact MCP** | 面向 TS/JS 仓库的一次性 pre-commit verdict | **这个仓库专门优化一个 gate answer：** 在 merge 或 agent 交接前给出 PASS / WARN / BLOCK。 |
-| **CodeGraphContext** | 面向长链 reasoning 的丰富 context retrieval 和 repository understanding | CodeGraphContext 更适合让 agent 读取更多代码上下文并进行推理。CodeImpact 刻意更窄，它不是 context provider，而是快速本地 gate verdict。 |
-| **Depwire** | multi-language dependency intelligence、stored analysis、deeper dependency health workflows | Depwire 更宽、更重。CodeImpact 保持 zero setup、MIT license，并专注于快速本地 pre-commit decision，而不是更大的 dependency platform。 |
-| **code-graph-mcp** | 通过更宽的 MCP tool surface 做 graph exploration 和 codebase inspection | CodeImpact 不打算成为 graph explorer。它适合需要立即启动、范围清晰、verdict-first workflow 的场景。 |
-| **RepoGraph** | repository graph browsing、graph-first discovery、visual exploration | RepoGraph 类工具更适合探索。CodeImpact 更适合你已经知道 touched files，只想快速拿到 PASS / WARN / BLOCK 结论的时候。 |
-| **code-pathfinder** | 仓库内的 code navigation 和 path tracing | code-pathfinder 关注的是找到代码路径。CodeImpact 关注的是在 commit 前用一个明确 gate result 挡住高风险改动。 |
+如果你在为 agent 或 reviewer 选工具，核心问题很简单：你需要的是 **探索 graph**，还是 **在 commit 前 gate 一次提议中的变更**？
 
-**什么时候选 CodeImpact MCP：** 你想要一个 zero setup、MIT 许可、几秒内完成的 fast local gate。它提供 single verdict、numeric risk score 和 pre-commit answer。
+| 替代方案 | 最擅长 | 它更强的地方 | CodeImpact MCP 更强的地方 |
+| --- | --- | --- | --- |
+| **CodeImpact MCP** | 面向提议中的 TS/JS 变更做 decision-first dependency gating，包括 monorepo | 即时 PASS/WARN/BLOCK 输出、内建 `detect_cycles`、workspace-aware gate checks、local-first workflow，以及可直接接入的 Husky `install-hook` helper | 当你的问题是“这个现在能安全 commit 吗？”，而不是“帮我探索整个仓库”时最合适 |
+| **code-graph-mcp** | 通过 MCP tool surface 做更宽的 graph inspection | 更适合 agent 遍历关系、查看更多 graph 细节，并持续停留在 exploration mode | 更适合你只想要一个有边界的 pre-commit verdict，而不是一次 graph exploration session |
+| **Depwire** | 面向更大 dependency workflows 的更广 dependency intelligence | 当你需要更重的平台视角、更深的 dependency management，或比 CodeImpact 有意覆盖得更广的 language coverage 时更合适 | 当你想要一个本地运行的小型 MIT 工具，快速回答 gating question 时更合适 |
+| **RepoGraph** | graph-first browsing 和 repository discovery | 当用户还在熟悉代码库、想交互式查看结构时更合适 | 当 touched files 已经明确，只需要 blast-radius triage 加一个 gate result 时更合适 |
+| **CodeGraphContext** | 面向更长 agent reasoning 的 repository context retrieval | 当 agent 需要广泛的代码上下文来做 planning、synthesis 或 explanation 时更合适 | 当你要的是 decision-first output，而不是通用 context provider 时更合适 |
 
-**什么时候选 context-provider / graph-explorer：** 你需要更广的 repository reasoning、graph traversal、visualization 或 persistent multi-language analysis。这些工具帮助 agent 理解代码库，CodeImpact 帮你 gate change。
+**什么时候选 CodeImpact MCP：** 当你已经知道涉及哪些文件，并且想在 commit 前拿到一个快速、本地、MIT 许可的答案，里面包含 risk score、明确的 cycle surfacing，以及清晰的 PASS/WARN/BLOCK verdict。
+
+**什么时候选其他替代：** 当主要工作是 graph exploration、仓库理解、更宽的 dependency workflow coverage，或者为更长 reasoning loop 提供 context retrieval。
 
 ## FAQ
 

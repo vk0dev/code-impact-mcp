@@ -209,18 +209,19 @@ Pre-commit safety gate. Анализирует указанные изменен
 
 ## Comparison
 
-| Альтернатива | Лучше всего подходит для | Чем отличается CodeImpact MCP |
-| --- | --- | --- |
-| **CodeImpact MCP** | Быстрого pre-commit verdict для TS/JS-репозиториев | **Этот репозиторий оптимизирован под один gate answer:** PASS / WARN / BLOCK перед merge или handoff другому агенту. |
-| **CodeGraphContext** | Богатого context retrieval и repository understanding для длинного reasoning | CodeGraphContext помогает агенту читать больше контекста и рассуждать по репозиторию. CodeImpact намеренно уже: это не context provider, а fast local gate verdict. |
-| **Depwire** | Multi-language dependency intelligence, stored analysis и более глубоких dependency health workflows | Depwire шире и тяжелее. CodeImpact остаётся zero setup, MIT license и сфокусирован на быстром local pre-commit decision, а не на большой dependency platform. |
-| **code-graph-mcp** | Graph exploration и codebase inspection через более широкий MCP tool surface | CodeImpact не пытается быть graph explorer. Он выигрывает, когда нужен мгновенный bounded verdict-first workflow. |
-| **RepoGraph** | Repository graph browsing, graph-first discovery и visual exploration | Инструменты класса RepoGraph лучше для исследования. CodeImpact лучше, когда touched files уже известны и нужен быстрый PASS / WARN / BLOCK ответ. |
-| **code-pathfinder** | Code navigation и path tracing внутри репозитория | code-pathfinder помогает искать пути по коду. CodeImpact помогает остановить risky edits до commit одним явным gate result. |
+Если выбираете инструмент для агента или reviewer, главный вопрос простой: вам нужно **исследовать граф**, или нужно **прогейтить одно предложенное изменение до коммита**?
 
-**Когда выбирать CodeImpact MCP:** когда нужен fast local gate без setup, с MIT license и ответом за секунды. Он сфокусирован на single verdict, numeric risk score и pre-commit answer.
+| Альтернатива | Лучше всего подходит для | Где выигрывает | Где выигрывает CodeImpact MCP |
+| --- | --- | --- | --- |
+| **CodeImpact MCP** | Decision-first dependency gate для предлагаемых TS/JS изменений, включая monorepo | Мгновенный PASS/WARN/BLOCK verdict, встроенный `detect_cycles`, workspace-aware gate checks, local-first workflow и прямой Husky `install-hook` helper | Лучший выбор, когда вопрос звучит как «это безопасно коммитить?», а не «помоги исследовать весь репозиторий» |
+| **code-graph-mcp** | Более широкого graph inspection через MCP tool surface | Лучше, когда агент хочет обходить связи, смотреть больше graph detail и оставаться в exploration mode | Лучше, когда нужен один bounded pre-commit verdict, а не отдельная graph-exploration session |
+| **Depwire** | Более широкой dependency intelligence для крупных dependency workflows | Лучше, когда нужен более тяжёлый platform view, глубокий dependency management или более широкий language coverage, чем CodeImpact намеренно таргетирует | Лучше, когда нужен небольшой MIT-инструмент, который запускается локально и быстро отвечает на gating question |
+| **RepoGraph** | Graph-first browsing и discovery по репозиторию | Лучше, когда пользователь ещё изучает кодовую базу и хочет интерактивно смотреть структуру | Лучше, когда touched files уже известны и нужен только blast-radius triage плюс gate result |
+| **CodeGraphContext** | Repository context retrieval для более длинного agent reasoning | Лучше, когда агенту нужен широкий кодовый контекст для planning, synthesis или explanation | Лучше, когда нужен decision-first output, а не general context provider |
 
-**Когда выбирать context-provider / graph-explorer альтернативы:** когда нужны более широкие repository reasoning, graph traversal, visualization или persistent multi-language analysis. Эти инструменты помогают думать о кодовой базе, а CodeImpact помогает gate change.
+**Выбирайте CodeImpact MCP, когда:** вы уже знаете, какие файлы в игре, и хотите быстрый локальный MIT-licensed ответ с risk score, явным surfacing cycles и понятным PASS/WARN/BLOCK verdict до коммита.
+
+**Выбирайте альтернативы, когда:** основная задача это graph exploration, понимание репозитория, более широкое dependency workflow coverage или context retrieval для длинных reasoning loops.
 
 ## FAQ
 
