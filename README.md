@@ -195,17 +195,17 @@ Supports: ESM imports, ESM re-exports, CommonJS `require()`, NodeNext-style `.js
 
 ## Comparison
 
-If you are choosing a tool for an agent or reviewer, the key question is simple: do you need to **explore the graph**, or do you need to **gate one proposed change**?
+If you are choosing a tool for an agent or reviewer, the key question is simple: do you need to **explore the graph**, or do you need to **gate one proposed change before commit**?
 
 | Alternative | Best at | Where it wins | Where CodeImpact MCP wins |
 | --- | --- | --- | --- |
-| **CodeImpact MCP** | Fast single-verdict dependency gating for TS/JS repos | Immediate PASS/WARN/BLOCK decision, local-first workflow, zero setup | Best fit when the job is "is this safe to commit?" rather than "help me explore the whole repo" |
-| **code-graph-mcp** | Wider graph inspection through an MCP tool surface | Better when the agent wants to traverse relationships and inspect the code graph from multiple angles | Better when you want one bounded pre-commit verdict instead of a graph-exploration session |
-| **Depwire** | Broader dependency intelligence across larger dependency workflows | Better when you need a heavier platform view, deeper dependency management, or wider language coverage | Better when you want a small MIT tool that runs locally and answers the gating question quickly |
+| **CodeImpact MCP** | Decision-first dependency gating for proposed TS/JS changes, including monorepos | Immediate PASS/WARN/BLOCK output, built-in `detect_cycles`, workspace-aware gate checks, local-first workflow, and a direct Husky install-hook helper | Best fit when the job is "is this safe to commit?" rather than "help me explore the whole repo" |
+| **code-graph-mcp** | Wider graph inspection through an MCP tool surface | Better when the agent wants to traverse relationships, inspect more graph detail, and stay in exploration mode | Better when you want one bounded pre-commit verdict instead of a graph-exploration session |
+| **Depwire** | Broader dependency intelligence across larger dependency workflows | Better when you need a heavier platform view, deeper dependency management, or wider language coverage than CodeImpact intentionally targets | Better when you want a small MIT tool that runs locally and answers the gating question quickly |
 | **RepoGraph** | Graph-first browsing and repository discovery | Better when the user is still learning the codebase and wants to inspect structure interactively | Better when the touched files are already known and you only need blast-radius triage plus a gate result |
 | **CodeGraphContext** | Repository context retrieval for longer-form agent reasoning | Better when the agent needs broad code context for planning, synthesis, or explanation | Better when you want decision-first output, not a general context provider |
 
-**Choose CodeImpact MCP when:** you already know the files in play and want a fast, local, MIT-licensed answer with a risk score and a clear PASS/WARN/BLOCK verdict.
+**Choose CodeImpact MCP when:** you already know the files in play and want a fast, local, MIT-licensed answer with a risk score, explicit cycle surfacing, and a clear PASS/WARN/BLOCK verdict before commit.
 
 **Choose one of the alternatives when:** the main job is graph exploration, repo understanding, wider dependency workflow coverage, or context retrieval for longer reasoning loops.
 
