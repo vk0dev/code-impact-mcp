@@ -8,7 +8,7 @@
 
 [English](./README.md) | [日本語](./README.ja.md) | [Русский](./README.ru.md) | [Español](./README.es.md)
 
-> Listing status：`awesome-mcp-servers` 的提交内容已经准备好，Official MCP Registry 的 package metadata 已经通过 `server.json` 处于 live 状态，而 MCP Hive 的提交流程也已确认是 manual follow-up 路径，但这个 README 目前还不会声称任何新的 third-party listing 已经 verified-live。
+> Listing status：`awesome-mcp-servers` 的提交内容已经准备好，Official MCP Registry 的 package metadata 已经通过 `server.json` 处于 live 状态，Glama 在 external PR lane 继续推进前仍然需要真实 listing，而 MCP Hive 目前只是 manual submit-next 的 operator step，不是当前已声明 live 的 listing。这个 README 目前还不会声称任何新的 third-party listing 已经 verified-live。
 
 ## Best for
 
@@ -249,7 +249,7 @@ Pre-commit safety gate。它会分析指定改动，并返回带原因的 **PASS
 | **Depwire** | 面向更大 dependency workflows 的更广 dependency intelligence | 当你需要更重的平台视角、更深的 dependency management，或比 CodeImpact 有意覆盖得更广的 language coverage 时更合适 | 当你想要一个本地运行的小型 MIT 工具，快速回答 gating question 时更合适 |
 | **RepoGraph** | graph-first browsing 和 repository discovery | 当用户还在熟悉代码库、想交互式查看结构时更合适 | 当 touched files 已经明确，只需要 blast-radius triage 加一个 gate result 时更合适 |
 | **CodeGraphContext** | 面向更长 agent reasoning 的 repository context retrieval | 当 agent 需要广泛的代码上下文来做 planning、synthesis 或 explanation 时更合适 | 当你要的是 decision-first output，而不是通用 context provider 时更合适 |
-| **MCP Hive 风格的 manual follow-up** | 在 repo truth 已稳定后做手动 marketplace/discovery 提交 | 当主要工作是 directory workflow 所需的 packaging、screenshot/demo packet 和 operator copy，而不是 dependency gate 本身时更合适 | 当你首先需要的是已经 shipped 的 product wedge，也就是 local verdicts、Husky `install-hook` helper，以及有边界的 Python `analyze_impact` / `gate_check` path 时更合适 |
+| **MCP Hive 风格的 marketplace follow-up** | 在 repo truth 已稳定后做手动 marketplace/discovery submit-next | 当主要工作是 directory workflow 所需的 packaging、screenshot/demo packet 和 operator copy，而不是 dependency gate 本身时更合适 | 当你首先需要的是已经 shipped 的 product wedge，也就是 local verdicts、Husky `install-hook` helper，以及有边界的 Python `analyze_impact` / `gate_check` path，然后再做手动 listing follow-up 时更合适 |
 
 **什么时候选 CodeImpact MCP：** 当你已经知道涉及哪些文件，并且想在 commit 前拿到一个快速、本地、MIT 许可的答案，里面包含 risk score、明确的 cycle surfacing、file-level blast-radius output、monorepo-aware checks、已经 shipped 的 Husky `install-hook` helper，以及清晰的 PASS/WARN/BLOCK verdict。
 

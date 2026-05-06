@@ -8,7 +8,7 @@
 
 [日本語](./README.ja.md) | [中文](./README.zh-CN.md) | [English](./README.md) | [Español](./README.es.md)
 
-> Статус листингов: payload для `awesome-mcp-servers` подготовлен, metadata пакета для Official MCP Registry уже live через `server.json`, а путь сабмита в MCP Hive подтверждён как manual follow-up, но этот README не утверждает, что какой-либо новый third-party listing уже verified-live.
+> Статус листингов: payload для `awesome-mcp-servers` подготовлен, metadata пакета для Official MCP Registry уже live через `server.json`, для Glama по-прежнему нужен реальный listing, прежде чем внешний PR lane сможет сдвинуться дальше, а MCP Hive остаётся manual submit-next operator step, а не текущим claimed live listing. Этот README не утверждает, что какой-либо новый third-party listing уже verified-live.
 
 ## Best for
 
@@ -249,7 +249,7 @@ Pre-commit safety gate. Анализирует указанные изменен
 | **Depwire** | Более широкой dependency intelligence для крупных dependency workflows | Лучше, когда нужен более тяжёлый platform view, глубокий dependency management или более широкий language coverage, чем CodeImpact намеренно таргетирует | Лучше, когда нужен небольшой MIT-инструмент, который запускается локально и быстро отвечает на gating question |
 | **RepoGraph** | Graph-first browsing и discovery по репозиторию | Лучше, когда пользователь ещё изучает кодовую базу и хочет интерактивно смотреть структуру | Лучше, когда touched files уже известны и нужен только blast-radius triage плюс gate result |
 | **CodeGraphContext** | Repository context retrieval для более длинного agent reasoning | Лучше, когда агенту нужен широкий кодовый контекст для planning, synthesis или explanation | Лучше, когда нужен decision-first output, а не general context provider |
-| **MCP Hive-style manual follow-up** | Ручной marketplace/discovery submit после того, как repo truth уже стабилен | Лучше, когда задача сводится к packaging, screenshot/demo packet и operator copy для directory workflow, а не к самому dependency gate | Лучше, когда сначала нужен product wedge: local verdicts, Husky `install-hook` helper и ограниченная Python `analyze_impact` / `gate_check` path, которые уже shipped |
+| **MCP Hive-style marketplace follow-up** | Ручной marketplace/discovery submit-next после того, как repo truth уже стабилен | Лучше, когда задача сводится к packaging, screenshot/demo packet и operator copy для directory workflow, а не к самому dependency gate | Лучше, когда сначала нужен product wedge: local verdicts, Husky `install-hook` helper и ограниченная Python `analyze_impact` / `gate_check` path, которые уже shipped, ещё до любого ручного listing follow-up |
 
 **Выбирайте CodeImpact MCP, когда:** вы уже знаете, какие файлы в игре, и хотите быстрый локальный MIT-licensed ответ с risk score, явным surfacing cycles, file-level blast-radius output, monorepo-aware checks, shipped Husky `install-hook` helper и понятным PASS/WARN/BLOCK verdict до коммита.
 
