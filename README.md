@@ -89,7 +89,7 @@ npx -y @vk0/code-impact-mcp install-hook
 
 ![install-hook demo: helper refuses to modify unrelated existing Husky hook content without a managed code-impact-mcp block](docs/demo-install-hook.gif)
 
-This is a Husky-only helper. If `.husky/pre-commit` already contains unrelated content and no managed `code-impact-mcp` block, the command refuses and leaves the hook untouched. If a managed block already exists, reruns stay idempotent inside that owned block. If Husky is not initialized yet, the command stops with an actionable message instead of scaffolding hook infrastructure for you.
+This is a Husky-only helper. If `.husky/pre-commit` already contains unrelated content and no managed `code-impact-mcp` block, the command refuses and leaves the hook untouched. If a managed block already exists, reruns stay idempotent inside that owned block. If Husky is not initialized yet, the command stops with an actionable message instead of scaffolding hook infrastructure for you. It does not bootstrap Husky, rewrite arbitrary hook logic, or manage non-`pre-commit` hook files for you.
 
 ## Tools
 
@@ -228,7 +228,7 @@ A: No. All 5 tools are read-only (annotated with `readOnlyHint: true`). They ana
 A: The risk score is a graph-based heuristic (affected files / total files). It does not know about runtime behavior, tests, or data migrations. Treat it as a triage signal, not a guarantee.
 
 **Q: What languages does it support today?**
-A: Full support is still centered on TypeScript and JavaScript files (`.ts`, `.tsx`, `.js`, `.jsx`, `.mts`, `.cts`, `.mjs`, `.cjs`). There is also a bounded Python path for `analyze_impact` and `gate_check` when changed files are `.py`, but it stays at file/module-level impact instead of broad multi-language platform coverage.
+A: Full support is still centered on TypeScript and JavaScript files (`.ts`, `.tsx`, `.js`, `.jsx`, `.mts`, `.cts`, `.mjs`, `.cjs`). There is also a bounded Python path for `analyze_impact` and `gate_check` when changed files are `.py`, but it stays at file/module-level impact instead of broad multi-language platform coverage or repo-wide graph exploration.
 
 **Q: How fast is it?**
 A: Graph building typically takes 1-5 seconds depending on project size. Individual tool calls against a cached graph are near-instant.

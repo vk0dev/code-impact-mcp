@@ -89,7 +89,7 @@ npx -y @vk0/code-impact-mcp install-hook
 
 ![install-hook demo: el helper se niega a modificar un hook existente de Husky sin un bloque managed de code-impact-mcp](docs/demo-install-hook.gif)
 
-Este es un helper solo para Husky. Si `.husky/pre-commit` ya contiene contenido ajeno y no incluye un bloque managed de `code-impact-mcp`, este comando se niega a modificarlo y deja el hook intacto. Solo cuando ese managed block ya existe, las re-ejecuciones siguen siendo idempotentes dentro de ese bloque owned. Si Husky todavía no está inicializado, el comando se detiene con un mensaje accionable en lugar de crear la infraestructura de hooks por ti.
+Este es un helper solo para Husky. Si `.husky/pre-commit` ya contiene contenido ajeno y no incluye un bloque managed de `code-impact-mcp`, este comando se niega a modificarlo y deja el hook intacto. Solo cuando ese managed block ya existe, las re-ejecuciones siguen siendo idempotentes dentro de ese bloque owned. Si Husky todavía no está inicializado, el comando se detiene con un mensaje accionable en lugar de crear la infraestructura de hooks por ti. No inicializa Husky por ti, no reescribe lógica arbitraria de hooks y no gestiona archivos de hook distintos de `pre-commit`.
 
 ### Claude Desktop
 
@@ -267,7 +267,7 @@ A: No. Las 5 tools son read-only (`readOnlyHint: true`). Analizan, pero no escri
 A: Es una heurística basada en el grafo (archivos afectados / total de archivos). No conoce runtime behavior, tests ni data migrations. Tómalo como señal de triage, no como garantía.
 
 **Q: ¿Qué lenguajes soporta hoy?**
-A: El soporte completo sigue centrado en TypeScript y JavaScript (`.ts`, `.tsx`, `.js`, `.jsx`, `.mts`, `.cts`, `.mjs`, `.cjs`). Además, `analyze_impact` y `gate_check` tienen una ruta Python acotada, pero se queda en impacto a nivel file/module y no implica una plataforma amplia multi-language.
+A: El soporte completo sigue centrado en TypeScript y JavaScript (`.ts`, `.tsx`, `.js`, `.jsx`, `.mts`, `.cts`, `.mjs`, `.cjs`). Además, `analyze_impact` y `gate_check` tienen una ruta Python acotada, pero se queda en impacto a nivel file/module y no implica una plataforma amplia multi-language ni una exploración repo-wide del grafo.
 
 **Q: ¿Qué tan rápido es?**
 A: La construcción del grafo suele tardar de 1 a 5 segundos según el tamaño del proyecto. Las tool calls individuales contra un grafo cacheado son casi instantáneas.

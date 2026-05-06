@@ -89,7 +89,7 @@ npx -y @vk0/code-impact-mcp install-hook
 
 ![install-hook demo: helper 会拒绝修改没有 managed code-impact-mcp 片段的现有 Husky hook 内容](docs/demo-install-hook.gif)
 
-这是一个 Husky-only helper。如果 `.husky/pre-commit` 已经包含无关内容，但其中没有 managed 的 `code-impact-mcp` 片段，这个命令会拒绝修改并保持 hook 原样不动。只有在 managed block 已经存在时，重复运行才会在这个 owned 区块内保持 idempotent。如果 Husky 还没初始化，它会停下来并给出可执行的提示，而不是替你搭建整套 hook 基础设施。
+这是一个 Husky-only helper。如果 `.husky/pre-commit` 已经包含无关内容，但其中没有 managed 的 `code-impact-mcp` 片段，这个命令会拒绝修改并保持 hook 原样不动。只有在 managed block 已经存在时，重复运行才会在这个 owned 区块内保持 idempotent。如果 Husky 还没初始化，它会停下来并给出可执行的提示，而不是替你搭建整套 hook 基础设施。它不会替你初始化 Husky，不会改写任意 hook 逻辑，也不会管理 `pre-commit` 之外的 hook 文件。
 
 ### Claude Desktop
 
@@ -267,7 +267,7 @@ A: 不会。5 个 tools 都是只读的（`readOnlyHint: true`）。它们只做
 A: 它是基于图谱的启发式指标（受影响文件 / 总文件数）。它不了解 runtime behavior、tests 或 data migrations。请把它当作 triage signal，而不是保证。
 
 **Q: 目前支持哪些语言？**
-A: 完整支持仍然集中在 TypeScript 和 JavaScript（`.ts`, `.tsx`, `.js`, `.jsx`, `.mts`, `.cts`, `.mjs`, `.cjs`）。另外，`analyze_impact` 和 `gate_check` 还有一个有边界的 Python path，但它只停留在 file/module 级 impact，不应被理解为宽泛的多语言平台能力。
+A: 完整支持仍然集中在 TypeScript 和 JavaScript（`.ts`, `.tsx`, `.js`, `.jsx`, `.mts`, `.cts`, `.mjs`, `.cjs`）。另外，`analyze_impact` 和 `gate_check` 还有一个有边界的 Python path，但它只停留在 file/module 级 impact，不应被理解为宽泛的多语言平台能力或 repo-wide 图谱探索能力。
 
 **Q: 速度怎么样？**
 A: 图构建通常需要 1-5 秒，取决于项目大小。基于缓存图的单次 tool call 几乎是即时的。
