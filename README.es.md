@@ -8,7 +8,7 @@
 
 [日本語](./README.ja.md) | [中文](./README.zh-CN.md) | [Русский](./README.ru.md) | [English](./README.md)
 
-> Estado de listings: el payload para `awesome-mcp-servers` ya está preparado y la vía de envío a MCP Hive está confirmada, pero este README todavía no afirma que ningún listing externo esté live.
+> Estado de listings: el payload para `awesome-mcp-servers` ya está preparado, el package metadata para Official MCP Registry ya está live vía `server.json`, y la vía de envío a MCP Hive está confirmada como manual follow-up, pero este README todavía no afirma que ningún nuevo listing de terceros esté verified-live.
 
 ## Best for
 
@@ -218,10 +218,11 @@ Si estás eligiendo una herramienta para un agente o reviewer, la pregunta clave
 | **Depwire** | Inteligencia de dependencias más amplia para workflows de dependencias mayores | Gana cuando necesitas una vista de plataforma más pesada, dependency management más profundo o una cobertura de lenguajes más amplia que la que CodeImpact apunta intencionalmente | Gana cuando quieres una herramienta pequeña con licencia MIT, que corre localmente y responde rápido a la gating question |
 | **RepoGraph** | Browsing graph-first y discovery del repositorio | Gana cuando la persona todavía está aprendiendo el codebase y quiere inspeccionar la estructura de forma interactiva | Gana cuando los touched files ya son conocidos y solo necesitas blast-radius triage más un gate result |
 | **CodeGraphContext** | Repository context retrieval para reasoning más largo del agente | Gana cuando el agente necesita contexto amplio del código para planning, synthesis o explanation | Gana cuando quieres salida decision-first y no un context provider general |
+| **Manual follow-up tipo MCP Hive** | Envío manual a marketplace/discovery una vez que el repo truth ya está estable | Gana cuando el trabajo es packaging, screenshot/demo packet y operator copy para un directory workflow, no el dependency gate en sí | Gana cuando primero necesitas el wedge ya shipped del producto: local verdicts, helper Husky `install-hook` y la ruta Python acotada de `analyze_impact` / `gate_check` |
 
-**Elige CodeImpact MCP cuando:** ya sabes qué archivos están en juego y quieres una respuesta rápida, local y con licencia MIT, con risk score, cycle surfacing explícito y un PASS/WARN/BLOCK claro antes del commit.
+**Elige CodeImpact MCP cuando:** ya sabes qué archivos están en juego y quieres una respuesta rápida, local y con licencia MIT, con risk score, cycle surfacing explícito, file-level blast-radius output, monorepo-aware checks, el helper Husky `install-hook` ya shipped y un PASS/WARN/BLOCK claro antes del commit.
 
-**Elige una de las alternativas cuando:** el trabajo principal es graph exploration, entender el repo, cubrir workflows de dependencias más amplios o recuperar contexto para reasoning loops más largos.
+**Elige una de las alternativas cuando:** el trabajo principal es graph exploration, entender el repo, cubrir workflows de dependencias más amplios, recuperar contexto para reasoning loops más largos o hacer manual marketplace packaging después de fijar el core repo surface.
 
 ## FAQ
 

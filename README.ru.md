@@ -8,7 +8,7 @@
 
 [日本語](./README.ja.md) | [中文](./README.zh-CN.md) | [English](./README.md) | [Español](./README.es.md)
 
-> Статус листингов: payload для `awesome-mcp-servers` подготовлен, путь сабмита в MCP Hive подтверждён, но этот README пока не утверждает, что какой-либо внешний листинг уже live.
+> Статус листингов: payload для `awesome-mcp-servers` подготовлен, metadata пакета для Official MCP Registry уже live через `server.json`, а путь сабмита в MCP Hive подтверждён как manual follow-up, но этот README не утверждает, что какой-либо новый third-party listing уже verified-live.
 
 ## Best for
 
@@ -218,10 +218,11 @@ Pre-commit safety gate. Анализирует указанные изменен
 | **Depwire** | Более широкой dependency intelligence для крупных dependency workflows | Лучше, когда нужен более тяжёлый platform view, глубокий dependency management или более широкий language coverage, чем CodeImpact намеренно таргетирует | Лучше, когда нужен небольшой MIT-инструмент, который запускается локально и быстро отвечает на gating question |
 | **RepoGraph** | Graph-first browsing и discovery по репозиторию | Лучше, когда пользователь ещё изучает кодовую базу и хочет интерактивно смотреть структуру | Лучше, когда touched files уже известны и нужен только blast-radius triage плюс gate result |
 | **CodeGraphContext** | Repository context retrieval для более длинного agent reasoning | Лучше, когда агенту нужен широкий кодовый контекст для planning, synthesis или explanation | Лучше, когда нужен decision-first output, а не general context provider |
+| **MCP Hive-style manual follow-up** | Ручной marketplace/discovery submit после того, как repo truth уже стабилен | Лучше, когда задача сводится к packaging, screenshot/demo packet и operator copy для directory workflow, а не к самому dependency gate | Лучше, когда сначала нужен product wedge: local verdicts, Husky `install-hook` helper и ограниченная Python `analyze_impact` / `gate_check` path, которые уже shipped |
 
-**Выбирайте CodeImpact MCP, когда:** вы уже знаете, какие файлы в игре, и хотите быстрый локальный MIT-licensed ответ с risk score, явным surfacing cycles и понятным PASS/WARN/BLOCK verdict до коммита.
+**Выбирайте CodeImpact MCP, когда:** вы уже знаете, какие файлы в игре, и хотите быстрый локальный MIT-licensed ответ с risk score, явным surfacing cycles, file-level blast-radius output, monorepo-aware checks, shipped Husky `install-hook` helper и понятным PASS/WARN/BLOCK verdict до коммита.
 
-**Выбирайте альтернативы, когда:** основная задача это graph exploration, понимание репозитория, более широкое dependency workflow coverage или context retrieval для длинных reasoning loops.
+**Выбирайте альтернативы, когда:** основная задача это graph exploration, понимание репозитория, более широкое dependency workflow coverage, context retrieval для длинных reasoning loops или manual marketplace packaging после того, как core repo surface уже зафиксирован.
 
 ## FAQ
 
