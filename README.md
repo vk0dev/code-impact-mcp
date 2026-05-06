@@ -93,6 +93,8 @@ This is a Husky-only helper. If `.husky/pre-commit` already contains unrelated c
 
 ## Tools
 
+Shipped demo assets for the core tool surface are reproducible from `scripts/demo-tool.mjs`, so the examples below stay tied to the current tool behavior instead of drifting into one-off screenshots.
+
 ### `gate_check`
 
 Pre-commit safety gate. Analyzes specified changes and returns a **PASS/WARN/BLOCK verdict** with reasons. Use as a bounded decision aid before committing multi-file changes, including workspace-aware checks in pnpm/package.json workspaces and lerna-style monorepos. BLOCK means risk exceeds threshold or a changed file participates in a detected cycle. WARN means human review recommended, including graphs that contain cycles elsewhere. PASS means low graph-based risk.
@@ -113,9 +115,13 @@ Analyze the blast radius of changing specific files. Returns which files would b
 
 Get the import and importedBy relationships for a specific file. Shows what this file depends on and what depends on it. Use to understand coupling before refactoring a file.
 
+![get_dependencies demo: inspect direct imports and reverse dependents before refactoring a shared module](docs/demo-get-dependencies.gif)
+
 ### `refresh_graph`
 
 Rebuild the dependency graph from scratch. Call this after significant file additions/deletions, or if results seem stale. Returns graph statistics including file count, edge count, build time, and circular dependencies detected.
+
+![refresh_graph demo: rebuild the local graph and return fresh file, edge, and cycle counts](docs/demo-refresh-graph.gif)
 
 ## Example conversation
 
