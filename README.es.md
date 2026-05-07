@@ -79,6 +79,9 @@ Usa un launch directory específico de workspace o proyecto para que el server p
 
 ### Optional pre-commit hook helper
 
+Ejecuta `npm run demo:install-hook` para previsualizar el snippet managed de Husky en modo dry-run (no crea ni modifica archivos `.husky`).
+La orden imprime un fragmento seguro para `.husky/pre-commit` y no inicializa Husky automáticamente.
+
 La versión v1.6.0 añadió un helper seguro, solo para Husky, para conectar el gate runner acotado sin editar a mano el pre-commit hook.
 
 Si ya usas Husky, `code-impact-mcp install-hook` es la vía directa para el wiring pre-commit, así que puedes añadir el gate runner acotado sin cablear el hook a mano:

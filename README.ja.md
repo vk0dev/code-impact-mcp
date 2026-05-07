@@ -79,6 +79,9 @@ MCP client が shell wrapper ではなく JSON を要求する場合、Claude De
 
 ### Optional pre-commit hook helper
 
+`npm run demo:install-hook` を実行すると、dry-run で managed な Husky snippet をプレビューできます（`.husky` のファイルは作成/変更しません）。
+安全な `.husky/pre-commit` 用 snippet を出力し、Husky の自動初期化は行いません。
+
 v1.6.0 では、pre-commit hook を手で編集せずに bounded gate runner を配線できる安全な Husky-only helper が追加されました。
 
 すでに Husky を使っている場合は、`code-impact-mcp install-hook` が pre-commit wiring への直接ルートなので、hook を手で配線し直さずに bounded gate runner を追加できます。

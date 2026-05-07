@@ -79,6 +79,9 @@ npx -y @vk0/code-impact-mcp
 
 ### Optional pre-commit hook helper
 
+Запустите `npm run demo:install-hook`, чтобы в dry-run режиме посмотреть managed Husky snippet без записи/правок файлов `.husky`.
+Команда выводит безопасный фрагмент для `.husky/pre-commit` и не инициализирует Husky автоматически.
+
 Релиз v1.6.0 добавил безопасный Husky-only helper для подключения ограниченного gate runner без ручной правки pre-commit hook.
 
 Если у вас уже используется Husky, `code-impact-mcp install-hook` это прямой путь для wiring pre-commit, так что можно подключить ограниченный gate runner без ручной правки hook:
