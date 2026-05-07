@@ -161,15 +161,19 @@ Pre-commit safety gate. Анализирует указанные изменен
 
 Анализирует blast radius изменения конкретных файлов. Возвращает, какие файлы будут затронуты напрямую и транзитивно, с risk score (0-1). Используйте ДО коммита мультифайловых изменений, чтобы понять, что может сломаться. Код не изменяет.
 
-![analyze_impact demo](docs/demo-analyze-impact.gif)
+![analyze_impact demo](docs/demo-blast-radius.gif)
 
 ### `get_dependencies`
 
 Показывает отношения import и importedBy для конкретного файла. Помогает понять, от чего зависит файл и что зависит от него, перед рефакторингом.
 
+![get_dependencies demo: inspect direct imports and reverse dependents before refactoring a shared module](docs/demo-get-dependencies.gif)
+
 ### `refresh_graph`
 
 Перестраивает dependency graph с нуля. Вызывайте после существенных добавлений/удалений файлов или если результат выглядит устаревшим. Возвращает статистику графа, включая число файлов, рёбер, время сборки и обнаруженные circular dependencies.
+
+![refresh_graph demo: rebuild the local graph and return fresh file, edge, and cycle counts](docs/demo-refresh-graph.gif)
 
 ## Example conversation
 

@@ -167,9 +167,13 @@ Pre-commit safety gate。指定した変更を解析し、理由付きで **PASS
 
 特定ファイルの import / importedBy 関係を返します。リファクタ前に、そのファイルが何に依存し、何から依存されているかを把握できます。
 
+![get_dependencies demo: inspect direct imports and reverse dependents before refactoring a shared module](docs/demo-get-dependencies.gif)
+
 ### `refresh_graph`
 
 dependency graph をゼロから再構築します。大きなファイル追加・削除のあとや、結果が古そうに見えるときに呼び出してください。ファイル数、edge 数、build time、検出した circular dependencies を返します。
+
+![refresh_graph demo: rebuild the local graph and return fresh file, edge, and cycle counts](docs/demo-refresh-graph.gif)
 
 ## Example conversation
 

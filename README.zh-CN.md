@@ -161,15 +161,19 @@ Pre-commit safety gate。它会分析指定改动，并返回带原因的 **PASS
 
 分析修改特定文件的 blast radius。返回直接和传递性受影响的文件，以及 risk score（0-1）。适合在提交多文件修改前评估可能的破坏范围。不会修改任何文件。
 
-![analyze_impact demo](docs/demo-analyze-impact.gif)
+![analyze_impact demo](docs/demo-blast-radius.gif)
 
 ### `get_dependencies`
 
 获取某个文件的 import 与 importedBy 关系。用来在重构前理解这个文件依赖谁，以及谁依赖它。
 
+![get_dependencies demo: inspect direct imports and reverse dependents before refactoring a shared module](docs/demo-get-dependencies.gif)
+
 ### `refresh_graph`
 
 从头重建 dependency graph。适合在大量新增/删除文件后，或者当结果看起来过期时调用。返回图统计信息，包括文件数、边数、构建时间以及检测到的 circular dependencies。
+
+![refresh_graph demo: rebuild the local graph and return fresh file, edge, and cycle counts](docs/demo-refresh-graph.gif)
 
 ## Example conversation
 

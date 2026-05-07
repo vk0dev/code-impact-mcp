@@ -161,15 +161,19 @@ Devuelve componentes fuertemente conectados compactos para dependencias circular
 
 Analiza el blast radius de cambiar archivos específicos. Devuelve qué archivos se verían afectados directa y transitivamente, con un risk score (0-1). Úsalo ANTES de commitear cambios en varios archivos para entender qué podría romperse. No modifica archivos.
 
-![analyze_impact demo](docs/demo-analyze-impact.gif)
+![analyze_impact demo](docs/demo-blast-radius.gif)
 
 ### `get_dependencies`
 
 Obtiene las relaciones import e importedBy para un archivo específico. Muestra de qué depende el archivo y qué depende de él. Úsalo para entender el acoplamiento antes de refactorizar.
 
+![get_dependencies demo: inspect direct imports and reverse dependents before refactoring a shared module](docs/demo-get-dependencies.gif)
+
 ### `refresh_graph`
 
 Reconstruye el dependency graph desde cero. Llámalo después de adiciones/eliminaciones importantes de archivos o si los resultados parecen obsoletos. Devuelve estadísticas del grafo, incluido número de archivos, aristas, tiempo de construcción y dependencias circulares detectadas.
+
+![refresh_graph demo: rebuild the local graph and return fresh file, edge, and cycle counts](docs/demo-refresh-graph.gif)
 
 ## Example conversation
 
