@@ -77,6 +77,12 @@ npx -y @vk0/code-impact-mcp
 
 Используйте workspace- или project-specific launch directory, чтобы server мог читать именно тот repository, который вы хотите анализировать.
 
+## Tutorials
+
+- [Быстрый старт с Claude Desktop](./docs/quickstart-claude-desktop.md)
+- [Как читать вывод `analyze_impact` и `gate_check`](./docs/read-analyze-impact-output.md)
+- [Рецепт pre-commit gate](./docs/pre-commit-gate-recipe.md)
+
 ### Optional pre-commit hook helper
 
 Запустите `npm run demo:install-hook`, чтобы в dry-run режиме посмотреть managed Husky snippet без записи/правок файлов `.husky`.

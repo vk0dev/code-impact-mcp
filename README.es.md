@@ -77,6 +77,12 @@ Después de guardar `claude_desktop_config.json`, reinicia por completo Claude D
 
 Usa un launch directory específico de workspace o proyecto para que el server pueda leer el repository que realmente quieres analizar.
 
+## Tutorials
+
+- [Inicio rápido con Claude Desktop](./docs/quickstart-claude-desktop.md)
+- [Cómo leer la salida de `analyze_impact` y `gate_check`](./docs/read-analyze-impact-output.md)
+- [Receta de pre-commit gate](./docs/pre-commit-gate-recipe.md)
+
 ### Optional pre-commit hook helper
 
 Ejecuta `npm run demo:install-hook` para previsualizar el snippet managed de Husky en modo dry-run (no crea ni modifica archivos `.husky`).

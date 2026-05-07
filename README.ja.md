@@ -77,6 +77,12 @@ MCP client が shell wrapper ではなく JSON を要求する場合、Claude De
 
 分析したい repository を読めるよう、workspace 単位または project 単位の launch directory を使ってください。
 
+## Tutorials
+
+- [Claude Desktop クイックスタート](./docs/quickstart-claude-desktop.md)
+- [`analyze_impact` と `gate_check` の読み方](./docs/read-analyze-impact-output.md)
+- [pre-commit gate レシピ](./docs/pre-commit-gate-recipe.md)
+
 ### Optional pre-commit hook helper
 
 `npm run demo:install-hook` を実行すると、dry-run で managed な Husky snippet をプレビューできます（`.husky` のファイルは作成/変更しません）。
