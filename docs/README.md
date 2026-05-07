@@ -7,9 +7,20 @@ Use this page when you want the shortest path to the already-shipped `@vk0/code-
 - If your main question is **"is this safe to commit?"**, start with the root [README](../README.md) tool examples for `gate_check`, `analyze_impact`, and `detect_cycles`.
 - If you want a visual walkthrough first, open the shipped demo GIFs already referenced from the root README.
 
+## Direct stdio config quickstart
+
+If your MCP client wants a plain stdio entrypoint, use:
+
+```bash
+npx -y @vk0/code-impact-mcp
+```
+
+For Claude Desktop JSON config, use the `mcpServers` example in the root [README](../README.md) and save it in `~/Library/Application Support/Claude/claude_desktop_config.json` on macOS or `%APPDATA%\Claude\claude_desktop_config.json` on Windows, then fully restart Claude Desktop.
+
 ## Install-hook helper quickstart
 
 `code-impact-mcp install-hook` is the bounded helper for wiring the pre-commit gate into an existing Husky setup.
+Use `npm run demo:install-hook` when you want a dry-run preview of the managed Husky snippet without creating or modifying `.husky` files.
 
 ```bash
 npx -y @vk0/code-impact-mcp install-hook
