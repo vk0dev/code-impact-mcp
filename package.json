@@ -31,7 +31,8 @@
     "lint": "tsc --noEmit",
     "smoke": "npm run build && node scripts/dogfood_smoke.mjs",
     "release-check": "node scripts/release-check.mjs",
-    "version-sync": "node scripts/version-sync.mjs"
+    "version-sync": "node scripts/version-sync.mjs",
+    "demo:install-hook": "node dist/cli.js install-hook --dry-run"
   },
   "keywords": [
     "mcp",

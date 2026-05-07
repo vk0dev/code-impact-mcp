@@ -30,6 +30,8 @@ USAGE
   npx -y @vk0/code-impact-mcp --help        Show this help.
   npx -y @vk0/code-impact-mcp --version     Show the package version.
   npx -y @vk0/code-impact-mcp install-hook  Install the managed hook block when safe.
+  npx -y @vk0/code-impact-mcp install-hook --dry-run
+                                           Preview the managed hook result without writing files.
 
 WHAT IT IS
   A Model Context Protocol (MCP) server. It is meant to be configured as an MCP
@@ -133,13 +135,18 @@ export async function runInstalledHook(
 
 export async function executeCliMode(
   mode: "help" | "version" | "install-hook" | "run-hook" | "server",
-  options: { cwd: string; write: (text: string) => void; collectFiles?: (cwd: string) => string[] },
+  options: { cwd: string; write: (text: string) => void; collectFiles?: (cwd: string) => string[]; args?: string[] },
 ): Promise<number> {
   if (mode === "help" || mode === "version") return 0;
 
   if (mode === "install-hook") {
-    const result = installHook(options.cwd, pkg.name);
+    const dryRun = options.args?.includes("--dry-run") ?? false;
+    const result = installHook(options.cwd, pkg.name, { dryRun });
     if (result.status === "print-only") {
+      if (dryRun) {
+        options.write(`Dry run, no files changed. ${result.message}\n\n${result.snippet}\n`);
+        return 0;
+      }
       options.write(`${result.message}\n\n${result.snippet}\n`);
       return 0;
     }
@@ -148,14 +155,14 @@ export async function executeCliMode(
       return 1;
     }
     if (result.status === "created") {
-      options.write(`Created ${result.hookPath}\n`);
+      options.write(dryRun ? `Dry run, would create ${result.hookPath}\n` : `Created ${result.hookPath}\n`);
       return 0;
     }
     if (result.status === "updated") {
-      options.write(`Updated ${result.hookPath}\n`);
+      options.write(dryRun ? `Dry run, would update ${result.hookPath}\n` : `Updated ${result.hookPath}\n`);
       return 0;
     }
-    options.write(`Already installed in ${result.hookPath}\n`);
+    options.write(dryRun ? `Dry run, no changes needed for ${result.hookPath}\n` : `Already installed in ${result.hookPath}\n`);
     return 0;
   }
 
@@ -171,7 +178,7 @@ const isDirectRun = process.argv[1] && import.meta.url === pathToFileURL(process
 
 if (isDirectRun) {
   const mode = handleCliArgs(process.argv.slice(2), (text) => process.stdout.write(text));
-  const exitCode = await executeCliMode(mode, { cwd: process.cwd(), write: (text) => process.stdout.write(text) });
+  const exitCode = await executeCliMode(mode, { cwd: process.cwd(), write: (text) => process.stdout.write(text), args: process.argv.slice(2) });
   if (exitCode !== 0) {
     process.exitCode = exitCode;
   }

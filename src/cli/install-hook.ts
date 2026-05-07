@@ -11,11 +11,11 @@ ${BLOCK_END}`;
 }
 
 export type InstallHookResult =
-  | { status: "created"; hookPath: string; snippet: string }
-  | { status: "updated"; hookPath: string; snippet: string }
-  | { status: "unchanged"; hookPath: string; snippet: string }
-  | { status: "print-only"; hookPath: string; message: string; snippet: string }
-  | { status: "refused"; hookPath: string; message: string; snippet: string };
+  | { status: "created"; hookPath: string; snippet: string; dryRun?: boolean }
+  | { status: "updated"; hookPath: string; snippet: string; dryRun?: boolean }
+  | { status: "unchanged"; hookPath: string; snippet: string; dryRun?: boolean }
+  | { status: "print-only"; hookPath: string; message: string; snippet: string; dryRun?: boolean }
+  | { status: "refused"; hookPath: string; message: string; snippet: string; dryRun?: boolean };
 
 function ensureTrailingNewline(text: string): string {
   return text.endsWith("\n") ? text : `${text}\n`;
@@ -34,7 +34,7 @@ function renderHuskyInstallSnippet(packageName: string): string {
   ].join("\n");
 }
 
-export function installHook(projectRoot: string, packageName: string): InstallHookResult {
+export function installHook(projectRoot: string, packageName: string, options: { dryRun?: boolean } = {}): InstallHookResult {
   const huskyDir = join(projectRoot, ".husky");
   const hookPath = join(huskyDir, "pre-commit");
   const snippet = renderHuskyPreCommitSnippet(packageName);
@@ -45,10 +45,14 @@ export function installHook(projectRoot: string, packageName: string): InstallHo
       hookPath,
       message: `.husky directory not found at ${huskyDir}. Printing a safe snippet instead of scaffolding Husky automatically.`,
       snippet: renderHuskyInstallSnippet(packageName),
+      dryRun: options.dryRun,
     };
   }
 
   if (!existsSync(hookPath)) {
+    if (options.dryRun) {
+      return { status: "created", hookPath, snippet, dryRun: true };
+    }
     writeFileSync(hookPath, `#!/usr/bin/env sh\nset -eu\n\n${snippet}\n`, "utf8");
     chmodSync(hookPath, 0o755);
     return { status: "created", hookPath, snippet };
@@ -69,13 +73,16 @@ export function installHook(projectRoot: string, packageName: string): InstallHo
       hookPath,
       message: `Refusing to overwrite existing pre-commit hook at ${hookPath}. The file already contains unrelated content and no managed code-impact-mcp block.`,
       snippet: renderHuskyInstallSnippet(packageName),
+      dryRun: options.dryRun,
     };
   }
 
   if (next !== existing) {
-    writeFileSync(hookPath, next, "utf8");
-    chmodSync(hookPath, 0o755);
+    if (!options.dryRun) {
+      writeFileSync(hookPath, next, "utf8");
+      chmodSync(hookPath, 0o755);
+    }
   }
 
-  return { status, hookPath, snippet };
+  return { status, hookPath, snippet, dryRun: options.dryRun };
 }

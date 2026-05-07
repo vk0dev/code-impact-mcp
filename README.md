@@ -79,6 +79,9 @@ Use a workspace or project-specific launch directory so the server can read the 
 
 ### Optional pre-commit hook helper
 
+Run `npm run demo:install-hook` to preview the managed Husky snippet without writing `.husky` files.
+It is a dry-run demo of the shipped helper, not a Husky scaffolder.
+
 Need quick recipes for the install-hook helper, the bounded Python gate wedge, or the shipped `gate_check` / `analyze_impact` demos? See [docs/README.md](./docs/README.md).
 
 Shipped in v1.6.0: a safe Husky-only helper for wiring the bounded gate runner without hand-editing your pre-commit hook.

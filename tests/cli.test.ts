@@ -17,6 +17,7 @@ describe("CLI help/version UX", () => {
     expect(out).toContain("gate_check");
     expect(out).toContain("install-hook");
     expect(out).toContain("npx -y @vk0/code-impact-mcp install-hook");
+    expect(out).toContain("npx -y @vk0/code-impact-mcp install-hook --dry-run");
     expect(out).toContain("npx -y @vk0/code-impact-mcp run-hook");
     expect(out).toContain("refuses to overwrite unrelated hook content");
     expect(out).toContain("prints a safe snippet");
@@ -137,6 +138,23 @@ describe("CLI install-hook", () => {
     expect(out).toContain("mkdir -p .husky");
     expect(out).toContain("BEGIN code-impact-mcp");
     expect(out).toContain("npx -y @vk0/code-impact-mcp run-hook");
+  });
+
+  it("supports dry-run mode without creating or modifying husky files", async () => {
+    mkdirSync(join(root, ".husky"), { recursive: true });
+
+    let out = "";
+    const exitCode = await executeCliMode("install-hook", {
+      cwd: root,
+      args: ["install-hook", "--dry-run"],
+      write: (text) => {
+        out += text;
+      },
+    });
+
+    expect(exitCode).toBe(0);
+    expect(out).toContain("Dry run, would create");
+    expect(() => readFileSync(join(root, ".husky", "pre-commit"), "utf8")).toThrow();
   });
 });
 
