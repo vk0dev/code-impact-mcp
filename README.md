@@ -84,6 +84,12 @@ It is a dry-run demo of the shipped helper, not a Husky scaffolder.
 
 Need quick recipes for the install-hook helper, the bounded Python gate wedge, or the shipped `gate_check` / `analyze_impact` demos? See [docs/README.md](./docs/README.md).
 
+## Tutorials
+
+- [Claude Desktop quickstart](./docs/quickstart-claude-desktop.md)
+- [How to read `analyze_impact` and `gate_check` output](./docs/read-analyze-impact-output.md)
+- [Pre-commit gate recipe](./docs/pre-commit-gate-recipe.md)
+
 Shipped in v1.6.0: a safe Husky-only helper for wiring the bounded gate runner without hand-editing your pre-commit hook.
 
 If you already use Husky, `code-impact-mcp install-hook` is the direct path for pre-commit wiring, so you can drop in the bounded gate runner instead of wiring the hook manually:
