@@ -8,7 +8,7 @@
 
 [日本語](./README.ja.md) | [中文](./README.zh-CN.md) | [Русский](./README.ru.md) | [English](./README.md)
 
-> Estado de listings: el payload para `awesome-mcp-servers` ya está preparado, el package metadata para Official MCP Registry ya está live vía `server.json`, Glama todavía necesita un listing real antes de que el external PR lane pueda avanzar, y MCP Hive es un manual submit-next operator step, no un listing actualmente reclamado como live. Este README todavía no afirma que ningún nuevo listing de terceros esté verified-live.
+> Estado de listados: el payload para `awesome-mcp-servers` ya está preparado, los metadatos del paquete para Official MCP Registry ya están activos vía `server.json`, Glama todavía necesita un listado manual real y el badge correspondiente antes de que pueda avanzar el carril del PR externo ya abierto (`punkpeye/awesome-mcp-servers#5907`), y MCP Hive sigue siendo un siguiente paso manual de envío por parte del operador, no un listado activo ya verificado. Este README no afirma que ningún nuevo listado de terceros esté activo salvo que ya esté verificado.
 
 ## Best for
 
