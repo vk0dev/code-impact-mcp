@@ -161,7 +161,7 @@ Pre-commit safety gate。指定した変更を解析し、理由付きで **PASS
 
 特定ファイル変更の blast radius を分析します。直接的・推移的に影響を受けるファイルと risk score (0-1) を返します。複数ファイル変更をコミットする前に、何が壊れそうか把握するために使います。ファイルは変更しません。
 
-![analyze_impact demo](docs/demo-analyze-impact.gif)
+![analyze_impact demo](docs/demo-blast-radius.gif)
 
 ### `get_dependencies`
 
