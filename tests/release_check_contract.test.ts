@@ -1,6 +1,14 @@
 import { execFileSync } from "node:child_process";
 import { describe, expect, it } from "vitest";
 
+function ensureBuildOutput() {
+  execFileSync("npm", ["run", "build"], {
+    cwd: process.cwd(),
+    stdio: "pipe",
+    encoding: "utf8",
+  });
+}
+
 import {
   DOCUMENTED_INSTALL_SURFACES,
   findDocumentedInstallSurfaces,
@@ -43,8 +51,10 @@ describe("release-check contract", () => {
   });
 
   it(
-    "stays green on the current repo head",
+    "stays green on the current repo head after a normal build",
     () => {
+      ensureBuildOutput();
+
       expect(() =>
         execFileSync(process.execPath, ["scripts/release-check.mjs"], {
           cwd: process.cwd(),
@@ -53,6 +63,6 @@ describe("release-check contract", () => {
         }),
       ).not.toThrow();
     },
-    15000,
+    30000,
   );
 });

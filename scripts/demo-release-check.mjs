@@ -15,6 +15,8 @@ const out = async (line = '', ms = 420) => {
 
 async function main() {
   await out(`${DIM}# Release QA proof for the shipped 1.6.4 lane.${RESET}`, 1100);
+  await out(`${BOLD}$ npm run build${RESET}`, 500);
+  execSync('npm run build', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
   await out(`${BOLD}$ node scripts/release-check.mjs${RESET}`, 700);
   await out();
 

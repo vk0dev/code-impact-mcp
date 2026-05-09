@@ -26,18 +26,20 @@ describe("release-check demo asset contract", () => {
       });
 
       expect(output).toContain("Release QA proof for the shipped 1.6.4 lane.");
+      expect(output).toContain("$ npm run build");
       expect(output).toContain("$ node scripts/release-check.mjs");
       expect(output).toContain("All checks passed!");
       expect(output).toContain("Ready to release.");
       expect(output).not.toContain("Release checklist has failures.");
     },
-    15000,
+    30000,
   );
 
   it("tracked cast still references the same bounded release QA proof story", () => {
     const cast = readFileSync(castPath, "utf8");
 
     expect(cast).toContain("Release QA proof for the shipped 1.6.4 lane.");
+    expect(cast).toContain("npm run build");
     expect(cast).toContain("node scripts/release-check.mjs");
     expect(cast).toContain("All checks passed!");
     expect(cast).toContain("Ready to release.");

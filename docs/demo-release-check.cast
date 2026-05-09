@@ -1,5 +1,6 @@
 {"version":3,"term":{"cols":80,"rows":24},"timestamp":1778339522,"command":"node scripts/demo-release-check.mjs"}
 [0.092, "o", "\u001b[2m# Release QA proof for the shipped 1.6.4 lane.\u001b[0m\r\n"]
+[0.500, "o", "\u001b[1m$ npm run build\u001b[0m\r\n"]
 [1.099, "o", "\u001b[1m$ node scripts/release-check.mjs\u001b[0m\r\n"]
 [0.702, "o", "\r\n"]
 [1.428, "o", "  \u001b[2mTarget version: 1.6.4\u001b[0m\r\n"]
