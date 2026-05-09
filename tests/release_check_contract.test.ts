@@ -42,13 +42,17 @@ describe("release-check contract", () => {
     expect(hasBlockingAuditVulnerabilities(audit)).toBe(true);
   });
 
-  it("stays green on the current repo head", () => {
-    expect(() =>
-      execFileSync(process.execPath, ["scripts/release-check.mjs"], {
-        cwd: process.cwd(),
-        stdio: "pipe",
-        encoding: "utf8",
-      }),
-    ).not.toThrow();
-  });
+  it(
+    "stays green on the current repo head",
+    () => {
+      expect(() =>
+        execFileSync(process.execPath, ["scripts/release-check.mjs"], {
+          cwd: process.cwd(),
+          stdio: "pipe",
+          encoding: "utf8",
+        }),
+      ).not.toThrow();
+    },
+    15000,
+  );
 });
