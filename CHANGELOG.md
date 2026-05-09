@@ -1,4 +1,9 @@
 
+## [1.6.2] — 2026-05-09
+
+### Fixed
+- Aligned the nested `server.json` package version with the shipped release version so `package.json`, `server.json`, and `server.json.packages[0].version` all stay in sync at publish time.
+
 ## [1.6.1] — 2026-05-09
 
 ### Fixed
