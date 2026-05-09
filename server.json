@@ -11,7 +11,7 @@
     {
       "registryType": "npm",
       "identifier": "@vk0/code-impact-mcp",
-      "version": "1.6.0",
+      "version": "1.6.1",
       "transport": {
         "type": "stdio"
       }
