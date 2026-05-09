@@ -212,20 +212,20 @@ Supports: ESM imports, ESM re-exports, CommonJS `require()`, NodeNext-style `.js
 
 ## Comparison
 
-If you are choosing a tool for an agent or reviewer, the key question is simple: do you need to **explore the graph**, or do you need to **gate one proposed change before commit**?
+If you are choosing a tool for an agent or reviewer, the key question is still simple: do you need to **explore a graph or broader code context**, or do you need to **gate one proposed change before commit**?
 
-| Alternative | Best at | Where it wins | Where CodeImpact MCP wins |
+| Alternative | Best at | Where it wins today | Where CodeImpact MCP wins |
 | --- | --- | --- | --- |
 | **CodeImpact MCP** | Decision-first dependency gating for proposed TS/JS changes, including monorepos | Immediate PASS/WARN/BLOCK output, built-in `detect_cycles`, workspace-aware gate checks, file-level blast-radius triage, bounded Python support for `analyze_impact` and `gate_check`, local-first workflow, and a direct Husky install-hook helper | Best fit when the job is "is this safe to commit?" rather than "help me explore the whole repo" |
-| **code-graph-mcp** | Wider graph inspection through an MCP tool surface | Better when the agent wants to traverse relationships, inspect more graph detail, and stay in exploration mode | Better when you want one bounded pre-commit verdict with affected-file triage instead of a graph-exploration session |
-| **Depwire** | Broader dependency intelligence across larger dependency workflows | Better when you need a heavier platform view, deeper dependency management, or wider language coverage than CodeImpact intentionally targets | Better when you want a small MIT tool that runs locally, is already live in the Official MCP Registry, and answers the gating question quickly |
-| **RepoGraph** | Graph-first browsing and repository discovery | Better when the user is still learning the codebase and wants to inspect structure interactively | Better when the touched files are already known and you only need bounded blast-radius triage plus a gate result |
-| **CodeGraphContext** | Repository context retrieval for longer-form agent reasoning | Better when the agent needs broad code context for planning, synthesis, or explanation | Better when you want decision-first output from a local gate, not a general context provider |
+| **code-graph-mcp** | Hosted or prebuilt code-graph inspection through an MCP surface | Better when the agent wants graph traversal, semantic graph queries, and public/private graph access through the existing DeepGraph or CodeGPT flow instead of a local gate-first CLI | Better when you want one bounded pre-commit verdict with affected-file triage instead of a graph-exploration session |
+| **Depwire** | Broader dependency intelligence and architecture workflows across a wider language/tooling surface | Better when you need symbol-level analysis, browser visualization, security or health workflows, or a wider multi-language platform than CodeImpact intentionally targets | Better when you want a small MIT tool that stays local-first, is already live in the Official MCP Registry, and answers the narrow gating question quickly |
+| **RepoGraph** | Repository-level graph retrieval for SWE-style context gathering | Better when the workflow is researchy or retrieval-heavy, especially line-level repo context for larger repo-understanding loops rather than a lightweight commit-time check | Better when the touched files are already known and you only need bounded blast-radius triage plus a gate result |
+| **CodeGraphContext** | Local graph-database indexing plus broader CLI/MCP code understanding | Better when the agent needs a queryable local graph database, wider multi-language context, and longer-form repository reasoning instead of a decision-first gate | Better when you want decision-first output from a local gate, not a broader graph-database workflow |
 | **MCP Hive style marketplace follow-up** | Manual marketplace/discovery submission after the repo truth is already stable | Better when the job is marketplace packaging, screenshots, and operator copy for a directory workflow rather than technical gating itself | Better when you need the product wedge first: local verdicts, install-hook wiring, and bounded Python impact checks that are already shipped before any manual listing follow-up |
 
 **Choose CodeImpact MCP when:** you already know the files in play and want a fast, local, MIT-licensed answer with a risk score, explicit cycle surfacing, file-level blast-radius output, monorepo-aware checks, the shipped Husky install-hook helper, and a clear PASS/WARN/BLOCK verdict before commit.
 
-**Choose one of the alternatives when:** the main job is graph exploration, repo understanding, wider dependency workflow coverage, context retrieval for longer reasoning loops, or manual marketplace packaging after the core repo surface is already settled.
+**Choose one of the alternatives when:** the main job is hosted/public graph access, graph exploration, repo understanding, wider dependency workflow coverage, graph-database-backed context retrieval for longer reasoning loops, or manual marketplace packaging after the core repo surface is already settled.
 
 ## FAQ
 
