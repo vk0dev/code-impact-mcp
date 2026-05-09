@@ -1,4 +1,9 @@
 
+## [1.6.1] — 2026-05-09
+
+### Fixed
+- Hardened the `scripts/demo-install-hook.mjs` fallback so the install-hook demo asset contract still passes on a clean test run when `dist/cli.js` has not been built yet. The demo now uses the built CLI when available and falls back to the repo-local `tsx` loader for `src/cli.ts` during clean-run verification.
+
 ## [1.6.0] — 2026-05-04
 
 ### Added
