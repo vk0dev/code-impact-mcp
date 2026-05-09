@@ -1,4 +1,9 @@
 
+## [1.6.6] — 2026-05-09
+
+### Fixed
+- Aligned Smithery manifest metadata and publish fallback identity with the shipped 1.6.5 package truth so marketplace publish automation no longer drifts to stale version, description, tool-surface, or namespace data.
+
 ## [1.6.5] — 2026-05-09
 
 ### Fixed
