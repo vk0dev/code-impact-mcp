@@ -253,20 +253,20 @@ dependency graph をゼロから再構築します。大きなファイル追加
 
 ## Comparison
 
-agent や reviewer のためにツールを選ぶなら、問いはシンプルです。必要なのは **graph を探索すること** なのか、それとも **提案された 1 つの変更を commit 前に gate すること** なのか。
+agent や reviewer のためにツールを選ぶなら、問いは依然としてシンプルです。必要なのは **graph やより広いコードコンテキストを探索すること** なのか、それとも **提案された 1 つの変更を commit 前に gate すること** なのか。
 
-| 代替ツール | 得意なこと | どこで勝つか | CodeImpact MCP が勝つ場面 |
+| 代替ツール | 得意なこと | どこで今勝つか | CodeImpact MCP が勝つ場面 |
 | --- | --- | --- | --- |
-| **CodeImpact MCP** | monorepo を含む提案済み TS/JS 変更に対する decision-first dependency gate | 即座の PASS/WARN/BLOCK 出力、組み込みの `detect_cycles`、workspace-aware gate checks、local-first workflow、そして直接使える Husky `install-hook` helper | 仕事が「この変更は安全に commit できるか？」であって、「repo 全体を探索したい」ではないときに最適 |
-| **code-graph-mcp** | MCP tool surface を通じたより広い graph inspection | agent が関係性をたどり、より多くの graph detail を見て、exploration mode のままでいたいときに強い | graph exploration session ではなく、bounded な pre-commit verdict を 1 つ欲しいときに強い |
-| **Depwire** | より大きな dependency workflows にまたがる幅広い dependency intelligence | より重い platform view、深い dependency management、または CodeImpact が意図的に狙わない広い language coverage が必要なときに強い | ローカルで動く小さな MIT ツールとして、gating question に素早く答えてほしいときに強い |
-| **RepoGraph** | graph-first browsing と repository discovery | ユーザーがまだ codebase を学習中で、構造を対話的に見たいときに強い | touched files がすでに分かっていて、必要なのが blast-radius triage と gate result だけのときに強い |
-| **CodeGraphContext** | より長い agent reasoning のための repository context retrieval | planning、synthesis、explanation のために agent が広い code context を必要とするときに強い | general context provider ではなく、decision-first output が欲しいときに強い |
-| **MCP Hive 風の marketplace follow-up** | repo truth が固まった後の手動 marketplace/discovery submit-next | directory workflow 向けの packaging、screenshot/demo packet、operator copy が主目的で、dependency gate 自体ではないときに強い | まず必要なのが、すでに shipped している local verdicts、Husky `install-hook` helper、そして限定的な Python `analyze_impact` / `gate_check` path という product wedge であり、その後に手動 listing follow-up を行うときに強い |
+| **CodeImpact MCP** | monorepo を含む提案済み TS/JS 変更に対する decision-first dependency gate | 即座の PASS/WARN/BLOCK 出力、組み込みの `detect_cycles`、workspace-aware gate checks、file-level blast-radius triage、`analyze_impact` と `gate_check` に対する bounded な Python support、local-first workflow、そして直接使える Husky `install-hook` helper | 仕事が「この変更は安全に commit できるか？」であって、「repo 全体を探索したい」ではないときに最適 |
+| **code-graph-mcp** | Hosted または prebuilt な code graph inspection を MCP surface で扱うこと | agent が graph traversal、semantic graph queries、public/private graph access を既存の DeepGraph や CodeGPT flow 経由で使いたいときに強く、local gate-first CLI を主役にしたいケースとは違う | graph exploration session ではなく、affected files の triage 付きで bounded な pre-commit verdict を 1 つ欲しいときに強い |
+| **Depwire** | より広い language/tooling surface にまたがる dependency intelligence と architecture workflows | symbol-level analysis、browser visualization、security/health workflows、または CodeImpact が意図的に狙わない広い multi-language platform が必要なときに強い | local-first を保ち、Official MCP Registry で live であり、狭い gating question に素早く答える小さな MIT ツールが欲しいときに強い |
+| **RepoGraph** | SWE-style な context gathering のための repository-level graph retrieval | workflow がより research-heavy / retrieval-heavy で、大きな repo understanding ループのために line-level repo context を取りたいときに強く、軽量な commit-time check が主目的のときとは向きが違う | touched files がすでに分かっていて、必要なのが bounded blast-radius triage と gate result だけのときに強い |
+| **CodeGraphContext** | ローカル graph database indexing と、より広い CLI/MCP code understanding | queryable な local graph database、より広い multi-language context、そして decision-first gate より長めの repository reasoning が欲しいときに強い | より広い graph-database workflow ではなく、ローカル gate から decision-first output を得たいときに強い |
+| **MCP Hive 風の marketplace follow-up** | repo truth が固まった後の手動 marketplace/discovery submit-next | directory workflow 向けの packaging、screenshots、operator copy が主目的で、technical gating 自体ではないときに強い | まず必要なのが、すでに shipped している local verdicts、install-hook wiring、そして bounded な Python impact checks という product wedge であり、その後に手動 listing follow-up を行うときに強い |
 
 **CodeImpact MCP を選ぶとき:** すでに対象ファイルが分かっていて、risk score、明示的な cycle surfacing、file-level blast-radius output、monorepo-aware checks、shipped Husky `install-hook` helper、そして commit 前の明確な PASS/WARN/BLOCK verdict を、ローカルで素早く MIT license のまま得たいときです。
 
-**他の代替を選ぶとき:** 主な仕事が graph exploration、repo 理解、より広い dependency workflow coverage、長い reasoning loop のための context retrieval、または core repo surface が固まった後の manual marketplace packaging であるときです.
+**他の代替を選ぶとき:** 主な仕事が hosted/public graph access、graph exploration、repo 理解、より広い dependency workflow coverage、graph database ベースの context retrieval による長い reasoning loop、または core repo surface が固まった後の manual marketplace packaging であるときです.
 
 ## FAQ
 

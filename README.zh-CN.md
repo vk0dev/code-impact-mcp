@@ -253,20 +253,20 @@ Pre-commit safety gate。它会分析指定改动，并返回带原因的 **PASS
 
 ## Comparison
 
-如果你在为 agent 或 reviewer 选工具，核心问题很简单：你需要的是 **探索 graph**，还是 **在 commit 前 gate 一次提议中的变更**？
+如果你在为 agent 或 reviewer 选工具，核心问题现在仍然很简单：你需要的是 **探索 graph 或更宽的代码上下文**，还是 **在 commit 前 gate 一次提议中的变更**？
 
-| 替代方案 | 最擅长 | 它更强的地方 | CodeImpact MCP 更强的地方 |
+| 替代方案 | 最擅长 | 它今天更强的地方 | CodeImpact MCP 更强的地方 |
 | --- | --- | --- | --- |
-| **CodeImpact MCP** | 面向提议中的 TS/JS 变更做 decision-first dependency gating，包括 monorepo | 即时 PASS/WARN/BLOCK 输出、内建 `detect_cycles`、workspace-aware gate checks、local-first workflow，以及可直接接入的 Husky `install-hook` helper | 当你的问题是“这个现在能安全 commit 吗？”，而不是“帮我探索整个仓库”时最合适 |
-| **code-graph-mcp** | 通过 MCP tool surface 做更宽的 graph inspection | 更适合 agent 遍历关系、查看更多 graph 细节，并持续停留在 exploration mode | 更适合你只想要一个有边界的 pre-commit verdict，而不是一次 graph exploration session |
-| **Depwire** | 面向更大 dependency workflows 的更广 dependency intelligence | 当你需要更重的平台视角、更深的 dependency management，或比 CodeImpact 有意覆盖得更广的 language coverage 时更合适 | 当你想要一个本地运行的小型 MIT 工具，快速回答 gating question 时更合适 |
-| **RepoGraph** | graph-first browsing 和 repository discovery | 当用户还在熟悉代码库、想交互式查看结构时更合适 | 当 touched files 已经明确，只需要 blast-radius triage 加一个 gate result 时更合适 |
-| **CodeGraphContext** | 面向更长 agent reasoning 的 repository context retrieval | 当 agent 需要广泛的代码上下文来做 planning、synthesis 或 explanation 时更合适 | 当你要的是 decision-first output，而不是通用 context provider 时更合适 |
-| **MCP Hive 风格的 marketplace follow-up** | 在 repo truth 已稳定后做手动 marketplace/discovery submit-next | 当主要工作是 directory workflow 所需的 packaging、screenshot/demo packet 和 operator copy，而不是 dependency gate 本身时更合适 | 当你首先需要的是已经 shipped 的 product wedge，也就是 local verdicts、Husky `install-hook` helper，以及有边界的 Python `analyze_impact` / `gate_check` path，然后再做手动 listing follow-up 时更合适 |
+| **CodeImpact MCP** | 面向提议中的 TS/JS 变更做 decision-first dependency gating，包括 monorepo | 即时 PASS/WARN/BLOCK 输出、内建 `detect_cycles`、workspace-aware gate checks、file-level blast-radius triage、针对 `analyze_impact` 与 `gate_check` 的 bounded Python support、local-first workflow，以及可直接接入的 Husky `install-hook` helper | 当你的问题是“这个现在能安全 commit 吗？”，而不是“帮我探索整个仓库”时最合适 |
+| **code-graph-mcp** | 通过 MCP surface 使用 hosted 或 prebuilt 的 code graph inspection | 更适合 agent 需要 graph traversal、semantic graph queries，以及通过现有 DeepGraph 或 CodeGPT flow 访问 public/private graphs，而不是把本地 gate-first CLI 放在中心位置 | 更适合你只想要一个有边界、且附带 affected-file triage 的 pre-commit verdict，而不是一次 graph exploration session |
+| **Depwire** | 覆盖更宽 language/tooling surface 的 dependency intelligence 与 architecture workflows | 当你需要 symbol-level analysis、browser visualization、security/health workflows，或比 CodeImpact 有意覆盖更宽的 multi-language platform 时更合适 | 当你想要一个保持 local-first、已经在 Official MCP Registry live、并能快速回答狭义 gating question 的小型 MIT 工具时更合适 |
+| **RepoGraph** | 面向 SWE-style context gathering 的 repository-level graph retrieval | 当 workflow 更偏 research-heavy 或 retrieval-heavy，尤其是为了更大的 repo-understanding 循环去拿 line-level repo context，而不是做轻量级 commit-time check 时更合适 | 当 touched files 已经明确，只需要 bounded blast-radius triage 加一个 gate result 时更合适 |
+| **CodeGraphContext** | 本地 graph database indexing 加上更宽的 CLI/MCP code understanding | 当 agent 需要 queryable local graph database、更宽的 multi-language context，以及比 decision-first gate 更长的 repository reasoning 时更合适 | 当你要的是来自本地 gate 的 decision-first output，而不是更宽的 graph-database workflow 时更合适 |
+| **MCP Hive 风格的 marketplace follow-up** | 在 repo truth 已稳定后做手动 marketplace/discovery submit-next | 当主要工作是 directory workflow 所需的 packaging、screenshots 和 operator copy，而不是 dependency gate 本身时更合适 | 当你首先需要的是已经 shipped 的 product wedge，也就是 local verdicts、install-hook wiring，以及有边界的 Python impact checks，然后再做手动 listing follow-up 时更合适 |
 
 **什么时候选 CodeImpact MCP：** 当你已经知道涉及哪些文件，并且想在 commit 前拿到一个快速、本地、MIT 许可的答案，里面包含 risk score、明确的 cycle surfacing、file-level blast-radius output、monorepo-aware checks、已经 shipped 的 Husky `install-hook` helper，以及清晰的 PASS/WARN/BLOCK verdict。
 
-**什么时候选其他替代：** 当主要工作是 graph exploration、仓库理解、更宽的 dependency workflow coverage、为更长 reasoning loop 提供 context retrieval，或者在 core repo surface 已稳定后做 manual marketplace packaging。
+**什么时候选其他替代：** 当主要工作是 hosted/public graph access、graph exploration、仓库理解、更宽的 dependency workflow coverage、基于 graph database 的 context retrieval 来支撑更长 reasoning loop，或者在 core repo surface 已稳定后做 manual marketplace packaging。
 
 ## FAQ
 
