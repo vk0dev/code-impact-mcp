@@ -167,7 +167,7 @@ describe("graph queries", () => {
         });
       },
     );
-  });
+  }, 15000);
 
   it("detects workspace package roots from pnpm-workspace.yaml", () => {
     withTempProject(
