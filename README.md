@@ -84,6 +84,8 @@ It is a dry-run demo of the shipped helper, not a Husky scaffolder.
 
 Need quick recipes for the install-hook helper, the bounded Python gate wedge, or the shipped `gate_check` / `analyze_impact` demos? See [docs/README.md](./docs/README.md).
 
+Latest shipped release note: v1.6.4 hardens the repo-local `release-check` against the documented install-surface contract and adds regression coverage so release QA stays aligned with the shipped Claude Code and plain stdio paths.
+
 ## Tutorials
 
 - [Claude Desktop quickstart](./docs/quickstart-claude-desktop.md)

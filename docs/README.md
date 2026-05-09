@@ -6,6 +6,7 @@ Use this page when you want the shortest path to the already-shipped `@vk0/code-
 
 - If your main question is **"is this safe to commit?"**, start with the root [README](../README.md) tool examples for `gate_check`, `analyze_impact`, and `detect_cycles`.
 - If you want a visual walkthrough first, open the shipped demo GIFs already referenced from the root README.
+- Latest shipped release note: v1.6.4 hardens the repo-local `release-check` to the documented install-surface contract and adds regression coverage so release QA stays aligned with the shipped Claude Code and plain stdio paths.
 
 ## Direct stdio config quickstart
 

@@ -77,6 +77,8 @@ npx -y @vk0/code-impact-mcp
 
 Используйте workspace- или project-specific launch directory, чтобы server мог читать именно тот repository, который вы хотите анализировать.
 
+Актуальная release note: v1.6.4 усилил repo-local `release-check` вокруг documented install-surface contract и добавил regression coverage, чтобы release QA оставался выровнен с shipped путями Claude Code и plain stdio.
+
 ## Tutorials
 
 - [Быстрый старт с Claude Desktop](./docs/quickstart-claude-desktop.md)
