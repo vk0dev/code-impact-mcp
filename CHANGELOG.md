@@ -1,4 +1,9 @@
 
+## [1.6.4] — 2026-05-09
+
+### Fixed
+- Locked the repo-local release-check to the shipped install-surface contract and added regression coverage so release QA no longer silently reintroduces Cursor/Cline requirements or untested npm audit blocking logic.
+
 ## [1.6.3] — 2026-05-09
 
 ### Fixed
