@@ -1,0 +1,196 @@
+{
+  "payload": {
+    "type": "hosted",
+    "stateful": false,
+    "hasAuthAdapter": false,
+    "serverCard": {
+      "serverInfo": {
+        "name": "code-impact-mcp",
+        "version": "1.6.5",
+        "description": "Lightweight pre-commit safety gate for AI agents. Answers 'is this change safe?' with PASS/WARN/BLOCK verdict in seconds. Zero setup, no database."
+      },
+      "tools": [
+        {
+          "name": "analyze_impact",
+          "description": "Analyze the blast radius of changing specific files. Returns which files would be directly and transitively affected, with a risk score (0-1). Use BEFORE committing multi-file changes to understand what might break. Does NOT modify any files.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "projectRoot": {
+                "type": "string",
+                "description": "Absolute path to the project root directory"
+              },
+              "files": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "minItems": 1,
+                "description": "Relative file paths that are being changed (e.g. ['src/utils/helpers.ts'])"
+              },
+              "tsconfigPath": {
+                "type": "string",
+                "description": "Optional tsconfig path relative to projectRoot"
+              }
+            },
+            "required": [
+              "projectRoot",
+              "files"
+            ],
+            "additionalProperties": false,
+            "$schema": "http://json-schema.org/draft-07/schema#"
+          },
+          "annotations": {
+            "readOnlyHint": true
+          },
+          "execution": {
+            "taskSupport": "forbidden"
+          }
+        },
+        {
+          "name": "get_dependencies",
+          "description": "Get the import and importedBy relationships for a specific file. Shows what this file depends on and what depends on it. Use to understand coupling before refactoring a file.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "projectRoot": {
+                "type": "string",
+                "description": "Absolute path to the project root directory"
+              },
+              "file": {
+                "type": "string",
+                "description": "Relative file path (e.g. 'src/server.ts')"
+              },
+              "tsconfigPath": {
+                "type": "string",
+                "description": "Optional tsconfig path relative to projectRoot"
+              }
+            },
+            "required": [
+              "projectRoot",
+              "file"
+            ],
+            "additionalProperties": false,
+            "$schema": "http://json-schema.org/draft-07/schema#"
+          },
+          "annotations": {
+            "readOnlyHint": true
+          },
+          "execution": {
+            "taskSupport": "forbidden"
+          }
+        },
+        {
+          "name": "detect_cycles",
+          "description": "Find circular dependencies in the project and return compact strongly-connected-component groups. Use to spot cycle hotspots before refactors or to explain why a gate_check result warned or blocked.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "projectRoot": {
+                "type": "string",
+                "description": "Absolute path to the project root directory"
+              },
+              "tsconfigPath": {
+                "type": "string",
+                "description": "Optional tsconfig path relative to projectRoot"
+              }
+            },
+            "required": [
+              "projectRoot"
+            ],
+            "additionalProperties": false,
+            "$schema": "http://json-schema.org/draft-07/schema#"
+          },
+          "annotations": {
+            "readOnlyHint": true
+          },
+          "execution": {
+            "taskSupport": "forbidden"
+          }
+        },
+        {
+          "name": "gate_check",
+          "description": "Pre-commit safety gate. Analyzes specified changes and returns a PASS/WARN/BLOCK verdict with reasons. Use as a bounded decision aid before committing multi-file changes. BLOCK means current impact is too risky. WARN means human review recommended. PASS means low-risk.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "projectRoot": {
+                "type": "string",
+                "description": "Absolute path to the project root directory"
+              },
+              "files": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "minItems": 1,
+                "description": "Relative file paths being changed"
+              },
+              "threshold": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "default": 0.5,
+                "description": "Risk threshold for BLOCK verdict (0-1, default 0.5)"
+              },
+              "tsconfigPath": {
+                "type": "string",
+                "description": "Optional tsconfig path relative to projectRoot"
+              }
+            },
+            "required": [
+              "projectRoot",
+              "files"
+            ],
+            "additionalProperties": false,
+            "$schema": "http://json-schema.org/draft-07/schema#"
+          },
+          "annotations": {
+            "readOnlyHint": true
+          },
+          "execution": {
+            "taskSupport": "forbidden"
+          }
+        },
+        {
+          "name": "refresh_graph",
+          "description": "Rebuild the dependency graph from scratch. Call this after significant file additions/deletions, or if analyze_impact results seem stale. Returns graph statistics including file count, edge count, build time, and any circular dependencies detected.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "projectRoot": {
+                "type": "string",
+                "description": "Absolute path to the project root directory"
+              },
+              "tsconfigPath": {
+                "type": "string",
+                "description": "Optional tsconfig path relative to projectRoot"
+              }
+            },
+            "required": [
+              "projectRoot"
+            ],
+            "additionalProperties": false,
+            "$schema": "http://json-schema.org/draft-07/schema#"
+          },
+          "annotations": {
+            "readOnlyHint": true
+          },
+          "execution": {
+            "taskSupport": "forbidden"
+          }
+        }
+      ],
+      "resources": [],
+      "prompts": []
+    },
+    "source": {
+      "commit": "06e443a9212026a7f6f74fea57c2e1ec8ec2428d",
+      "branch": "main"
+    }
+  },
+  "artifacts": {
+    "module": "module.js",
+    "sourcemap": "module.js.map"
+  }
+}

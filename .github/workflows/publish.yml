@@ -71,7 +71,7 @@ jobs:
 
       - name: Publish to Smithery
         run: |
-          npx -y @smithery/cli@latest mcp publish --name "${{ vars.SMITHERY_SERVER_NAME || 'unfucker/code-impact-mcp' }}" || \
+          npx -y @smithery/cli@latest mcp publish --name "${{ vars.SMITHERY_SERVER_NAME || 'vk0dev/code-impact-mcp' }}" || \
           echo "::warning::Smithery publish failed — may need manual publish"
         env:
           SMITHERY_API_KEY: ${{ secrets.SMITHERY_API_KEY }}
