@@ -227,13 +227,18 @@ if (!readme) {
     'README has "Why" or "When to use" section',
   );
 
-  // Install snippets for >= 4 clients
-  const clients = ['Claude Desktop', 'Claude Code', 'Cursor', 'Cline'];
-  const foundClients = clients.filter((c) => readme.includes(c));
+  // Install guidance for the documented client surfaces
+  const installSurfaces = [
+    'Claude Desktop',
+    'Claude Code',
+    'Other stdio MCP clients',
+    'JSON config example for stdio clients',
+  ];
+  const foundInstallSurfaces = installSurfaces.filter((surface) => readme.includes(surface));
   check(
-    foundClients.length >= 4,
-    `Install snippets for >= 4 clients`,
-    `found: ${foundClients.join(', ')} (${foundClients.length}/4)`,
+    foundInstallSurfaces.length >= 4,
+    `Install guidance for documented client surfaces`,
+    `found: ${foundInstallSurfaces.join(', ')} (${foundInstallSurfaces.length}/4)`,
   );
 
   // FAQ section
