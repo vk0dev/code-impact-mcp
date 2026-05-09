@@ -1,4 +1,9 @@
 
+## [1.6.3] — 2026-05-09
+
+### Fixed
+- Released the already-landed nested `server.json` package-version alignment fix so the published package metadata no longer advertises `1.6.1` inside `server.json.packages[0].version` while the shipped release is newer.
+
 ## [1.6.2] — 2026-05-09
 
 ### Fixed
