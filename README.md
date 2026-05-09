@@ -8,7 +8,7 @@
 
 [日本語](./README.ja.md) | [中文](./README.zh-CN.md) | [Русский](./README.ru.md) | [Español](./README.es.md)
 
-> Listing status: the `awesome-mcp-servers` payload is prepared, Official MCP Registry package metadata is live via `server.json`, Glama still needs a real manual listing plus badge before the already-open external PR lane (`punkpeye/awesome-mcp-servers#5907`) can move, and MCP Hive is a manual submit-next operator step, not a currently claimed live listing. This README does not claim any new third-party listing as live unless it is already verified.
+> Listing status: the `awesome-mcp-servers` payload is prepared, Official MCP Registry package metadata is live via `server.json`, Glama still needs a real manual listing plus badge before the already-open external PR lane (`punkpeye/awesome-mcp-servers#5907`) can move, and MCP Hive is a manual submit-next operator step, not a currently claimed live listing. Once a real Glama listing and badge exist, the next operator step is to update PR `punkpeye/awesome-mcp-servers#5907` with the verified URLs. This README does not claim any new third-party listing as live unless it is already verified.
 
 ## Best for
 
