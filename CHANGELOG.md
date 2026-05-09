@@ -1,4 +1,9 @@
 
+## [1.6.5] — 2026-05-09
+
+### Fixed
+- Aligned the release-check proof lane with the intended build-first contract so release QA stays green after a normal `npm run build` flow and no longer fails on missing `dist/` in clean verification runs.
+
 ## [1.6.4] — 2026-05-09
 
 ### Fixed
