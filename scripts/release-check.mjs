@@ -8,7 +8,8 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { execSync } from 'node:child_process';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -24,6 +25,30 @@ const dim = (s) => `\x1b[2m${s}\x1b[0m`;
 const PASS = green('✔');
 const FAIL = red('✘');
 const WARN = yellow('⚠');
+
+export const DOCUMENTED_INSTALL_SURFACES = [
+  'Claude Desktop',
+  'Claude Code',
+  'Other stdio MCP clients',
+  'JSON config example for stdio clients',
+];
+
+export function findDocumentedInstallSurfaces(readme) {
+  return DOCUMENTED_INSTALL_SURFACES.filter((surface) => readme.includes(surface));
+}
+
+export function getAuditSeverityCounts(auditData) {
+  const vulnerabilities = auditData?.metadata?.vulnerabilities || {};
+  return {
+    high: vulnerabilities.high || 0,
+    critical: vulnerabilities.critical || 0,
+  };
+}
+
+export function hasBlockingAuditVulnerabilities(auditData) {
+  const { high, critical } = getAuditSeverityCounts(auditData);
+  return high > 0 || critical > 0;
+}
 
 // ─── State ───────────────────────────────────────────────────────────────────
 
@@ -83,6 +108,7 @@ function walkDir(dir, ext) {
 
 // ─── Checks ──────────────────────────────────────────────────────────────────
 
+function main() {
 const pkg = readJSON('package.json');
 
 // ── Code Quality ─────────────────────────────────────────────────────────────
@@ -228,13 +254,7 @@ if (!readme) {
   );
 
   // Install guidance for the documented client surfaces
-  const installSurfaces = [
-    'Claude Desktop',
-    'Claude Code',
-    'Other stdio MCP clients',
-    'JSON config example for stdio clients',
-  ];
-  const foundInstallSurfaces = installSurfaces.filter((surface) => readme.includes(surface));
+  const foundInstallSurfaces = findDocumentedInstallSurfaces(readme);
   check(
     foundInstallSurfaces.length >= 4,
     `Install guidance for documented client surfaces`,
@@ -295,19 +315,16 @@ console.log(`\n${bold('Security')}`);
 
 // npm audit — no high/critical vulnerabilities
 try {
-  const { execSync } = await import('node:child_process');
   const auditOutput = execSync('npm audit --json 2>/dev/null', { encoding: 'utf-8', timeout: 30000 });
   const audit = JSON.parse(auditOutput);
-  const high = audit?.metadata?.vulnerabilities?.high ?? 0;
-  const critical = audit?.metadata?.vulnerabilities?.critical ?? 0;
-  check(high === 0 && critical === 0, 'No high/critical npm vulnerabilities', `high: ${high}, critical: ${critical}`);
+  const { high, critical } = getAuditSeverityCounts(audit);
+  check(!hasBlockingAuditVulnerabilities(audit), 'No high/critical npm vulnerabilities', `high: ${high}, critical: ${critical}`);
 } catch (e) {
   // npm audit exits non-zero when vulnerabilities found
   try {
     const parsed = JSON.parse(e.stdout || '{}');
-    const high = parsed?.metadata?.vulnerabilities?.high ?? 0;
-    const critical = parsed?.metadata?.vulnerabilities?.critical ?? 0;
-    check(high === 0 && critical === 0, 'No high/critical npm vulnerabilities', `high: ${high}, critical: ${critical}`);
+    const { high, critical } = getAuditSeverityCounts(parsed);
+    check(!hasBlockingAuditVulnerabilities(parsed), 'No high/critical npm vulnerabilities', `high: ${high}, critical: ${critical}`);
   } catch {
     check(true, 'npm audit (skipped — could not parse output)');
   }
@@ -402,4 +419,9 @@ if (failed > 0) {
 } else {
   console.log(`${green('All checks passed!')} Ready to release.\n`);
   process.exit(0);
+}
+}
+
+if (pathToFileURL(process.argv[1] || '').href === import.meta.url) {
+  main();
 }
