@@ -1,0 +1,38 @@
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import { describe, expect, it } from "vitest";
+
+const repoRoot = process.cwd();
+const readmes = [
+  "README.md",
+  "README.ru.md",
+  "README.ja.md",
+  "README.zh-CN.md",
+  "README.es.md",
+] as const;
+
+function read(name: string): string {
+  return readFileSync(path.join(repoRoot, name), "utf8");
+}
+
+function expectInstallHookDemoContract(text: string) {
+  expect(text).toContain("npm run demo:install-hook");
+  expect(text).toContain("code-impact-mcp install-hook");
+  expect(text).toMatch(/dry-run/i);
+  expect(text).toContain(".husky/pre-commit");
+  expect(text).toMatch(/snippet|fragment|фрагмент|片段/iu);
+  expect(text).toMatch(/Husky/);
+
+  expect(text).not.toContain("Initialized Husky");
+  expect(text).not.toContain("Bootstrapping Husky");
+  expect(text).not.toContain("create .husky for you");
+  expect(text).not.toContain("modifies .husky automatically");
+}
+
+describe("README install-hook demo wording", () => {
+  for (const readme of readmes) {
+    it(`${readme} keeps the current install-hook demo contract`, () => {
+      expectInstallHookDemoContract(read(readme));
+    });
+  }
+});
