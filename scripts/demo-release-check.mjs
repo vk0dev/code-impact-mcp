@@ -7,10 +7,11 @@ const GREEN = '\x1b[32m';
 const CYAN = '\x1b[36m';
 const BOLD = '\x1b[1m';
 const RESET = '\x1b[0m';
+const isInteractiveDemo = Boolean(process.stdout.isTTY && process.stdin.isTTY);
 
 const out = async (line = '', ms = 420) => {
   process.stdout.write(`${line}\n`);
-  await sleep(ms);
+  await sleep(isInteractiveDemo ? ms : Math.min(25, Math.max(0, Math.round(ms / 40))));
 };
 
 async function main() {
