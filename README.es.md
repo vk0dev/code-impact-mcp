@@ -77,7 +77,7 @@ Después de guardar `claude_desktop_config.json`, reinicia por completo Claude D
 
 Usa un launch directory específico de workspace o proyecto para que el server pueda leer el repository que realmente quieres analizar.
 
-Nota de release actual: v1.6.4 refuerza el `release-check` repo-local contra el documented install-surface contract y añade regression coverage para que release QA siga alineado con las rutas shipped de Claude Code y stdio simple.
+Nota de release actual: v1.6.7 acorta las pausas human-paced en los live demo scripts para que las superficies existentes de prueba README/demo sean más rápidas de verificar sin cambiar la capacidad central del producto.
 
 ## Tutorials
 

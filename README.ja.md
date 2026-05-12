@@ -77,7 +77,7 @@ MCP client が shell wrapper ではなく JSON を要求する場合、Claude De
 
 分析したい repository を読めるよう、workspace 単位または project 単位の launch directory を使ってください。
 
-最新の release note: v1.6.4 では、repo-local `release-check` を documented install-surface contract に対して強化し、release QA が shipped な Claude Code と plain stdio の経路に沿ったまま戻り崩れしないよう regression coverage を追加しました。
+最新の release note: v1.6.7 では、live demo scripts の human-paced な待ち時間を短くし、既存の README/demo proof surface を core product capability を変えずにより速く検証できるようにしました。
 
 ## Tutorials
 
