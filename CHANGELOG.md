@@ -1,4 +1,9 @@
 
+## [1.6.7] — 2026-05-12
+
+### Fixed
+- Shortened human-paced delays in the live demo scripts during non-interactive runs so full-suite verification no longer times out the install-hook and release-check demo asset tests while keeping the interactive recording output unchanged.
+
 ## [1.6.6] — 2026-05-09
 
 ### Fixed
