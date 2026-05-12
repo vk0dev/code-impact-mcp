@@ -25,7 +25,7 @@ describe('README comparison table contract', () => {
     expect(text).toContain('| **CodeGraphContext** | Broader local code graph and context platform with dual CLI + MCP entrypoints |');
     expect(text).toContain('| **MCP Hive style marketplace follow-up** | Manual marketplace/discovery submission after the repo truth is already stable |');
 
-    expect(text).toContain('Better when you want a fast local PASS/WARN/BLOCK gate for known file changes, not a broader graph/context platform');
+    expect(text).toContain('Better when you want a fast local PASS/WARN/BLOCK gate with bounded blast-radius triage for known file changes, not a broader graph/context workflow');
     expect(text).toContain('Choose CodeImpact MCP when:');
     expect(text).toContain('Choose one of the alternatives when:');
 
