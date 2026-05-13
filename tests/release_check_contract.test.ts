@@ -1,10 +1,13 @@
-import { execFileSync } from "node:child_process";
+import { execFile } from "node:child_process";
 import { readFileSync } from "node:fs";
 import path from "node:path";
+import { promisify } from "node:util";
 import { describe, expect, it } from "vitest";
 
-function ensureBuildOutput() {
-  execFileSync("npm", ["run", "build"], {
+const execFileAsync = promisify(execFile);
+
+async function ensureBuildOutput() {
+  await execFileAsync("npm", ["run", "build"], {
     cwd: process.cwd(),
     stdio: "pipe",
     encoding: "utf8",
@@ -87,16 +90,16 @@ describe("release-check contract", () => {
 
   it(
     "stays green on the current repo head after a normal build",
-    () => {
-      ensureBuildOutput();
+    async () => {
+      await ensureBuildOutput();
 
-      expect(() =>
-        execFileSync(process.execPath, ["scripts/release-check.mjs"], {
+      await expect(
+        execFileAsync(process.execPath, ["scripts/release-check.mjs"], {
           cwd: process.cwd(),
           stdio: "pipe",
           encoding: "utf8",
         }),
-      ).not.toThrow();
+      ).resolves.toBeDefined();
     },
     30000,
   );

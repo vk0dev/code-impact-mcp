@@ -114,7 +114,8 @@ export function buildGraph(projectRoot: string, tsconfigPath?: string, options?:
     project = new Project({
       tsConfigFilePath: resolvedTsconfig,
       skipAddingFilesFromTsConfig: !tsconfigPath,
-      skipFileDependencyResolution: false,
+      skipFileDependencyResolution: true,
+      skipLoadingLibFiles: true,
     });
   } catch (error) {
     if (resolvedTsconfig) {

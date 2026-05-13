@@ -1,12 +1,14 @@
 import { existsSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
-import { execFileSync } from "node:child_process";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
 import { describe, expect, it } from "vitest";
 
 const repoRoot = process.cwd();
 const castPath = path.join(repoRoot, "docs", "demo-install-hook.cast");
 const gifPath = path.join(repoRoot, "docs", "demo-install-hook.gif");
 const scriptPath = path.join(repoRoot, "scripts", "demo-install-hook.mjs");
+const execFileAsync = promisify(execFile);
 
 function read(pathname: string): string {
   return readFileSync(pathname, "utf8");
@@ -33,11 +35,13 @@ describe("install-hook demo asset contract", () => {
     expect(cast).not.toContain("Bootstrapping Husky");
   });
 
-  it("live demo script still shows refusal-first helper behavior", () => {
-    const output = execFileSync("node", [scriptPath], {
+  it("live demo script still shows refusal-first helper behavior", async () => {
+    const { stdout } = await execFileAsync("node", [scriptPath], {
       cwd: repoRoot,
       encoding: "utf8",
     });
+
+    const output = stdout;
 
     expect(output).toContain("Refusing to overwrite existing pre-commit hook");
     expect(output).toContain("Suggested snippet:");
