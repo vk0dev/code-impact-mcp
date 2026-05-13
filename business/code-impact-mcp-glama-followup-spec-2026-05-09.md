@@ -15,9 +15,9 @@
 Refresh stale Glama follow-up surfaces so they no longer imply that the next step is creating a first live Glama listing. The truthful next step is narrower: sync docs and proof surfaces to the live URL while keeping badge-ready / stable-badge claims unresolved.
 
 ## Coder scope
-Update only stale docs/business artifacts that still say any of the following:
-- no verified live Glama listing exists today
-- Glama still needs a real manual listing plus badge
+Update only stale docs/business artifacts that still say any of the following kinds of outdated claims:
+- Glama has not gone live yet
+- Glama still requires first-time listing creation before any badge follow-up can begin
 - the next step is first-time Glama submission before any live URL exists
 
 ## Required wording boundary
