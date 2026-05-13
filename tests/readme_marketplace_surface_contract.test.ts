@@ -30,10 +30,22 @@ function expectMarketplaceContract(text: string) {
   expect(text).not.toContain("MCP Hive verified-live");
 }
 
+function expectRootReadmeGlamaBoundary(text: string) {
+  expect(text).toContain("Glama recovery is visible in factory metrics");
+  expect(text).toContain("public canonical badge-ready path is still unresolved");
+  expect(text).toContain("cannot yet be finalized with a stable badge URL");
+  expect(text).toContain("punkpeye/awesome-mcp-servers#5907");
+  expect(text).not.toContain("Glama still needs a real manual listing plus badge");
+}
+
 describe("README marketplace/distribution surface", () => {
   for (const readme of readmes) {
     it(`${readme} keeps the current truthful marketplace wording`, () => {
-      expectMarketplaceContract(read(readme));
+      const text = read(readme);
+      expectMarketplaceContract(text);
+      if (readme === "README.md") {
+        expectRootReadmeGlamaBoundary(text);
+      }
     });
   }
 });
