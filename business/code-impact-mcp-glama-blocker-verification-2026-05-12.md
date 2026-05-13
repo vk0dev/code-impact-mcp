@@ -26,17 +26,16 @@ Verdict: `READY_FOR_OPERATOR_ACTION`
 ## Findings
 
 ### 1) Is there a real live Glama product page for code-impact-mcp right now?
-No verified live Glama product page was found in this bounded pass.
+Yes. The Glama listing is live again at `https://glama.ai/mcp/servers/vk0dev-code-impact-mcp`.
 
 Evidence:
-- `https://glama.ai/mcp/servers/vk0dev/code-impact-mcp` returned `404 Not Found`.
-- `https://glama.ai/mcp/servers/io.github.vk0dev/code-impact-mcp` returned `404 Not Found`.
-- `https://glama.ai/mcp/servers/vk0dev-code-impact-mcp` did not resolve to a product page; it redirected to a generic query surface (`/mcp/servers?query=author%3Avk0dev-code-impact-mcp`) that only exposed aggregate directory chrome, not a listing.
-- `https://glama.ai/api/mcp/v1/servers?query=code-impact-mcp` returned generic search results in the checked slice, but no exact `code-impact-mcp` hit or canonical `vk0dev/code-impact-mcp` listing URL.
+- Older candidate paths such as `https://glama.ai/mcp/servers/vk0dev/code-impact-mcp` and `https://glama.ai/mcp/servers/io.github.vk0dev/code-impact-mcp` were historical dead ends and should no longer be treated as the canonical target.
+- Current accepted repo truth and latest follow-up docs now align on the live canonical listing URL `https://glama.ai/mcp/servers/vk0dev-code-impact-mcp`.
+- What remains unresolved is not live-listing existence, but whether Glama exposes a stable badge-ready / canonical badge path suitable for PR proof.
 
 Conclusion:
-- There is no public proof in this pass that a real live Glama listing exists for `code-impact-mcp`.
-- Therefore there is no canonical Glama URL to add as a verified badge target yet.
+- Public proof now supports a real live Glama listing for `code-impact-mcp`.
+- Public proof still does not establish a stable canonical badge URL to add as a verified badge target yet.
 
 ### 2) What exact blocker is preventing PR #5907 from moving?
 The current blocker is explicitly stated in the PR thread by the Glama check bot.
@@ -85,4 +84,4 @@ Why:
 
 ## Recommendation
 
-Stop looking for repo churn here. The live blocker is external and specific: no verified Glama listing exists yet, while PR `punkpeye/awesome-mcp-servers#5907` explicitly requires a Glama listing plus badge. The next bounded action is vk-side manual Glama submission. If that succeeds, the follow-up is a PR comment/update with the canonical Glama URL and badge. If that fails with a named metadata issue, only then reopen a coder task with exact file targets.
+Stop looking for repo churn here. The live blocker is now narrower and external: the Glama listing exists, but PR `punkpeye/awesome-mcp-servers#5907` still needs stable badge-ready / canonical badge proof before it can be advanced. The next bounded action is vk-side verification of a stable canonical badge URL for the already-live listing, then a PR comment/update on the already-existing PR rather than any duplicate PR. If that follow-up exposes a named metadata issue or one exact insertion target, only then reopen a coder task with exact file targets.
