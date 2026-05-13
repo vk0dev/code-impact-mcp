@@ -49,8 +49,9 @@ Quoted expectation from `https://github.com/punkpeye/awesome-mcp-servers/pull/59
 > `[![OWNER/REPO MCP server](https://glama.ai/mcp/servers/OWNER/REPO/badges/score.svg)](https://glama.ai/mcp/servers/OWNER/REPO)`
 
 Interpretation:
-- The PR is blocked not by README wording or repo metadata drift, but by the still-unresolved Glama badge-ready / canonical badge path.
-- The Glama listing is live again, but that alone does not satisfy the current maintainer/operator expectation for PR follow-up.
+- The first sentence in the bot comment is now historical context, not the current next step for this repo, because the live listing already exists at `https://glama.ai/mcp/servers/vk0dev-code-impact-mcp`.
+- The PR is blocked not by README wording or repo metadata drift, and not by absence of a live listing, but by the still-unresolved Glama badge-ready / canonical badge path.
+- The already-open PR `#5907` must be updated if badge proof becomes stable; do **not** open a duplicate PR.
 
 ### 3) Is any repo-side patch actually justified now?
 No repo-side patch is justified now.
@@ -67,8 +68,9 @@ Conclusion:
 ### 4) What is the smallest next operator action?
 The smallest next operator action is:
 
-1. Re-check whether Glama now exposes a stable canonical badge URL for `vk0dev/code-impact-mcp` at `https://glama.ai/mcp/servers/vk0dev-code-impact-mcp`.
-2. If that stable badge path is publicly proven, update the already-existing PR `#5907` rather than opening a duplicate PR.
+1. Re-check whether Glama now exposes a stable canonical badge URL for the already-live listing at `https://glama.ai/mcp/servers/vk0dev-code-impact-mcp`.
+2. If that stable badge path is publicly proven, update the already-existing PR `#5907`.
+3. Do **not** create a duplicate PR and do **not** treat manual listing creation as the next step, because the listing is already live.
 
 This is smaller and more truthful than a repo patch, because the current blocker is badge-proof maturity of the external artifact, not absence of the listing itself.
 
@@ -84,4 +86,4 @@ Why:
 
 ## Recommendation
 
-Stop looking for repo churn here. The live blocker is now narrower and external: the Glama listing exists, but PR `punkpeye/awesome-mcp-servers#5907` still needs stable badge-ready / canonical badge proof before it can be advanced. The next bounded action is vk-side verification of a stable canonical badge URL for the already-live listing, then a PR comment/update on the already-existing PR rather than any duplicate PR. If that follow-up exposes a named metadata issue or one exact insertion target, only then reopen a coder task with exact file targets.
+Stop looking for repo churn here. The live blocker is now narrower and external: the Glama listing exists at `https://glama.ai/mcp/servers/vk0dev-code-impact-mcp`, but PR `punkpeye/awesome-mcp-servers#5907` still needs stable badge-ready / canonical badge proof before it can be advanced. The next bounded action is vk-side verification of a stable canonical badge URL for the already-live listing, then a PR comment/update on the already-existing PR. Do **not** open a duplicate PR, and do **not** treat manual listing creation as the next step. If that follow-up exposes a named metadata issue or one exact insertion target, only then reopen a coder task with exact file targets.
