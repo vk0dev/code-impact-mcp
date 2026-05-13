@@ -8,7 +8,7 @@
 
 [English](./README.md) | [日本語](./README.ja.md) | [Русский](./README.ru.md) | [Español](./README.es.md)
 
-> Listing status：`awesome-mcp-servers` 的提交内容已经准备好，Official MCP Registry 的 package metadata 已经通过 `server.json` 处于 live 状态，Glama 在 external PR lane 继续推进前仍然需要真实 listing，而 MCP Hive 目前只是 manual submit-next 的 operator step，不是当前已声明 live 的 listing。这个 README 目前还不会声称任何新的 third-party listing 已经 verified-live。
+> Listing status：`awesome-mcp-servers` 的提交内容已经准备好，Official MCP Registry 的 package metadata 已经通过 `server.json` 处于 live 状态，Glama listing 也已在 [`https://glama.ai/mcp/servers/vk0dev-code-impact-mcp`](https://glama.ai/mcp/servers/vk0dev-code-impact-mcp) 恢复为 live。PR [`punkpeye/awesome-mcp-servers#5907`](https://github.com/punkpeye/awesome-mcp-servers/pull/5907) 已经存在，不应重复提交；MCP Hive 目前仍然只是 manual submit-next 的 operator step，不是当前已声明 live 的 listing。这个 README 不会声称 Glama 已经 badge-ready，也不会声称 awesome-listing 已经最终完成。
 
 ## Best for
 

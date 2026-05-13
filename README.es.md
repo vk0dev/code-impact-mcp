@@ -8,7 +8,7 @@
 
 [日本語](./README.ja.md) | [中文](./README.zh-CN.md) | [Русский](./README.ru.md) | [English](./README.md)
 
-> Estado de listados: el payload para `awesome-mcp-servers` ya está preparado, los metadatos del paquete para Official MCP Registry ya están activos vía `server.json`, Glama todavía necesita un listado manual real y el badge correspondiente antes de que pueda avanzar el carril del PR externo ya abierto (`punkpeye/awesome-mcp-servers#5907`), y MCP Hive sigue siendo un siguiente paso manual de envío por parte del operador, no un listado activo ya verificado. Este README no afirma que ningún nuevo listado de terceros esté activo salvo que ya esté verificado.
+> Estado de listados: el payload para `awesome-mcp-servers` ya está preparado, los metadatos del paquete para Official MCP Registry ya están activos vía `server.json`, y el listado de Glama vuelve a estar activo en [`https://glama.ai/mcp/servers/vk0dev-code-impact-mcp`](https://glama.ai/mcp/servers/vk0dev-code-impact-mcp). El PR [`punkpeye/awesome-mcp-servers#5907`](https://github.com/punkpeye/awesome-mcp-servers/pull/5907) ya existe y no debe duplicarse, mientras que MCP Hive sigue siendo un siguiente paso manual de envío por parte del operador, no un listado activo ya verificado. Este README no afirma que Glama ya esté badge-ready ni que el awesome-listing ya esté finalizado.
 
 ## Best for
 

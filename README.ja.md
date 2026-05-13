@@ -8,7 +8,7 @@
 
 [English](./README.md) | [中文](./README.zh-CN.md) | [Русский](./README.ru.md) | [Español](./README.es.md)
 
-> Listing status: `awesome-mcp-servers` 向けの payload は準備済みで、Official MCP Registry 向け package metadata は `server.json` 経由ですでに live、Glama は external PR lane を進める前に実在する listing がまだ必要で、MCP Hive は現在 live と主張している listing ではなく manual submit-next の operator step です。この README では新しい third-party listing が verified-live だとはまだ主張しません。
+> Listing status: `awesome-mcp-servers` 向けの payload は準備済みで、Official MCP Registry 向け package metadata は `server.json` 経由ですでに live、Glama の listing も [`https://glama.ai/mcp/servers/vk0dev-code-impact-mcp`](https://glama.ai/mcp/servers/vk0dev-code-impact-mcp) で再び live です。PR [`punkpeye/awesome-mcp-servers#5907`](https://github.com/punkpeye/awesome-mcp-servers/pull/5907) はすでに存在するため重複させるべきではなく、MCP Hive は現在 live と主張している listing ではなく manual submit-next の operator step のままです。この README では、Glama がすでに badge-ready であるとか、awesome-listing が最終確定したとは主張しません。
 
 ## Best for
 

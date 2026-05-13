@@ -8,7 +8,7 @@
 
 [日本語](./README.ja.md) | [中文](./README.zh-CN.md) | [English](./README.md) | [Español](./README.es.md)
 
-> Статус листингов: payload для `awesome-mcp-servers` подготовлен, metadata пакета для Official MCP Registry уже live через `server.json`, для Glama по-прежнему нужен реальный listing, прежде чем внешний PR lane сможет сдвинуться дальше, а MCP Hive остаётся manual submit-next operator step, а не текущим claimed live listing. Этот README не утверждает, что какой-либо новый third-party listing уже verified-live.
+> Статус листингов: payload для `awesome-mcp-servers` подготовлен, metadata пакета для Official MCP Registry уже live через `server.json`, а листинг Glama снова live по адресу [`https://glama.ai/mcp/servers/vk0dev-code-impact-mcp`](https://glama.ai/mcp/servers/vk0dev-code-impact-mcp). PR [`punkpeye/awesome-mcp-servers#5907`](https://github.com/punkpeye/awesome-mcp-servers/pull/5907) уже существует и не должен дублироваться, а MCP Hive остаётся manual submit-next operator step, а не текущим claimed live listing. Этот README не утверждает, что Glama уже badge-ready или что awesome-listing уже финализирован.
 
 ## Best for
 
