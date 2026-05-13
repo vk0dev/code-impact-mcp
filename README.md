@@ -8,7 +8,7 @@
 
 [日本語](./README.ja.md) | [中文](./README.zh-CN.md) | [Русский](./README.ru.md) | [Español](./README.es.md)
 
-> Listing status: the `awesome-mcp-servers` payload is prepared, Official MCP Registry package metadata is live via `server.json`, Glama recovery is visible in factory metrics but the public canonical badge-ready path is still unresolved, so the already-open external PR lane (`punkpeye/awesome-mcp-servers#5907`) cannot yet be finalized with a stable badge URL, and MCP Hive is a manual submit-next operator step, not a currently claimed live listing. This README does not claim any new third-party listing as live unless it is already verified.
+> Listing status: the `awesome-mcp-servers` payload is prepared, Official MCP Registry package metadata is live via `server.json`, Glama recovery is visible in factory metrics but the public canonical badge-ready path is still unresolved, PR [`punkpeye/awesome-mcp-servers#5907`](https://github.com/punkpeye/awesome-mcp-servers/pull/5907) already exists and should not be duplicated, and the current blocker is the maintainer request for a real Glama listing plus badge before re-check, so that PR cannot yet be finalized with a stable badge URL. This README does not claim a Glama badge-ready or verified-live listing yet, and MCP Hive remains a manual submit-next operator step rather than a currently claimed live listing.
 
 ## Best for
 
