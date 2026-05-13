@@ -29,3 +29,4 @@ Dependency graph and blast-radius analysis for agent-driven code changes. Predic
 - Analyzes TS/JS projects by parsing import/export relationships with ts-morph
 - Graph is cached per (projectRoot, tsconfigPath) pair
 - Local-first, zero network egress
+- Verification note: `npm test` exits cleanly on a clean/stashed tree. If tracked runtime/test files like `src/graph.ts` or `tests/graph.test.ts` are left dirty from another lane, isolate them with `git stash` before QA so you do not misread a dirty-worktree timeout/regression as a repo-wide vitest exit bug.
