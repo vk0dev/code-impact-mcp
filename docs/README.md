@@ -64,7 +64,7 @@ Good fit:
 - fast blast-radius triage with a gate verdict
 - monorepo-aware checks on the shipped TS/JS graph surface
 
-See the root [README gate_check example](../README.md) and the shipped [gate_check demo GIF](./demo-gate-check.gif).
+See the root [README gate_check example](../README.md), the shipped [gate_check demo GIF](./demo-gate-check.gif), and the focused [gate_check threshold recipe](./gate-check-threshold-recipe.md).
 
 ### `analyze_impact`
 
@@ -76,6 +76,13 @@ Good fit:
 - using the bounded Python path on `.py` changes without claiming full graph parity
 
 See the root [README analyze_impact example](../README.md) and the shipped [blast-radius demo GIF](./demo-blast-radius.gif).
+
+## Quick recipes index
+
+- [Pre-commit gate recipe](./pre-commit-gate-recipe.md)
+- [gate_check threshold recipe](./gate-check-threshold-recipe.md)
+- [How to read analyze_impact output](./read-analyze-impact-output.md)
+- [Claude Desktop quickstart](./quickstart-claude-desktop.md)
 
 ## What this page does not replace
 
