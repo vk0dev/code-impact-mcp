@@ -8,7 +8,7 @@
 
 [日本語](./README.ja.md) | [中文](./README.zh-CN.md) | [Русский](./README.ru.md) | [Español](./README.es.md)
 
-> Listing status: the `awesome-mcp-servers` payload is prepared, Official MCP Registry package metadata is live via `server.json`, and the Glama listing is live again at [`https://glama.ai/mcp/servers/vk0dev-code-impact-mcp`](https://glama.ai/mcp/servers/vk0dev-code-impact-mcp). PR [`punkpeye/awesome-mcp-servers#5907`](https://github.com/punkpeye/awesome-mcp-servers/pull/5907) already exists and should not be duplicated, while MCP Hive remains a manual submit-next operator step rather than a currently claimed live listing.
+> Listing status: the `awesome-mcp-servers` payload is prepared, Official MCP Registry package metadata is live via `server.json`, and the Glama listing is live again at [`https://glama.ai/mcp/servers/vk0dev-code-impact-mcp`](https://glama.ai/mcp/servers/vk0dev-code-impact-mcp). Glama recovery is visible in factory metrics, but the public canonical badge-ready path is still unresolved, so PR [`punkpeye/awesome-mcp-servers#5907`](https://github.com/punkpeye/awesome-mcp-servers/pull/5907) already exists, should not be duplicated, and cannot yet be finalized with a stable badge URL. MCP Hive remains a manual submit-next operator step rather than a currently claimed live listing, and this README does not claim a badge-ready or finalized awesome-listing state.
 
 ## Best for
 
