@@ -6,12 +6,12 @@
     "url": "https://github.com/vk0dev/code-impact-mcp",
     "source": "github"
   },
-  "version": "1.6.7",
+  "version": "1.6.8",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "@vk0/code-impact-mcp",
-      "version": "1.6.7",
+      "version": "1.6.8",
       "transport": {
         "type": "stdio"
       }

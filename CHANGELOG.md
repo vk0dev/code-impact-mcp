@@ -1,4 +1,10 @@
 
+## [1.6.8] — 2026-06-06
+
+### Fixed
+- Upgraded `vitest` to `4.1.8` so release QA no longer blocks on critical advisory `GHSA-5xrq-8626-4rwp` during the npm audit gate.
+- Fixed no-tsconfig source discovery so `.mts/.cts/.mjs/.cjs` files in supported source directories are included in the dependency graph fallback scan instead of being silently skipped.
+
 ## [1.6.7] — 2026-05-12
 
 ### Fixed
