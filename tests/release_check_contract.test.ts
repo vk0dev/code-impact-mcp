@@ -101,6 +101,7 @@ describe("release-check contract", () => {
         }),
       ).resolves.toBeDefined();
     },
-    30000,
+    // Build + release-check can exceed 30s on slower CI/harness runs.
+    45000,
   );
 });

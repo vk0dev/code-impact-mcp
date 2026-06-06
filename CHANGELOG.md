@@ -1,4 +1,10 @@
 
+## [1.6.9] — 2026-06-06
+
+### Fixed
+- Released the already-landed workflow node-floor alignment so the publish lane now runs on the same supported Node floor as CI instead of the older floating Node 20 setup that broke the Vitest 4/Rolldown stack on GitHub Actions.
+- Raised the bounded release-check demo and contract test timeouts so full-suite verification stays green on slower runners now that the release QA path performs a real build plus release-check pass.
+
 ## [1.6.8] — 2026-06-06
 
 ### Fixed

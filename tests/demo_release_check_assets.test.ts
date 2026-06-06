@@ -36,7 +36,8 @@ describe("release-check demo asset contract", () => {
       expect(output).toContain("Ready to release.");
       expect(output).not.toContain("Release checklist has failures.");
     },
-    30000,
+    // The demo script includes a real build + release-check pass.
+    45000,
   );
 
   it("tracked cast still references the same bounded release QA proof story", () => {

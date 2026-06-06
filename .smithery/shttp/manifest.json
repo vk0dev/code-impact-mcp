@@ -6,7 +6,7 @@
     "serverCard": {
       "serverInfo": {
         "name": "code-impact-mcp",
-        "version": "1.6.8",
+        "version": "1.6.9",
         "description": "Lightweight pre-commit safety gate for AI agents. Answers 'is this change safe?' with PASS/WARN/BLOCK verdict in seconds. Zero setup, no database."
       },
       "tools": [
