@@ -6,7 +6,7 @@
 
 import { Project, SyntaxKind, type SourceFile } from "ts-morph";
 import { dirname, extname, isAbsolute, join, normalize, relative, resolve } from "node:path";
-import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
+import { Dirent, existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { buildPythonGraph } from "./pythonGraph.js";
 
 export class GraphBuildError extends Error {
@@ -75,14 +75,6 @@ export interface WorkspacePackage {
 }
 
 const SOURCE_DIRS = ["src", "app", "components", "lib", "hooks", "stores", "utils", "pages", "tests", "scripts"];
-const SOURCE_GLOBS = [
-  ...SOURCE_DIRS.flatMap((dir) => [`${dir}/**/*.ts`, `${dir}/**/*.tsx`, `${dir}/**/*.js`, `${dir}/**/*.jsx`]),
-  "*.ts",
-  "*.tsx",
-  "*.js",
-  "*.jsx",
-];
-
 const RESOLVE_EXTENSIONS = [".ts", ".tsx", ".js", ".jsx", ".mts", ".cts", ".mjs", ".cjs"];
 const INDEX_CANDIDATES = RESOLVE_EXTENSIONS.map((ext) => `/index${ext}`);
 const SOURCE_EXTENSION_ALIASES: Record<string, string[]> = {
@@ -126,8 +118,9 @@ export function buildGraph(projectRoot: string, tsconfigPath?: string, options?:
   }
 
   if (!tsconfigPath) {
-    for (const pattern of SOURCE_GLOBS) {
-      project.addSourceFilesAtPaths(join(root, pattern));
+    const sourceFiles = collectSourceFiles(root);
+    if (sourceFiles.length > 0) {
+      project.addSourceFilesAtPaths(sourceFiles);
     }
   }
 
@@ -309,6 +302,45 @@ export function summarizeCycles(cycles: string[][], maxExamples = 3): CycleDiagn
     hotspots,
     examples,
   };
+}
+
+function collectSourceFiles(projectRoot: string): string[] {
+  const seen = new Set<string>();
+  const files: string[] = [];
+
+  const maybeAdd = (absolutePath: string) => {
+    const rel = normalizePath(relative(projectRoot, absolutePath));
+    if (rel.startsWith("..") || rel === "") return;
+    if (!RESOLVE_EXTENSIONS.includes(extname(absolutePath) as any)) return;
+    if (!seen.has(absolutePath)) {
+      seen.add(absolutePath);
+      files.push(absolutePath);
+    }
+  };
+
+  const walkDir = (dirPath: string) => {
+    if (!existsSync(dirPath) || !statSync(dirPath).isDirectory()) return;
+    for (const entry of readdirSync(dirPath, { withFileTypes: true }) as Dirent[]) {
+      const absolutePath = join(dirPath, entry.name);
+      if (entry.isDirectory()) {
+        walkDir(absolutePath);
+      } else if (entry.isFile()) {
+        maybeAdd(absolutePath);
+      }
+    }
+  };
+
+  for (const dir of SOURCE_DIRS) {
+    walkDir(join(projectRoot, dir));
+  }
+
+  for (const entry of readdirSync(projectRoot, { withFileTypes: true }) as Dirent[]) {
+    if (entry.isFile()) {
+      maybeAdd(join(projectRoot, entry.name));
+    }
+  }
+
+  return files.sort((a, b) => a.localeCompare(b));
 }
 
 function collectModuleReferences(sourceFile: SourceFile): Array<{ specifier: string; kind: GraphEdgeKind }> {
