@@ -3,6 +3,7 @@ name: Publish to npm
 on:
   push:
     tags: ["v*"]
+  workflow_dispatch:
 
 jobs:
   publish:
@@ -13,12 +14,15 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Use Node.js 20.19.0
+      - name: Use Node.js 22.14.0
         uses: actions/setup-node@v6
         with:
-          node-version: "20.19.0"
+          node-version: "22.14.0"
           registry-url: "https://registry.npmjs.org"
           cache: "npm"
+
+      - name: Read package version
+        run: echo "PACKAGE_VERSION=$(node -p \"require('./package.json').version\")" >> "$GITHUB_ENV"
 
       - name: Install dependencies
         run: npm ci
@@ -35,12 +39,18 @@ jobs:
       - name: MCP client smoke test
         run: npm run smoke
 
-      - name: Publish to npm with provenance
+      - name: Publish to npm with provenance via token
+        if: ${{ secrets.NPM_TOKEN != '' }}
         run: npm publish --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+      - name: Publish to npm with trusted publishing
+        if: ${{ secrets.NPM_TOKEN == '' }}
+        run: npm publish --access public --provenance
+
       - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v3
         with:
           generate_release_notes: true
@@ -92,7 +102,7 @@ jobs:
       - name: Notify dashboard refresh
         if: success()
         run: |
-          PAYLOAD="{\"product\":\"${GITHUB_REPOSITORY##*/}\",\"version\":\"${GITHUB_REF_NAME}\"}"
+          PAYLOAD="{\"product\":\"${GITHUB_REPOSITORY##*/}\",\"version\":\"${PACKAGE_VERSION}\"}"
           SECRET="${{ secrets.DASHBOARD_REFRESH_SECRET }}"
           if [ -z "$SECRET" ]; then
             echo "::warning::DASHBOARD_REFRESH_SECRET not set — skipping notify"
