@@ -1,4 +1,11 @@
 
+## [1.6.10] — 2026-06-07
+
+### Fixed
+- Added a trusted npm publish fallback in the release workflow so a tag-triggered publish can still use a valid repo-level publish credential path when the primary auth route is unavailable.
+- Fixed the workflow secret fallback conditions so the publish lane no longer silently drops the npm auth path during reruns or alternate trigger contexts that still need the saved release secret.
+- Corrected package-version export quoting in the CI release path so workflow steps that derive the publish version from `package.json` keep the exact semantic version string instead of shell-mangling it.
+
 ## [1.6.9] — 2026-06-06
 
 ### Fixed
