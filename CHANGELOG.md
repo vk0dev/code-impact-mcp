@@ -1,4 +1,9 @@
 
+## [Unreleased]
+
+### Changed
+- Updated @types/node from 25.6.0 to 25.9.3, tsx from 4.21.0 to 4.22.4, and zod from 4.3.6 to 4.4.3 for better TypeScript compatibility and dependency hygiene.
+
 ## [1.6.10] — 2026-06-07
 
 ### Fixed
