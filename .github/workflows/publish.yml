@@ -42,14 +42,17 @@ jobs:
       - name: MCP client smoke test
         run: npm run smoke
 
+      # NB: the `secrets` context is not allowed in step `if:` expressions —
+      # GitHub rejects the whole workflow file (run #27, zero jobs). Gate the
+      # lanes on the job-level env mirror of the secret instead.
       - name: Publish to npm with provenance via token
-        if: ${{ secrets.NPM_TOKEN }}
+        if: ${{ env.NPM_TOKEN != '' }}
         run: npm publish --access public --provenance
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
 
       - name: Publish to npm with trusted publishing
-        if: ${{ !secrets.NPM_TOKEN }}
+        if: ${{ env.NPM_TOKEN == '' }}
         run: npm publish --access public --provenance
 
       - name: Create GitHub Release
