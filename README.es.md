@@ -77,7 +77,7 @@ Después de guardar `claude_desktop_config.json`, reinicia por completo Claude D
 
 Usa un launch directory específico de workspace o proyecto para que el server pueda leer el repository que realmente quieres analizar.
 
-Nota de release actual: v1.6.7 acorta las pausas human-paced en los live demo scripts para que las superficies existentes de prueba README/demo sean más rápidas de verificar sin cambiar la capacidad central del producto.
+Para conocer los últimos cambios, consulta [CHANGELOG.md](./CHANGELOG.md).
 
 ## Tutorials
 

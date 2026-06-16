@@ -84,7 +84,7 @@ It is a dry-run demo of the shipped helper, not a Husky scaffolder.
 
 Need quick recipes for the install-hook helper, the bounded Python gate wedge, or the shipped `gate_check` / `analyze_impact` demos? See [docs/README.md](./docs/README.md).
 
-Latest shipped release note: v1.6.7 shortens the human-paced delays in the live demo scripts so the existing README/demo proof surfaces stay faster to verify without changing the core product capability.
+For the latest changes, see [CHANGELOG.md](./CHANGELOG.md).
 
 ## Tutorials
 

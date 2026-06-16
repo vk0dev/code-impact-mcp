@@ -77,7 +77,7 @@ npx -y @vk0/code-impact-mcp
 
 请使用 workspace 或 project 级别的 launch directory，这样 server 才能读取你真正想分析的 repository。
 
-最新 release note：v1.6.7 缩短了 live demo scripts 里 human-paced 的等待时间，让现有 README/demo proof surface 在不改变核心产品能力的前提下更快完成验证。
+最新变更请参见 [CHANGELOG.md](./CHANGELOG.md)。
 
 ## Tutorials
 

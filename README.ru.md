@@ -77,7 +77,7 @@ npx -y @vk0/code-impact-mcp
 
 Используйте workspace- или project-specific launch directory, чтобы server мог читать именно тот repository, который вы хотите анализировать.
 
-Актуальная release note: v1.6.7 сокращает искусственные human-paced задержки в live demo scripts, чтобы существующие README/demo proof surface-ы было быстрее проверять без изменения core product capability.
+Последние изменения см. в [CHANGELOG.md](./CHANGELOG.md).
 
 ## Tutorials
 
