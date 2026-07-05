@@ -16,7 +16,11 @@ These tools are meant to help you decide whether to commit now, refactor first, 
     "src/index.ts"
   ],
   "riskScore": 0.57,
-  "totalAffected": 4
+  "totalAffected": 4,
+  "depthHistogram": {
+    "1": 2,
+    "2": 2
+  }
 }
 ```
 
@@ -47,6 +51,11 @@ It is a triage signal, not a guarantee about runtime behavior.
 Quick count of all direct + transitive dependents.
 
 Use this when you need a fast answer like, “Is this a 2-file change or a repo-shape change?”
+
+### `depthHistogram`
+Count of affected files per BFS depth level away from the changed file. Depth `1` is `directlyAffected`, depth `2` and beyond are further hops through `transitivelyAffected`.
+
+Use this to see the *shape* of the blast radius, not just its size: a change where impact is concentrated at depth 1 is easier to reason about than one with the same `totalAffected` spread across five depth levels.
 
 ## Example `gate_check` result
 
