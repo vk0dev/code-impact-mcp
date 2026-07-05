@@ -1,0 +1,36 @@
+name: Republish Official MCP Registry
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Git ref to publish server.json from (branch, tag, or SHA). Leave empty for default branch HEAD.
+        required: false
+        type: string
+
+jobs:
+  republish-official-registry:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref || github.ref_name }}
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v6
+        with:
+          node-version: "20"
+
+      - name: Install mcp-publisher
+        run: |
+          curl -L "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_$(uname -s | tr '[:upper:]' '[:lower:]')_$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/').tar.gz" | tar xz mcp-publisher
+          chmod +x ./mcp-publisher
+
+      - name: Authenticate to MCP Registry via GitHub OIDC
+        run: ./mcp-publisher login github-oidc
+
+      - name: Republish server.json to Official MCP Registry
+        run: ./mcp-publisher publish server.json
