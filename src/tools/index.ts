@@ -1,7 +1,7 @@
 import path from "node:path";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { GraphBuildError, buildGraph, analyzeImpact, detectCycles, detectWorkspacePackages, summarizeCycles, type DependencyGraph } from "../graph.js";
+import { GraphBuildError, buildGraph, analyzeImpact, detectCycles, detectWorkspacePackages, summarizeCycles, topHotFiles, type DependencyGraph } from "../graph.js";
 
 let cachedGraph: DependencyGraph | null = null;
 let cachedRoot: string | null = null;
@@ -240,6 +240,7 @@ export function registerTools(server: McpServer): void {
           riskScore: impact.riskScore,
           totalAffected,
           cascadeDepth: impact.cascadeChain.reduce((max, c) => Math.max(max, c.length), 0),
+          depthHistogram: impact.depthHistogram,
         };
       }),
   );
@@ -463,6 +464,7 @@ export function registerTools(server: McpServer): void {
           edges: graph.edgeCount,
           buildTimeMs: graph.buildTimeMs,
           circularDependencies: cycles.length,
+          topHotFiles: topHotFiles(graph),
           cycles: cycles.length > 0 ? cycles.slice(0, 5) : undefined,
         };
       }),

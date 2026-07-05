@@ -3,7 +3,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
-import { analyzeImpact, buildGraph, detectCycles, detectWorkspacePackages, summarizeCycles } from "../src/graph.js";
+import { analyzeImpact, buildGraph, detectCycles, detectWorkspacePackages, summarizeCycles, topHotFiles } from "../src/graph.js";
 
 function withTempProject(files: Record<string, string>, run: (root: string) => void) {
   const root = mkdtempSync(join(tmpdir(), "code-impact-graph-"));
@@ -168,6 +168,38 @@ describe("graph queries", () => {
       },
     );
   }, 15000);
+
+  it("ranks files by importer count via topHotFiles", () => {
+    withTempProject(
+      {
+        "src/hot.ts": "export const hot = 1;\n",
+        "src/a.ts": "import { hot } from './hot'; export const a = hot;\n",
+        "src/b.ts": "import { hot } from './hot'; export const b = hot;\n",
+        "src/c.ts": "import { a } from './a'; export const c = a;\n",
+      },
+      (root) => {
+        const graph = buildGraph(root);
+        const hot = topHotFiles(graph);
+        expect(hot[0]).toEqual({ file: "src/hot.ts", importers: 2 });
+        expect(topHotFiles(graph, 1)).toHaveLength(1);
+      },
+    );
+  });
+
+  it("buckets affected files per BFS depth in depthHistogram", () => {
+    withTempProject(
+      {
+        "src/a.ts": "export const a = 1;\n",
+        "src/b.ts": "import { a } from './a'; export const b = a;\n",
+        "src/c.ts": "import { b } from './b'; export const c = b;\n",
+      },
+      (root) => {
+        const graph = buildGraph(root);
+        const impact = analyzeImpact(graph, "src/a.ts");
+        expect(impact.depthHistogram).toEqual({ 1: 1, 2: 1 });
+      },
+    );
+  });
 
   it("detects workspace package roots from pnpm-workspace.yaml", () => {
     withTempProject(

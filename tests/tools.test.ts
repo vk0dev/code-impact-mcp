@@ -119,6 +119,26 @@ describe("registerTools", { timeout: 15000 }, () => {
     );
   });
 
+  it("exposes depthHistogram in analyze_impact output", async () => {
+    await withTempProject(
+      {
+        "src/core.ts": "export const core = 1;\n",
+        "src/service.ts": "import { core } from './core'; export const service = core;\n",
+        "src/feature.ts": "import { service } from './service'; export const feature = service;\n",
+      },
+      async (root) => {
+        const server = new FakeServer();
+        registerTools(server as any);
+
+        const payload = parseToolResult(
+          await server.handlers.get("analyze_impact")!({ projectRoot: root, files: ["src/core.ts"] }),
+        );
+
+        expect(payload.depthHistogram).toEqual({ 1: 1, 2: 1 });
+      },
+    );
+  });
+
   it("exposes gate_check with a PASS verdict for low-risk changes", async () => {
     await withTempProject(
       {
@@ -249,6 +269,27 @@ describe("registerTools", { timeout: 15000 }, () => {
         expect(payload.cycleCount).toBe(1);
         expect(payload.cycles).toEqual([["src/a.ts", "src/b.ts"]]);
         expect(payload.hotspots).toEqual(["src/a.ts", "src/b.ts"]);
+      },
+    );
+  });
+
+  it("exposes topHotFiles in refresh_graph output", async () => {
+    await withTempProject(
+      {
+        "src/hot.ts": "export const hot = 1;\n",
+        "src/a.ts": "import { hot } from './hot'; export const a = hot;\n",
+        "src/b.ts": "import { hot } from './hot'; export const b = hot;\n",
+      },
+      async (root) => {
+        const server = new FakeServer();
+        registerTools(server as any);
+
+        const payload = parseToolResult(
+          await server.handlers.get("refresh_graph")!({ projectRoot: root }),
+        );
+
+        expect(Array.isArray(payload.topHotFiles)).toBe(true);
+        expect(payload.topHotFiles[0]).toEqual({ file: "src/hot.ts", importers: 2 });
       },
     );
   });

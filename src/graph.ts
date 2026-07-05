@@ -56,6 +56,7 @@ export interface ImpactAnalysis {
   directlyAffected: string[];
   transitivelyAffected: string[];
   cascadeChain: string[][];
+  depthHistogram: Record<number, number>;
   riskScore: number;
 }
 
@@ -183,6 +184,7 @@ export function analyzeImpact(graph: DependencyGraph, changed: string | string[]
   const directDependenciesSet = new Set<string>();
   const allDependents = new Set<string>();
   const cascadeChain: string[][] = [];
+  const depthHistogram: Record<number, number> = {};
 
   for (const changedFile of changedFiles) {
     for (const dep of graph.nodes.get(changedFile)?.imports || []) {
@@ -201,6 +203,8 @@ export function analyzeImpact(graph: DependencyGraph, changed: string | string[]
       }
       allDependents.add(current.file);
       cascadeChain.push(current.chain);
+      const depth = current.chain.length - 1;
+      depthHistogram[depth] = (depthHistogram[depth] ?? 0) + 1;
       for (const next of graph.reverseDeps.get(current.file) || []) {
         if (!changedFilesSet.has(next) && !allDependents.has(next)) {
           queue.push({ file: next, chain: [...current.chain, next] });
@@ -226,6 +230,7 @@ export function analyzeImpact(graph: DependencyGraph, changed: string | string[]
     directlyAffected,
     transitivelyAffected,
     cascadeChain,
+    depthHistogram,
     riskScore,
   };
 }
@@ -302,6 +307,13 @@ export function summarizeCycles(cycles: string[][], maxExamples = 3): CycleDiagn
     hotspots,
     examples,
   };
+}
+
+export function topHotFiles(graph: DependencyGraph, limit = 20): Array<{ file: string; importers: number }> {
+  return [...graph.reverseDeps.entries()]
+    .map(([file, importers]) => ({ file, importers: importers.size }))
+    .sort((a, b) => b.importers - a.importers || a.file.localeCompare(b.file))
+    .slice(0, limit);
 }
 
 function collectSourceFiles(projectRoot: string): string[] {
