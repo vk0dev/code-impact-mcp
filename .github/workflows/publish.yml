@@ -85,13 +85,9 @@ jobs:
           echo "::warning::MCP Registry publish failed — may need manual 'mcp-publisher publish'"
         continue-on-error: true
 
-      - name: Publish to Smithery
-        run: |
-          npx -y @smithery/cli@latest mcp publish --name "${{ vars.SMITHERY_SERVER_NAME || 'vk0dev/code-impact-mcp' }}" || \
-          echo "::warning::Smithery publish failed — may need manual publish"
-        env:
-          SMITHERY_API_KEY: ${{ secrets.SMITHERY_API_KEY }}
-        continue-on-error: true
+      # Smithery listings for stdio npm servers are created once via smithery.ai
+      # (OAuth) and then track the repo; the CLI cannot publish npm/stdio servers.
+      # Post-release verify (last step) checks the listing via the registry API.
 
       - name: Deploy to MCPize
         run: |
@@ -122,3 +118,11 @@ jobs:
             https://inbox.vk0.dev/api/dashboard/refresh \
             || echo "::warning::dashboard refresh webhook failed (cron will catch up)"
         continue-on-error: true
+
+      # Post-release verification: fails the workflow if the release did not
+      # actually land on npm / Official MCP Registry / Pages. De-masks the
+      # continue-on-error publish steps above. Smithery is warn-only.
+      - name: Post-release verify
+        run: node scripts/post-release-verify.mjs "${GITHUB_REF_NAME#v}"
+        env:
+          SMITHERY_API_KEY: ${{ secrets.SMITHERY_API_KEY }}
