@@ -25,6 +25,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Version sync check (package.json / plugin.json / server.json / createServer.ts)
+        run: node scripts/version-sync.mjs --check
+
       - name: Lint (tsc --noEmit)
         run: npm run lint
 

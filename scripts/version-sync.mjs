@@ -2,7 +2,9 @@
 
 /**
  * Syncs a semver version across all 4 required locations.
- * Usage: node scripts/version-sync.mjs 1.2.3
+ * Usage:
+ *   node scripts/version-sync.mjs 1.2.3    — write version everywhere
+ *   node scripts/version-sync.mjs --check  — verify all 4 locations agree (CI gate, exit 1 on drift)
  * Uses only Node.js built-in modules.
  */
 
@@ -26,9 +28,61 @@ const version = process.argv[2];
 
 if (!version) {
   console.error(`${red('Error:')} version argument required.\n`);
-  console.error(`Usage: node scripts/version-sync.mjs <version>`);
+  console.error(`Usage: node scripts/version-sync.mjs <version> | --check`);
   console.error(`Example: node scripts/version-sync.mjs 1.2.3`);
   process.exit(1);
+}
+
+// ─── Check Mode (CI gate) ───────────────────────────────────────────────────
+// Reads the version from all 4 sync locations and exits 1 if they disagree.
+
+if (version === '--check') {
+  const found = [];
+  const readJSONVersion = (relPath, extract) => {
+    const p = path.join(ROOT, relPath);
+    if (!fs.existsSync(p)) return found.push([relPath, null]);
+    try {
+      found.push([relPath, extract(JSON.parse(fs.readFileSync(p, 'utf8')))]);
+    } catch (err) {
+      found.push([relPath, `unreadable: ${err.message}`]);
+    }
+  };
+  readJSONVersion('package.json', (d) => d.version);
+  readJSONVersion('.claude-plugin/plugin.json', (d) => d.version);
+  readJSONVersion('server.json', (d) => d.version);
+  {
+    const p = path.join(ROOT, 'server.json');
+    if (fs.existsSync(p)) {
+      try {
+        const d = JSON.parse(fs.readFileSync(p, 'utf8'));
+        found.push(['server.json packages[0]', d.packages?.[0]?.version ?? null]);
+      } catch {
+        // already reported as unreadable by the server.json entry above
+      }
+    }
+  }
+  const srcPath = path.join(ROOT, 'src/createServer.ts');
+  if (fs.existsSync(srcPath)) {
+    const m = fs.readFileSync(srcPath, 'utf8').match(/version:\s*['"]([^'"]+)['"]/);
+    found.push(['src/createServer.ts', m ? m[1] : null]);
+  } else {
+    found.push(['src/createServer.ts', null]);
+  }
+
+  const reference = found[0][1];
+  let drift = false;
+  console.log(`\n${bold('Version sync check')} ${dim(`(reference: package.json = ${reference})`)}\n`);
+  for (const [loc, v] of found) {
+    const ok = v === reference && v != null;
+    if (!ok) drift = true;
+    console.log(`  ${ok ? green('✔') : red('✘')} ${loc}: ${v ?? red('missing')}`);
+  }
+  if (drift) {
+    console.error(`\n${red('Version drift detected.')} Run: node scripts/version-sync.mjs ${reference}\n`);
+    process.exit(1);
+  }
+  console.log(`\n${green('All locations in sync.')}\n`);
+  process.exit(0);
 }
 
 // Semver validation (basic: major.minor.patch with optional pre-release and build metadata)
@@ -47,7 +101,7 @@ console.log(`\n${bold('Version sync:')} ${green(version)}\n`);
 let updated = 0;
 let errors = 0;
 
-function updateJSON(relPath, updater, label) {
+function updateJSON(relPath, updater) {
   const fullPath = path.join(ROOT, relPath);
   if (!fs.existsSync(fullPath)) {
     console.error(`  ${red('✘')} ${relPath} — ${red('file not found')}`);
@@ -75,13 +129,13 @@ function updateJSON(relPath, updater, label) {
 
 updateJSON('package.json', (data) => {
   data.version = version;
-}, 'package.json');
+});
 
 // ─── 2. .claude-plugin/plugin.json ──────────────────────────────────────────
 
 updateJSON('.claude-plugin/plugin.json', (data) => {
   data.version = version;
-}, 'plugin.json');
+});
 
 // ─── 3. server.json ─────────────────────────────────────────────────────────
 
@@ -90,7 +144,7 @@ updateJSON('server.json', (data) => {
   if (data.packages && Array.isArray(data.packages) && data.packages.length > 0) {
     data.packages[0].version = version;
   }
-}, 'server.json');
+});
 
 // ─── 4. src/createServer.ts ─────────────────────────────────────────────────
 
