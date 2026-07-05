@@ -124,6 +124,8 @@ Return compact strongly connected components for circular dependencies in the cu
 
 Analyze the blast radius of changing specific files. Returns which files would be directly and transitively affected, with a risk score (0-1). Use BEFORE committing multi-file changes to understand what might break. Does NOT modify any files.
 
+Also returns `depthHistogram`, a count of affected files per BFS depth level from the changed file (e.g. `{ "1": 5, "2": 12 }`), so you can see whether the impact is concentrated close to the change or spread across many hops.
+
 ![analyze_impact demo](docs/demo-blast-radius.gif)
 
 ### `get_dependencies`
@@ -135,6 +137,8 @@ Get the import and importedBy relationships for a specific file. Shows what this
 ### `refresh_graph`
 
 Rebuild the dependency graph from scratch. Call this after significant file additions/deletions, or if results seem stale. Returns graph statistics including file count, edge count, build time, and circular dependencies detected.
+
+Also returns `topHotFiles`, the top 20 most-imported files across the whole graph ranked by importer count (e.g. `{ "file": "src/shared/config.ts", "importers": 14 }`), so you can spot structural hotspots without running `get_dependencies` on every file.
 
 ![refresh_graph demo: rebuild the local graph and return fresh file, edge, and cycle counts](docs/demo-refresh-graph.gif)
 
