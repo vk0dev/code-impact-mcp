@@ -81,11 +81,15 @@ describe("release-check contract", () => {
     expect(manifestToolNames).toContain("detect_cycles");
   });
 
-  it("keeps Smithery publish workflow pinned to the canonical server identity", () => {
+  it("verifies releases via post-release-verify instead of the dead Smithery CLI publish", () => {
     const workflow = readFileSync(path.join(repoRoot, ".github", "workflows", "publish.yml"), "utf8");
 
-    expect(workflow).toContain("vars.SMITHERY_SERVER_NAME || 'vk0dev/code-impact-mcp'");
-    expect(workflow).not.toContain("unfucker/code-impact-mcp");
+    // `smithery mcp publish` cannot publish stdio npm servers (needs URL/.mcpb);
+    // the listing lives at unfucker/code-impact-mcp and is checked by the
+    // post-release verify step via the Smithery registry API.
+    expect(workflow).not.toContain("smithery mcp publish");
+    expect(workflow).toContain("Post-release verify");
+    expect(workflow).toContain("post-release-verify.mjs");
   });
 
   it(
