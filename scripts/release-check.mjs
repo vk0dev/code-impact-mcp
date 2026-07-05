@@ -211,6 +211,12 @@ if (!pkgVersion) {
     if (pkgVer !== undefined) {
       check(pkgVer === pkgVersion, 'server.json packages[0].version matches', `got "${pkgVer}"`);
     }
+    // Official MCP Registry hard limit — publish fails with HTTP 422 above 100
+    check(
+      typeof serverJson.description === 'string' && serverJson.description.length <= 100,
+      'server.json description <= 100 chars (Official MCP Registry 422 limit)',
+      `current: ${serverJson.description?.length ?? 'missing'} chars`,
+    );
   } else {
     check(false, 'server.json version matches', 'file not found');
   }
