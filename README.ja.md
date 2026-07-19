@@ -8,7 +8,7 @@
 
 [English](./README.md) | [中文](./README.zh-CN.md) | [Русский](./README.ru.md) | [Español](./README.es.md)
 
-> Listing status: `awesome-mcp-servers` 向けの payload は準備済みで、Official MCP Registry 向け package metadata は `server.json` 経由ですでに live、Glama の listing も [`https://glama.ai/mcp/servers/vk0dev-code-impact-mcp`](https://glama.ai/mcp/servers/vk0dev-code-impact-mcp) で再び live です。PR [`punkpeye/awesome-mcp-servers#5907`](https://github.com/punkpeye/awesome-mcp-servers/pull/5907) はすでに存在するため重複させるべきではなく、MCP Hive は現在 live と主張している listing ではなく manual submit-next の operator step のままです。この README では、Glama がすでに badge-ready であるとか、awesome-listing が最終確定したとは主張しません。
+> Listing status: 本日時点で verified-live な distribution は Official MCP Registry（package metadata は `server.json` 経由で live）と Smithery です。Glama の listing も [`https://glama.ai/mcp/servers/vk0dev-code-impact-mcp`](https://glama.ai/mcp/servers/vk0dev-code-impact-mcp) で live ですが、public な badge-ready path はまだ unresolved のため、PR [`punkpeye/awesome-mcp-servers#5907`](https://github.com/punkpeye/awesome-mcp-servers/pull/5907) はすでに存在し、重複させるべきではなく、まだ安定した badge URL で finalize できません。Cline marketplace の entry（[`cline/mcp-marketplace#1486`](https://github.com/cline/mcp-marketplace/issues/1486)）は open で、まだ accepted されていません。MCP Hive は現在 claimed live な listing ではなく、manual submit-next の operator step のままであり、この README は badge-ready または finalized な awesome-listing 状態を主張しません。
 
 ## Best for
 

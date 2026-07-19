@@ -8,7 +8,7 @@
 
 [日本語](./README.ja.md) | [中文](./README.zh-CN.md) | [English](./README.md) | [Español](./README.es.md)
 
-> Статус листингов: payload для `awesome-mcp-servers` подготовлен, metadata пакета для Official MCP Registry уже live через `server.json`, а листинг Glama снова live по адресу [`https://glama.ai/mcp/servers/vk0dev-code-impact-mcp`](https://glama.ai/mcp/servers/vk0dev-code-impact-mcp). PR [`punkpeye/awesome-mcp-servers#5907`](https://github.com/punkpeye/awesome-mcp-servers/pull/5907) уже существует и не должен дублироваться, а MCP Hive остаётся manual submit-next operator step, а не текущим claimed live listing. Этот README не утверждает, что Glama уже badge-ready или что awesome-listing уже финализирован.
+> Статус листингов: проверенная live-дистрибуция на сегодня — Official MCP Registry (metadata пакета live через `server.json`) и Smithery; листинг Glama также live по адресу [`https://glama.ai/mcp/servers/vk0dev-code-impact-mcp`](https://glama.ai/mcp/servers/vk0dev-code-impact-mcp), хотя его публичный badge-ready путь всё ещё не разрешён, поэтому PR [`punkpeye/awesome-mcp-servers#5907`](https://github.com/punkpeye/awesome-mcp-servers/pull/5907) уже существует, не должен дублироваться и пока не может быть финализирован со стабильным badge URL. Запись в маркетплейсе Cline ([`cline/mcp-marketplace#1486`](https://github.com/cline/mcp-marketplace/issues/1486)) открыта и ещё не принята; MCP Hive остаётся manual submit-next operator step, а не текущим claimed live listing; и этот README не утверждает, что достигнуто badge-ready или финализированное awesome-listing состояние.
 
 ## Best for
 

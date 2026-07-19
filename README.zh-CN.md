@@ -8,7 +8,7 @@
 
 [English](./README.md) | [日本語](./README.ja.md) | [Русский](./README.ru.md) | [Español](./README.es.md)
 
-> Listing status：`awesome-mcp-servers` 的提交内容已经准备好，Official MCP Registry 的 package metadata 已经通过 `server.json` 处于 live 状态，Glama listing 也已在 [`https://glama.ai/mcp/servers/vk0dev-code-impact-mcp`](https://glama.ai/mcp/servers/vk0dev-code-impact-mcp) 恢复为 live。PR [`punkpeye/awesome-mcp-servers#5907`](https://github.com/punkpeye/awesome-mcp-servers/pull/5907) 已经存在，不应重复提交；MCP Hive 目前仍然只是 manual submit-next 的 operator step，不是当前已声明 live 的 listing。这个 README 不会声称 Glama 已经 badge-ready，也不会声称 awesome-listing 已经最终完成。
+> Listing status：截至今天，verified-live 的 distribution 是 Official MCP Registry（package metadata 已通过 `server.json` 处于 live 状态）和 Smithery；Glama 的 listing 也在 [`https://glama.ai/mcp/servers/vk0dev-code-impact-mcp`](https://glama.ai/mcp/servers/vk0dev-code-impact-mcp) 处于 live 状态，不过其 public 的 badge-ready path 仍未 resolved，因此 PR [`punkpeye/awesome-mcp-servers#5907`](https://github.com/punkpeye/awesome-mcp-servers/pull/5907) 已经存在，不应重复提交，也还不能以稳定的 badge URL finalize。Cline marketplace 的 entry（[`cline/mcp-marketplace#1486`](https://github.com/cline/mcp-marketplace/issues/1486)）处于 open 状态，尚未被 accepted；MCP Hive 仍然只是 manual submit-next 的 operator step，而不是当前已声明 live 的 listing；本 README 不会声称已经达到 badge-ready 或 awesome-listing 已经 finalized 的状态。
 
 ## Best for
 
