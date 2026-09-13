@@ -27,6 +27,9 @@ jobs:
         run: |
           echo "PACKAGE_VERSION=$(node -p 'require(\"./package.json\").version')" >> "$GITHUB_ENV"
 
+      - name: Update npm for OIDC trusted publishing
+        run: npm install -g npm@11
+
       - name: Install dependencies
         run: npm ci
 
@@ -45,15 +48,10 @@ jobs:
       # NB: the `secrets` context is not allowed in step `if:` expressions —
       # GitHub rejects the whole workflow file (run #27, zero jobs). Gate the
       # lanes on the job-level env mirror of the secret instead.
-      - name: Publish to npm with provenance via token
-        if: ${{ env.NPM_TOKEN != '' }}
-        run: npm publish --access public --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
-
+      # 2026-09-13: token path removed — npm restricted bypass-2FA tokens;
+      # auth comes from OIDC Trusted Publishing (configured on npmjs).
       - name: Publish to npm with trusted publishing
-        if: ${{ env.NPM_TOKEN == '' }}
-        run: npm publish --access public --provenance
+        run: npm publish --access public
 
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/')
